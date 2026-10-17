@@ -10,7 +10,7 @@
 
   // --- Initial Preset Data ---
   let syncing = false, syncPending = false, syncTimer = null, remoteSyncing = false, selfSaving = false, applyingRemote = false;
-  const SYNC_KEYS = ['hero_slides', 'hero_config', 'menu_items', 'categories', 'settings'];
+  const SYNC_KEYS = ['hero_slides', 'hero_config', 'menu_items', 'categories', 'settings', 'branches'];
   const DEFAULT_SETTINGS = {
     storeName: 'LFC',
     fullName: 'Lahore Fried Chicken (LFC)',
@@ -198,35 +198,19 @@
   const DEFAULT_BRANCHES = [
     {
       id: 1,
-      name: 'Gulberg III (Main MM Alam)',
-      address: 'Shop 4, Block K, Near Mini Market & MM Alam Road, Gulberg III, Lahore',
+      name: 'LFC - (Manawan): Ram Pura',
+      address: '(Manawan): Ram Pura Near Masjid Yousafia Manawan Lahore',
       phone: '0322-4940181',
-      timings: '12:00 PM - 02:30 AM',
-      mapUrl: 'https://maps.google.com/?q=Gulberg+Lahore'
+      timings: '3:00 PM to 3:00 AM',
+      mapUrl: 'https://maps.google.com/?q=Ram+Pura+Near+Masjid+Yousafia+Manawan+Lahore'
     },
     {
       id: 2,
-      name: 'DHA Phase 5 Commercial',
-      address: 'Plaza 18-C, Sector CCA, Phase 5 DHA, Lahore',
-      phone: '0322-4940181',
-      timings: '01:00 PM - 03:00 AM',
-      mapUrl: 'https://maps.google.com/?q=DHA+Phase+5+Lahore'
-    },
-    {
-      id: 3,
-      name: 'Johar Town (G1 Market)',
-      address: 'Main Boulevard, Opposite Doctors Hospital, Johar Town, Lahore',
-      phone: '0322-4940181',
-      timings: '12:00 PM - 02:00 AM',
-      mapUrl: 'https://maps.google.com/?q=Johar+Town+Lahore'
-    },
-    {
-      id: 4,
-      name: 'Mall Road Heritage',
-      address: 'Shahrah-e-Quaid-e-Azam, Near Regal Chowk, Mall Road, Lahore',
-      phone: '0322-4940181',
-      timings: '11:30 AM - 01:30 AM',
-      mapUrl: 'https://maps.google.com/?q=Mall+Road+Lahore'
+      name: 'LFC - Daroghawala Mehmood Booti Station, Lahore',
+      address: 'Mehmood Boti Metro train station, 31B Grand Trunk Rd, Daroghawala, Lahore, 54920, Pakistan',
+      phone: '03223393333',
+      timings: '3:00 PM to 3:00 AM',
+      mapUrl: 'https://maps.google.com/?q=Mehmood+Boti+Metro+train+station,+31B+Grand+Trunk+Rd,+Daroghawala,+Lahore,+54920,+Pakistan'
     }
   ];
 
@@ -401,6 +385,13 @@
           ...s,
           image: s.image && !s.image.includes('src/assets') ? s.image : (idx === 1 ? './images/hero-2.jpg' : idx === 2 ? './images/hero-3.jpg' : idx === 3 ? './images/hero-4.jpg' : './images/hero-1.jpg')
         }));
+      }
+      if (key === 'branches' && Array.isArray(parsed)) {
+        const oldDefaults = ['Gulberg III (Main MM Alam)', 'DHA Phase 5 Commercial', 'Johar Town (G1 Market)', 'Mall Road Heritage'];
+        if (parsed.length === oldDefaults.length && parsed.every((branch) => oldDefaults.includes(branch.name))) {
+          localStorage.setItem('lfc_branches', JSON.stringify(fallback));
+          return fallback;
+        }
       }
       return parsed;
     } catch (e) {
@@ -1742,7 +1733,7 @@
       selfSaving = false;
       const updatedAt = Date.now();
       const slim = menuItems.map((m) => ({ ...m, image: m.image && m.image.startsWith('data:image/svg') ? '' : m.image }));
-      await apiPost({ action: 'save', data: { updatedAt, heroSlides, heroConfig, categories, menuItems: slim, logoUrl: settings.logoUrl } });
+      await apiPost({ action: 'save', data: { updatedAt, heroSlides, heroConfig, categories, menuItems: slim, logoUrl: settings.logoUrl, branches } });
       localStorage.setItem('lfc_remote_stamp', String(updatedAt));
       setSyncStatus('✅ Synced to all devices · ' + new Date().toLocaleTimeString());
       if (manual) showToast('Synced to all devices!');
@@ -1774,6 +1765,7 @@
       if (Array.isArray(d.heroSlides)) { heroSlides = d.heroSlides; saveData('hero_slides', heroSlides); }
       if (d.heroConfig) { heroConfig = d.heroConfig; saveData('hero_config', heroConfig); }
       if (Array.isArray(d.categories)) { categories = d.categories; saveData('categories', categories); }
+      if (Array.isArray(d.branches)) { branches = d.branches; saveData('branches', branches); }
       if (Array.isArray(d.menuItems)) {
         menuItems = d.menuItems.map((m) => (!m.image || m.image.startsWith('data:image/svg') ? { ...m, image: menuArt(m.art || '🍽️') } : m));
         saveData('menu_items', menuItems);
@@ -1782,7 +1774,7 @@
       applyingRemote = false;
       try { localStorage.setItem('lfc_menu_version', MENU_VERSION); localStorage.setItem('lfc_remote_stamp', String(d.updatedAt)); } catch (e) {}
       activeCategory = 'all';
-      updateBrandLogos(); renderHeroSlide(0); startHeroTimer(); renderCategories(); renderMenu();
+      updateBrandLogos(); renderHeroSlide(0); startHeroTimer(); renderCategories(); renderMenu(); renderBranches();
     } catch (e) {
       applyingRemote = false;
       console.warn('Shared site sync failed:', e);
