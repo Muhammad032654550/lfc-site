@@ -1798,7 +1798,35 @@
     if (u && h) u.value = h.value.startsWith('data:') ? '' : h.value;
   }
   function editItemPhoto(input) {
-    handlePhotoUpload(input, '', (b64) => { document.getElementById('edit-item-image').value = b64; refreshEditImage(); showToast('Photo changed — press Save Changes'); return false; }, { maxDim: 900, quality: 0.82 });
+    const itemId = Number((document.getElementById('edit-item-id') || {}).value);
+    handlePhotoUpload(input, '', (b64) => {
+      const imageField = document.getElementById('edit-item-image');
+      if (!adminKey()) {
+        if (imageField) imageField.value = b64;
+        refreshEditImage();
+        showToast('Photo selected. Enter your publishing key, then click Save Changes.', 'error');
+        return false;
+      }
+
+      setSyncStatus('⏳ Uploading menu photo to shared storage…');
+      apiPost({ action: 'upload', dataUri: b64 })
+        .then((result) => {
+          const currentId = Number((document.getElementById('edit-item-id') || {}).value);
+          if (!result.url) throw new Error('Image upload returned no URL');
+          if (currentId !== itemId || !imageField) {
+            throw new Error('Photo uploaded, but the menu editor changed. Reopen this item and upload the photo again.');
+          }
+          imageField.value = result.url;
+          refreshEditImage();
+          setSyncStatus('✅ Photo uploaded. Click Save Changes to apply it to this menu item.');
+          showToast('Photo uploaded to shared storage. Click Save Changes.');
+        })
+        .catch((error) => {
+          setSyncStatus('❌ Photo upload failed: ' + error.message);
+          showToast('Photo upload failed: ' + error.message, 'error');
+        });
+      return false;
+    }, { maxDim: 900, quality: 0.82 });
   }
   function editItemUseArt() {
     const it = menuItems.find((m) => m.id === Number((document.getElementById('edit-item-id') || {}).value));
