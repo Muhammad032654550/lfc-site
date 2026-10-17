@@ -1,0 +1,12 @@
+node_modules/
+build/
+dist/
+_site/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+
+# Local Netlify folder
+.netlify

@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+# Block source/build folders from search crawlers (not part of the live site)
+Disallow: /src/
+Disallow: /node_modules/

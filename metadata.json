@@ -1,0 +1,6 @@
+{
+  "name": "Lahore Fried Chicken (LFC) - Taste the Legend",
+  "description": "Lahore's premier crispy fried chicken, burgers, wraps, and loaded pizzas with instant WhatsApp ordering and comprehensive admin control suite.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
