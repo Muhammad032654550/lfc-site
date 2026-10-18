@@ -10,7 +10,7 @@
 
   // --- Initial Preset Data ---
   let syncing = false, syncPending = false, syncTimer = null, remoteSyncing = false, selfSaving = false, applyingRemote = false;
-  const SYNC_KEYS = ['hero_slides', 'hero_config', 'menu_items', 'categories', 'settings', 'branches'];
+  const SYNC_KEYS = ['hero_slides', 'hero_config', 'menu_items', 'categories', 'settings', 'branches', 'deals'];
   const DEFAULT_SETTINGS = {
     storeName: 'LFC',
     fullName: 'Lahore Fried Chicken (LFC)',
@@ -44,6 +44,13 @@
     { code: 'CRUNCH20', type: 'percent', discount: 20, minOrder: 1500, active: true, desc: '20% OFF on orders above Rs. 1,500' },
     { code: 'WELCOME50', type: 'flat', discount: 50, minOrder: 500, active: true, desc: 'Rs. 50 OFF on first order' },
     { code: 'TRIVOX', type: 'flat', discount: 200, minOrder: 1200, active: true, desc: 'Rs. 200 Special Partner Discount' }
+  ];
+
+  const DEFAULT_DEALS = [
+    { id: 1, title: 'Family Feast Mega Box', description: '4 Crispy Zinger Burgers, 4 Pcs Golden Fried Chicken, 1 Jumbo Fries, 2 Paratha Rolls, and 1.5L Chilled Soft Drink.', type: 'standard', price: 2890, originalPrice: 3850, badge: 'Save 25%', image: './images/hero-1.jpg', active: true, startsAt: '', endsAt: '' },
+    { id: 2, title: 'Couple Crunch Deal', description: '2 Zinger Burgers, 2 Pcs Crunchy Fried Chicken, 1 Large Fries, and 2 Soft Drink cans (250ml).', type: 'standard', price: 1450, originalPrice: 1850, badge: 'Duo Pack', image: './images/hero-4.jpg', active: true, startsAt: '', endsAt: '' },
+    { id: 3, title: 'Pizza & Chicken Platter', description: '1 Medium Cheesy Loaded Pizza + 5 Pcs Hot Tender Strips + 2 Garlic Dips + 2 Chilled Soft Drinks.', type: 'standard', price: 1690, originalPrice: 2100, badge: 'Hot Special', image: './images/hero-3.jpg', active: true, startsAt: '', endsAt: '' },
+    { id: 4, title: 'Pizza Buy 1 Get 1 Free', description: 'Choose any two available pizzas and sizes. The higher-priced pizza is charged; the other pizza is free.', type: 'bogo', price: 0, originalPrice: 0, badge: 'Buy 1 Get 1 Free', image: './images/hero-3.jpg', active: true, startsAt: '', endsAt: '' }
   ];
 
   const DEFAULT_CATEGORIES = [
@@ -353,6 +360,57 @@
   ];
 
   // --- LocalStorage Persistence with Defaults Merging ---
+  function escapeHtml(value) {
+    return String(value == null ? '' : value).replace(/[&<>"']/g, (char) => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#39;'
+    }[char]));
+  }
+
+  function safeDealImage(value) {
+    const image = String(value || '').trim();
+    return /^(?:(?:https?:\/\/|\.{0,2}\/|\/).+|data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+)$/i.test(image) ? image : './images/hero-1.jpg';
+  }
+
+  function isDealAvailable(deal) {
+    if (!deal || deal.active === false) return false;
+    const now = Date.now();
+    const startsAt = deal.startsAt ? new Date(deal.startsAt).getTime() : NaN;
+    const endsAt = deal.endsAt ? new Date(deal.endsAt).getTime() : NaN;
+    return (!Number.isFinite(startsAt) || now >= startsAt) && (!Number.isFinite(endsAt) || now <= endsAt);
+  }
+
+  function normalizeDeals(value) {
+    if (!Array.isArray(value)) return JSON.parse(JSON.stringify(DEFAULT_DEALS));
+    const usedIds = new Set();
+    return value.filter((deal) => deal && typeof deal === 'object').map((deal, idx) => {
+      let id = Number.isSafeInteger(Number(deal.id)) ? Number(deal.id) : Date.now() + idx;
+      while (usedIds.has(id)) id += 1;
+      usedIds.add(id);
+      const normalizeDate = (dateValue) => {
+        if (typeof dateValue !== 'string' || !dateValue) return '';
+        const date = new Date(dateValue);
+        return Number.isNaN(date.getTime()) ? '' : date.toISOString();
+      };
+      return {
+        id,
+        title: String(deal.title || 'Special Deal'),
+        description: String(deal.description || ''),
+        type: deal.type === 'bogo' ? 'bogo' : 'standard',
+        price: Number(deal.price) || 0,
+        originalPrice: Number(deal.originalPrice) || 0,
+        badge: String(deal.badge || ''),
+        image: safeDealImage(deal.image),
+        startsAt: normalizeDate(deal.startsAt),
+        endsAt: normalizeDate(deal.endsAt),
+        active: deal.active !== false
+      };
+    });
+  }
+
   function loadData(key, fallback) {
     try {
       const saved = localStorage.getItem('lfc_' + key);
@@ -431,6 +489,7 @@
   let reviews = loadData('reviews', DEFAULT_REVIEWS);
   let zones = loadData('zones', DEFAULT_ZONES);
   let promos = loadData('promos', DEFAULT_PROMOS);
+  let deals = normalizeDeals(loadData('deals', DEFAULT_DEALS));
   let orders = loadData('orders', DEFAULT_ORDERS);
   let cart = loadData('cart', []);
   let orderType = loadData('order_type', 'delivery'); // 'delivery' | 'pickup' | 'dinein'
@@ -487,6 +546,9 @@
   let customSelectedSpice = null;
   let customSelectedAddons = [];
   let customQty = 1;
+  let activeBogoDeal = null;
+  let bogoPizzaIds = [];
+  let bogoSizeIndexes = [0, 0];
 
   // --- Toast Notification ---
   function showToast(message, type = 'success') {
@@ -797,6 +859,192 @@
     if (item) openCustomizeModal(item.id);
   }
 
+  function orderMenuItemById(id) {
+    const item = menuItems.find((entry) => entry.id === id);
+    if (!item) return;
+    const hasBogoBadge = item.cat === 'pizzas' && String(item.badge || '').toLowerCase().includes('buy 1 get 1 free');
+    const bogoDeal = hasBogoBadge ? deals.find((deal) => deal.type === 'bogo' && isDealAvailable(deal)) : null;
+    if (bogoDeal) {
+      openBogoDealModal(bogoDeal.id, item.id);
+      return;
+    }
+    openCustomizeModal(item.id);
+  }
+
+  function orderDealById(id) {
+    const deal = deals.find((entry) => entry.id === Number(id) && isDealAvailable(entry));
+    if (!deal) {
+      showToast('This deal is no longer available', 'error');
+      return;
+    }
+    if (deal.type === 'bogo') {
+      openBogoDealModal(deal.id);
+      return;
+    }
+    const price = Number(deal.price);
+    if (!Number.isFinite(price) || price <= 0) {
+      showToast('This deal price is not set up yet', 'error');
+      return;
+    }
+    cart.push({
+      id: `deal_${deal.id}_${Date.now()}`,
+      dealId: deal.id,
+      name: deal.title,
+      price,
+      image: safeDealImage(deal.image),
+      selectedSize: null,
+      selectedSpice: null,
+      selectedAddons: [],
+      specialNotes: deal.description || '',
+      qty: 1
+    });
+    saveData('cart', cart);
+    updateCartUI();
+    showToast(`${deal.title} added to your order!`);
+    animateCartButton();
+  }
+
+  function getBogoPizzas() {
+    return menuItems.filter((item) => item.cat === 'pizzas' && item.inStock !== false);
+  }
+
+  function getBogoSizes(item) {
+    return item.sizes && item.sizes.length ? item.sizes : [{ name: 'Regular', price: 0 }];
+  }
+
+  function openBogoDealModal(dealId, preferredPizzaId) {
+    const deal = deals.find((entry) => entry.id === Number(dealId) && isDealAvailable(entry));
+    const pizzas = getBogoPizzas();
+    if (!deal || pizzas.length < 2) {
+      showToast(pizzas.length < 2 ? 'At least two available pizzas are needed for this deal' : 'This deal is no longer available', 'error');
+      return;
+    }
+    activeBogoDeal = deal;
+    const preferredPizza = pizzas.find((pizza) => String(pizza.id) === String(preferredPizzaId));
+    const secondPizza = pizzas.find((pizza) => !preferredPizza || String(pizza.id) !== String(preferredPizza.id));
+    bogoPizzaIds = preferredPizza
+      ? [String(preferredPizza.id), String((secondPizza || pizzas[1]).id)]
+      : [String(pizzas[0].id), String(pizzas[1].id)];
+    bogoSizeIndexes = [0, 0];
+
+    const title = document.getElementById('bogo-deal-title');
+    const description = document.getElementById('bogo-deal-description');
+    if (title) title.textContent = deal.title;
+    if (description) description.textContent = deal.description || '';
+    [1, 2].forEach((slot) => {
+      const select = document.getElementById(`bogo-pizza-${slot}`);
+      if (select) {
+        select.innerHTML = pizzas.map((pizza) =>
+          `<option value="${escapeHtml(pizza.id)}">${escapeHtml(pizza.name)} — from Rs. ${Number(pizza.price).toLocaleString()}</option>`
+        ).join('');
+        select.value = bogoPizzaIds[slot - 1];
+      }
+      renderBogoSizes(slot);
+    });
+    updateBogoDealTotal();
+    const modal = document.getElementById('bogo-deal-modal');
+    if (modal) modal.classList.remove('hidden');
+    document.body.classList.add('overflow-hidden');
+  }
+
+  function renderBogoSizes(slot) {
+    const item = menuItems.find((pizza) => String(pizza.id) === bogoPizzaIds[slot - 1]);
+    const select = document.getElementById(`bogo-size-${slot}`);
+    if (!item || !select) return;
+    const sizes = getBogoSizes(item);
+    const selectedIndex = Math.min(bogoSizeIndexes[slot - 1] || 0, sizes.length - 1);
+    bogoSizeIndexes[slot - 1] = selectedIndex;
+    select.innerHTML = sizes.map((size, index) => {
+      const total = (Number(item.price) || 0) + (Number(size.price) || 0);
+      return `<option value="${index}">${escapeHtml(size.name)} — Rs. ${total.toLocaleString()}</option>`;
+    }).join('');
+    select.value = String(selectedIndex);
+  }
+
+  function setBogoPizza(slot, id) {
+    if (slot !== 1 && slot !== 2) return;
+    const item = getBogoPizzas().find((pizza) => String(pizza.id) === String(id));
+    if (!item) return;
+    bogoPizzaIds[slot - 1] = String(item.id);
+    bogoSizeIndexes[slot - 1] = 0;
+    renderBogoSizes(slot);
+    updateBogoDealTotal();
+  }
+
+  function setBogoSize(slot, index) {
+    if (slot !== 1 && slot !== 2) return;
+    const item = menuItems.find((pizza) => String(pizza.id) === bogoPizzaIds[slot - 1]);
+    if (!item) return;
+    const sizeIndex = Number(index);
+    if (!Number.isInteger(sizeIndex) || !getBogoSizes(item)[sizeIndex]) return;
+    bogoSizeIndexes[slot - 1] = sizeIndex;
+    updateBogoDealTotal();
+  }
+
+  function getBogoChoice(slot) {
+    const item = getBogoPizzas().find((pizza) => String(pizza.id) === bogoPizzaIds[slot - 1]);
+    if (!item) return null;
+    const size = getBogoSizes(item)[bogoSizeIndexes[slot - 1] || 0];
+    if (!size) return null;
+    return { item, size, price: (Number(item.price) || 0) + (Number(size.price) || 0) };
+  }
+
+  function updateBogoDealTotal() {
+    const first = getBogoChoice(1);
+    const second = getBogoChoice(2);
+    const total = document.getElementById('bogo-deal-total');
+    const button = document.getElementById('bogo-add-button');
+    if (!first || !second) {
+      if (total) total.textContent = 'Select two pizzas to see your total.';
+      if (button) button.disabled = true;
+      return;
+    }
+    const paid = first.price >= second.price ? first : second;
+    const free = first.price >= second.price ? second : first;
+    if (total) total.textContent = `Pay Rs. ${paid.price.toLocaleString()} · ${free.item.name} is FREE (save Rs. ${free.price.toLocaleString()})`;
+    if (button) button.disabled = false;
+  }
+
+  function addBogoDealToCart() {
+    if (!activeBogoDeal || !deals.some((deal) => deal.id === activeBogoDeal.id && isDealAvailable(deal))) {
+      showToast('This deal is no longer available', 'error');
+      closeBogoDealModal();
+      return;
+    }
+    const first = getBogoChoice(1);
+    const second = getBogoChoice(2);
+    if (!first || !second) {
+      showToast('Please choose two available pizzas', 'error');
+      return;
+    }
+    const paid = first.price >= second.price ? first : second;
+    const free = first.price >= second.price ? second : first;
+    cart.push({
+      id: `bogo_${activeBogoDeal.id}_${Date.now()}`,
+      dealId: activeBogoDeal.id,
+      name: `${activeBogoDeal.title}: ${paid.item.name} (${paid.size.name}) + FREE ${free.item.name} (${free.size.name})`,
+      price: paid.price,
+      image: paid.item.image,
+      selectedSize: null,
+      selectedSpice: null,
+      selectedAddons: [],
+      specialNotes: '',
+      qty: 1
+    });
+    saveData('cart', cart);
+    updateCartUI();
+    closeBogoDealModal();
+    showToast('Your B1G1 pizza deal was added to the order!');
+    animateCartButton();
+  }
+
+  function closeBogoDealModal() {
+    const modal = document.getElementById('bogo-deal-modal');
+    if (modal) modal.classList.add('hidden');
+    activeBogoDeal = null;
+    document.body.classList.remove('overflow-hidden');
+  }
+
   function animateCartButton() {
     const btns = document.querySelectorAll('.cart-btn-trigger');
     btns.forEach((btn) => {
@@ -885,19 +1133,19 @@
       if (itemsList) {
         itemsList.innerHTML = cart
           .map((i) => {
-            const sizeTag = i.selectedSize && i.selectedSize.name ? i.selectedSize.name : '';
-            const spiceTag = i.selectedSpice ? i.selectedSpice : '';
+            const sizeTag = i.selectedSize && i.selectedSize.name ? escapeHtml(i.selectedSize.name) : '';
+            const spiceTag = i.selectedSpice ? escapeHtml(i.selectedSpice) : '';
             const addonsText =
               i.selectedAddons && i.selectedAddons.length
-                ? '+ ' + i.selectedAddons.map((a) => a.name).join(', ')
+                ? '+ ' + i.selectedAddons.map((a) => escapeHtml(a.name)).join(', ')
                 : '';
-            const noteTag = i.specialNotes ? `Note: "${i.specialNotes}"` : '';
+            const noteTag = i.specialNotes ? `Note: "${escapeHtml(i.specialNotes)}"` : '';
 
             return `
             <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-white border border-amber-200/90 shadow-sm hover:border-amber-400 transition">
-              <img src="${i.image}" alt="${i.name}" loading="lazy" decoding="async" class="w-14 h-14 rounded-xl object-cover bg-amber-50 flex-shrink-0 border border-amber-200" onerror="this.onerror=null; this.src='./images/hero-1.jpg';"/>
+              <img src="${escapeHtml(i.image)}" alt="${escapeHtml(i.name)}" loading="lazy" decoding="async" class="w-14 h-14 rounded-xl object-cover bg-amber-50 flex-shrink-0 border border-amber-200" onerror="this.onerror=null; this.src='./images/hero-1.jpg';"/>
               <div class="flex-1 min-w-0">
-                <h4 class="font-black text-xs sm:text-sm text-gray-900 truncate font-heading">${i.name}</h4>
+                <h4 class="font-black text-xs sm:text-sm text-gray-900 truncate font-heading">${escapeHtml(i.name)}</h4>
                 <div class="text-[11px] text-amber-700 font-black mt-0.5">Rs. ${(i.price * i.qty).toLocaleString()}</div>
                 
                 <!-- Multi-Options Details -->
@@ -1195,6 +1443,49 @@
       .join('');
   }
 
+  function renderDeals() {
+    const grid = document.getElementById('deals-grid');
+    if (!grid) return;
+    const activeDeals = deals.filter(isDealAvailable);
+    if (!activeDeals.length) {
+      grid.innerHTML = '<div class="md:col-span-2 xl:col-span-4 text-center p-8 rounded-3xl bg-white/80 border border-amber-200 text-gray-600">No active deals right now. Please check back soon!</div>';
+      return;
+    }
+
+    grid.innerHTML = activeDeals.map((deal) => {
+      const isBogo = deal.type === 'bogo';
+      const badge = escapeHtml(deal.badge || (isBogo ? 'Buy 1 Get 1 Free' : 'Special Deal'));
+      const title = escapeHtml(deal.title);
+      const description = escapeHtml(deal.description);
+      const image = escapeHtml(safeDealImage(deal.image));
+      const oldPrice = !isBogo && Number(deal.originalPrice) > Number(deal.price)
+        ? `<span class="text-[10px] sm:text-xs text-gray-500 line-through font-bold">Rs. ${Number(deal.originalPrice).toLocaleString()}</span>`
+        : '';
+      const price = isBogo
+        ? '<div class="text-amber-700 font-black text-sm sm:text-base">Choose any 2 pizzas</div><div class="text-[10px] text-gray-500">Pay for the higher-priced one</div>'
+        : `<div class="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 font-black text-xl sm:text-2xl font-heading">Rs. ${Number(deal.price).toLocaleString()}</div>`;
+      const buttonLabel = isBogo ? 'Choose Pizzas' : 'Order Deal';
+
+      return `
+        <article class="p-5 sm:p-6 rounded-3xl bg-white border-2 border-amber-200/90 hover:border-amber-400 flex flex-col justify-between relative overflow-hidden group shadow-xl hover:shadow-[0_20px_45px_rgba(245,158,11,0.22)] transition-all duration-300">
+          <span class="absolute top-4 right-4 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-slate-950 font-black text-[10px] sm:text-xs px-3.5 py-1 rounded-full uppercase tracking-wider shadow-md z-10 border border-yellow-300">${badge}</span>
+          <div>
+            <div class="relative overflow-hidden rounded-2xl mb-4 border border-amber-100 group-hover:border-amber-300 transition">
+              <img src="${image}" alt="${title}" loading="lazy" decoding="async" class="w-full h-40 sm:h-44 object-cover group-hover:scale-108 transition duration-500" onerror="this.onerror=null; this.src='./images/hero-1.jpg'"/>
+              <div class="absolute inset-0 bg-gradient-to-t from-white/60 via-transparent to-transparent opacity-60"></div>
+            </div>
+            <h3 class="text-lg sm:text-xl font-black text-gray-950 font-heading group-hover:text-amber-700 transition">${title}</h3>
+            <p class="text-gray-600 text-xs mt-2 leading-relaxed">${description}</p>
+          </div>
+          <div class="pt-4 mt-4 border-t border-amber-100 flex items-center justify-between gap-3">
+            <div>${oldPrice}${price}</div>
+            <button onclick="window.LFC.orderDealById(${deal.id})" class="px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 hover:from-amber-300 hover:to-yellow-200 text-slate-950 font-black text-xs uppercase tracking-wider transition shadow-md shadow-amber-400/30 active:scale-95 cursor-pointer">${buttonLabel}</button>
+          </div>
+        </article>
+      `;
+    }).join('');
+  }
+
   function renderMenu() {
     const grid = document.getElementById('menu-grid');
     const empty = document.getElementById('menu-empty');
@@ -1228,9 +1519,13 @@
                </div>`
             : '';
 
-        const badgeHtml = item.badge
+        const hasActiveBogoDeal = deals.some((deal) => deal.type === 'bogo' && isDealAvailable(deal));
+        const badgeText = item.cat === 'pizzas' && String(item.badge || '').toLowerCase().includes('buy 1 get 1 free') && !hasActiveBogoDeal
+          ? ''
+          : item.badge;
+        const badgeHtml = badgeText
           ? `<span class="absolute top-2.5 left-2.5 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-slate-950 font-black text-[9px] sm:text-[10px] uppercase px-2.5 py-0.5 rounded-lg shadow-md tracking-wider z-10 border border-yellow-300">
-              ${item.badge}
+              ${escapeHtml(badgeText)}
              </span>`
           : '';
 
@@ -1247,19 +1542,19 @@
           <div class="group relative bg-white rounded-[26px] border-2 border-amber-200/90 hover:border-amber-400 shadow-[0_10px_30px_-5px_rgba(245,158,11,0.12)] hover:shadow-[0_20px_45px_-5px_rgba(245,158,11,0.25)] transition-all duration-300 flex flex-col overflow-hidden hover:-translate-y-1.5">
             ${stockOverlay}
             
-            <div class="relative aspect-[4/3] sm:h-52 overflow-hidden bg-amber-50 flex-shrink-0 cursor-pointer lfc-media" onclick="window.LFC.openCustomizeModal(${item.id})">
+            <div class="relative aspect-[4/3] sm:h-52 overflow-hidden bg-amber-50 flex-shrink-0 cursor-pointer lfc-media" onclick="window.LFC.orderMenuItemById(${item.id})">
               ${badgeHtml}
-              <img src="${item.image}" alt="${item.name}" loading="lazy" decoding="async" class="w-full h-full object-cover transform group-hover:scale-108 transition-all duration-500" onerror="this.onerror=null; this.src='./images/hero-1.jpg';"/>
+              <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" loading="lazy" decoding="async" class="w-full h-full object-cover transform group-hover:scale-108 transition-all duration-500" onerror="this.onerror=null; this.src='./images/hero-1.jpg';"/>
               <div class="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-transparent opacity-60"></div>
             </div>
 
             <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between">
               <div>
                 <div class="flex items-start justify-between gap-1 mb-1.5">
-                  <h3 onclick="window.LFC.openCustomizeModal(${item.id})" class="font-extrabold text-sm sm:text-base text-gray-900 group-hover:text-amber-600 transition leading-snug line-clamp-1 font-heading cursor-pointer">${item.name}</h3>
+                  <h3 onclick="window.LFC.orderMenuItemById(${item.id})" class="font-extrabold text-sm sm:text-base text-gray-900 group-hover:text-amber-600 transition leading-snug line-clamp-1 font-heading cursor-pointer">${escapeHtml(item.name)}</h3>
                   ${spicinessDots}
                 </div>
-                <p class="text-gray-600 text-[11px] sm:text-xs line-clamp-2 leading-relaxed mb-3">${item.desc}</p>
+                <p class="text-gray-600 text-[11px] sm:text-xs line-clamp-2 leading-relaxed mb-3">${escapeHtml(item.desc)}</p>
                 
                 ${
                   hasMultiOptions
@@ -1278,7 +1573,7 @@
                 </div>
 
                 <button 
-                  onclick="window.LFC.openCustomizeModal(${item.id})"
+                  onclick="window.LFC.orderMenuItemById(${item.id})"
                   ${!item.inStock ? 'disabled' : ''}
                   class="flex items-center gap-1.5 px-4 sm:px-4.5 py-2 sm:py-2.5 rounded-xl font-black text-[11px] sm:text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer ${
                     item.inStock
@@ -1703,7 +1998,7 @@
 
   /* ============ Shared save: Netlify Function + Blobs ============ */
   const IMG_RE = /^data:image\/(jpeg|png|webp);base64,/;
-  const adminKey = () => { try { return localStorage.getItem('lfc_admin_key') || ''; } catch (e) { return ''; } };
+  function adminKey() { try { return localStorage.getItem('lfc_admin_key') || ''; } catch (e) { return ''; } }
   function setSyncStatus(t) {
     window.__lfcSync = t;
     const e = document.getElementById('sync-state'); if (e) e.textContent = t;
@@ -1727,13 +2022,14 @@
       const up = async (o) => { if (o && IMG_RE.test(o.image || '')) o.image = (await apiPost({ action: 'upload', dataUri: o.image })).url; };
       for (const s of heroSlides) await up(s);
       for (const m of menuItems) await up(m);
+      for (const deal of deals) await up(deal);
       if (IMG_RE.test(settings.logoUrl || '')) settings.logoUrl = (await apiPost({ action: 'upload', dataUri: settings.logoUrl })).url;
       selfSaving = true;
-      saveData('hero_slides', heroSlides); saveData('menu_items', menuItems); saveData('settings', settings);
+      saveData('hero_slides', heroSlides); saveData('menu_items', menuItems); saveData('settings', settings); saveData('deals', deals);
       selfSaving = false;
       const updatedAt = Date.now();
       const slim = menuItems.map((m) => ({ ...m, image: m.image && m.image.startsWith('data:image/svg') ? '' : m.image }));
-      await apiPost({ action: 'save', data: { updatedAt, heroSlides, heroConfig, categories, menuItems: slim, logoUrl: settings.logoUrl, branches } });
+      await apiPost({ action: 'save', data: { updatedAt, heroSlides, heroConfig, categories, menuItems: slim, logoUrl: settings.logoUrl, branches, deals } });
       localStorage.setItem('lfc_remote_stamp', String(updatedAt));
       setSyncStatus('✅ Synced to all devices · ' + new Date().toLocaleTimeString());
       if (manual) showToast('Synced to all devices!');
@@ -1766,6 +2062,7 @@
       if (d.heroConfig) { heroConfig = d.heroConfig; saveData('hero_config', heroConfig); }
       if (Array.isArray(d.categories)) { categories = d.categories; saveData('categories', categories); }
       if (Array.isArray(d.branches)) { branches = d.branches; saveData('branches', branches); }
+      if (Array.isArray(d.deals)) { deals = normalizeDeals(d.deals); saveData('deals', deals); }
       if (Array.isArray(d.menuItems)) {
         menuItems = d.menuItems.map((m) => (!m.image || m.image.startsWith('data:image/svg') ? { ...m, image: menuArt(m.art || '🍽️') } : m));
         saveData('menu_items', menuItems);
@@ -1774,7 +2071,7 @@
       applyingRemote = false;
       try { localStorage.setItem('lfc_menu_version', MENU_VERSION); localStorage.setItem('lfc_remote_stamp', String(d.updatedAt)); } catch (e) {}
       activeCategory = 'all';
-      updateBrandLogos(); renderHeroSlide(0); startHeroTimer(); renderCategories(); renderMenu(); renderBranches();
+      updateBrandLogos(); renderHeroSlide(0); startHeroTimer(); renderCategories(); renderMenu(); renderDeals(); renderAdminDeals(); renderBranches();
     } catch (e) {
       applyingRemote = false;
       console.warn('Shared site sync failed:', e);
@@ -1835,7 +2132,7 @@
   function editItemUrl(v) { v = (v || '').trim(); if (v) { document.getElementById('edit-item-image').value = v; refreshEditImage(); } }
 
   function switchAdminTab(tabName) {
-    const tabs = ['dashboard', 'orders', 'pos', 'analytics', 'menu', 'coupons', 'zones', 'categories', 'hero', 'branches', 'branding', 'publish', 'settings'];
+    const tabs = ['dashboard', 'orders', 'pos', 'analytics', 'menu', 'coupons', 'deals', 'zones', 'categories', 'hero', 'branches', 'branding', 'publish', 'settings'];
     renderAdminDashboard();
     tabs.forEach((t) => {
       const btn = document.getElementById(`tab-btn-${t}`);
@@ -1859,6 +2156,7 @@
     if (tabName === 'menu') renderAdminMenuItems();
     if (tabName === 'publish') renderPublishTab();
     if (tabName === 'coupons') renderAdminCoupons();
+    if (tabName === 'deals') renderAdminDeals();
     if (tabName === 'zones') renderAdminZones();
   }
 
@@ -3001,6 +3299,246 @@
     showToast('Coupon deleted');
   }
 
+  function renderAdminDeals() {
+    const list = document.getElementById('admin-deals-list');
+    if (!list) return;
+    if (!deals.length) {
+      list.innerHTML = '<div class="text-center p-6 rounded-2xl bg-[#141826] border border-gray-800 text-xs text-gray-400">No deals created yet. Add your first customer deal above.</div>';
+      return;
+    }
+    list.innerHTML = deals.map((deal) => {
+      const isBogo = deal.type === 'bogo';
+      const startsAt = deal.startsAt ? new Date(deal.startsAt) : null;
+      const endsAt = deal.endsAt ? new Date(deal.endsAt) : null;
+      const scheduleLabel = startsAt || endsAt
+        ? `${startsAt ? `From ${startsAt.toLocaleString()}` : ''}${startsAt && endsAt ? ' · ' : ''}${endsAt ? `Until ${endsAt.toLocaleString()}` : ''}`
+        : 'Always available';
+      const statusLabel = deal.active === false
+        ? '● Hidden'
+        : deal.startsAt && new Date(deal.startsAt).getTime() > Date.now()
+        ? '● Scheduled'
+        : deal.endsAt && new Date(deal.endsAt).getTime() < Date.now()
+        ? '● Expired'
+        : '● Live';
+      const details = isBogo ? 'Buy 1 Get 1 Free · Customer chooses two pizzas' : `Rs. ${Number(deal.price || 0).toLocaleString()}${Number(deal.originalPrice) > Number(deal.price) ? ` · Was Rs. ${Number(deal.originalPrice).toLocaleString()}` : ''}`;
+      return `
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-2xl bg-[#141826] border border-gray-800 text-xs sm:text-sm gap-3">
+          <div class="flex items-center gap-3 min-w-0">
+            <img src="${escapeHtml(safeDealImage(deal.image))}" alt="" class="w-16 h-14 object-cover rounded-xl border border-white/10 bg-black flex-shrink-0" onerror="this.onerror=null;this.src='./images/hero-1.jpg'"/>
+            <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="font-black text-white">${escapeHtml(deal.title)}</span>
+              <span class="text-[9px] uppercase tracking-wide font-black px-2 py-0.5 rounded ${isBogo ? 'bg-emerald-500/15 text-emerald-300' : 'bg-amber-500/15 text-amber-300'}">${isBogo ? 'B1G1 Pizza' : 'Fixed Price'}</span>
+              <span class="text-[10px] ${isDealAvailable(deal) ? 'text-emerald-400' : 'text-gray-500 font-bold'}">${statusLabel}</span>
+            </div>
+            <div class="text-[11px] text-gray-400 mt-1 line-clamp-2">${escapeHtml(deal.description)}</div>
+            <div class="text-[10px] text-amber-300 font-bold mt-1">${details}</div>
+            <div class="text-[10px] text-gray-500 mt-0.5">${escapeHtml(scheduleLabel)}</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 flex-shrink-0">
+            <button onclick="window.LFC.editDeal(${deal.id})" class="px-2.5 py-1 rounded-xl bg-sky-500/15 text-sky-300 hover:bg-sky-500/25 font-bold">Edit</button>
+            <button onclick="window.LFC.toggleDeal(${deal.id})" class="px-2.5 py-1 rounded-xl font-bold ${deal.active === false ? 'bg-emerald-500/15 text-emerald-300' : 'bg-amber-500/15 text-amber-300'}">${deal.active === false ? 'Enable' : 'Disable'}</button>
+            <button onclick="window.LFC.deleteDeal(${deal.id})" class="px-2.5 py-1 rounded-xl bg-red-500/10 text-red-300 hover:bg-red-500/20 font-bold">Delete</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function updateDealFormFields() {
+    const isBogo = (document.getElementById('deal-type') || {}).value === 'bogo';
+    const priceFields = document.getElementById('admin-deal-price-fields');
+    const priceInput = document.getElementById('deal-price');
+    if (priceFields) priceFields.classList.toggle('hidden', isBogo);
+    if (priceInput) priceInput.required = !isBogo;
+  }
+
+  function editDeal(id) {
+    const deal = deals.find((entry) => entry.id === Number(id));
+    if (!deal) return;
+    document.getElementById('deal-edit-id').value = String(deal.id);
+    document.getElementById('deal-title').value = deal.title || '';
+    document.getElementById('deal-description').value = deal.description || '';
+    document.getElementById('deal-type').value = deal.type === 'bogo' ? 'bogo' : 'standard';
+    document.getElementById('deal-price').value = deal.type === 'bogo' ? '' : deal.price || '';
+    document.getElementById('deal-original-price').value = deal.type === 'bogo' ? '' : deal.originalPrice || '';
+    document.getElementById('deal-badge').value = deal.badge || '';
+    document.getElementById('deal-image').value = safeDealImage(deal.image);
+    document.getElementById('deal-image-url').value = String(deal.image || '').startsWith('data:') ? '' : safeDealImage(deal.image);
+    document.getElementById('deal-image-preview').src = safeDealImage(deal.image);
+    document.getElementById('deal-active').checked = deal.active !== false;
+    document.getElementById('deal-starts-at').value = toDateTimeLocal(deal.startsAt);
+    document.getElementById('deal-ends-at').value = toDateTimeLocal(deal.endsAt);
+    document.getElementById('admin-deal-form-title').textContent = 'Edit customer deal';
+    document.getElementById('save-deal-button').textContent = 'Save Deal Changes';
+    document.getElementById('cancel-deal-edit-button').classList.remove('hidden');
+    updateDealFormFields();
+    document.getElementById('deal-title').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function cancelDealEdit() {
+    ['deal-edit-id', 'deal-title', 'deal-description', 'deal-price', 'deal-original-price', 'deal-badge', 'deal-image', 'deal-image-url', 'deal-starts-at', 'deal-ends-at'].forEach((id) => {
+      const input = document.getElementById(id);
+      if (input) input.value = '';
+    });
+    const active = document.getElementById('deal-active');
+    if (active) active.checked = true;
+    const preview = document.getElementById('deal-image-preview');
+    if (preview) preview.src = './images/hero-1.jpg';
+    const type = document.getElementById('deal-type');
+    if (type) type.value = 'standard';
+    const title = document.getElementById('admin-deal-form-title');
+    if (title) title.textContent = 'Create a deal';
+    const button = document.getElementById('save-deal-button');
+    if (button) button.textContent = 'Create Deal';
+    const cancel = document.getElementById('cancel-deal-edit-button');
+    if (cancel) cancel.classList.add('hidden');
+    updateDealFormFields();
+  }
+
+  function toDateTimeLocal(value) {
+    if (!value) return '';
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return '';
+    return new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+  }
+
+  function updateDealImagePreview(value) {
+    const hidden = document.getElementById('deal-image');
+    const preview = document.getElementById('deal-image-preview');
+    const image = String(value || '').trim();
+    if (hidden) hidden.value = image;
+    if (preview) preview.src = image ? safeDealImage(image) : './images/hero-1.jpg';
+  }
+
+  function uploadDealPhoto(input) {
+    handlePhotoUpload(input, 'deal-image-preview', (base64) => {
+      const hidden = document.getElementById('deal-image');
+      const url = document.getElementById('deal-image-url');
+      if (hidden) hidden.value = base64;
+      if (url) url.value = '';
+      return true;
+    }, { maxDim: 1000, quality: 0.78 });
+  }
+
+  function clearDealPhoto() {
+    const hidden = document.getElementById('deal-image');
+    const url = document.getElementById('deal-image-url');
+    const preview = document.getElementById('deal-image-preview');
+    if (hidden) hidden.value = '';
+    if (url) url.value = '';
+    const isBogo = (document.getElementById('deal-type') || {}).value === 'bogo';
+    if (preview) preview.src = isBogo ? './images/hero-3.jpg' : './images/hero-1.jpg';
+  }
+
+  function saveDeal() {
+    const title = (document.getElementById('deal-title') || {}).value.trim();
+    const description = (document.getElementById('deal-description') || {}).value.trim();
+    const type = (document.getElementById('deal-type') || {}).value;
+    const price = Number((document.getElementById('deal-price') || {}).value);
+    const originalPriceValue = (document.getElementById('deal-original-price') || {}).value.trim();
+    const originalPrice = originalPriceValue ? Number(originalPriceValue) : 0;
+    const badge = (document.getElementById('deal-badge') || {}).value.trim();
+    const rawImage = (document.getElementById('deal-image') || {}).value.trim();
+    const startsAtValue = (document.getElementById('deal-starts-at') || {}).value.trim();
+    const endsAtValue = (document.getElementById('deal-ends-at') || {}).value.trim();
+    const editIdValue = (document.getElementById('deal-edit-id') || {}).value.trim();
+    const editId = editIdValue ? Number(editIdValue) : null;
+    const startsAt = startsAtValue ? new Date(startsAtValue) : null;
+    const endsAt = endsAtValue ? new Date(endsAtValue) : null;
+
+    if (!title || !description || (type !== 'standard' && type !== 'bogo')) {
+      showToast('Enter a deal title and description, then choose a valid deal type', 'error');
+      return;
+    }
+    if (type === 'standard' && (!Number.isInteger(price) || price <= 0)) {
+      showToast('Enter a valid deal price greater than zero', 'error');
+      return;
+    }
+    if (type === 'standard' && originalPriceValue && (!Number.isInteger(originalPrice) || originalPrice <= price)) {
+      showToast('Original price must be greater than the deal price', 'error');
+      return;
+    }
+    if (rawImage && !/^(?:(?:https?:\/\/|\.{0,2}\/|\/).+|data:image\/(?:jpeg|png|webp);base64,[A-Za-z0-9+/=]+)$/i.test(rawImage)) {
+      showToast('Choose a valid photo or enter a web URL / site image path', 'error');
+      return;
+    }
+    if ((startsAtValue && Number.isNaN(startsAt.getTime())) || (endsAtValue && Number.isNaN(endsAt.getTime()))) {
+      showToast('Enter a valid deal start and end time', 'error');
+      return;
+    }
+    if (startsAt && endsAt && endsAt <= startsAt) {
+      showToast('Deal end time must be after the start time', 'error');
+      return;
+    }
+
+    const existing = editId === null ? null : deals.find((deal) => deal.id === editId);
+    if (editId !== null && !existing) {
+      showToast('Could not find the deal being edited. Refresh and try again.', 'error');
+      return;
+    }
+    let id = existing ? existing.id : Date.now();
+    while (!existing && deals.some((deal) => deal.id === id)) id += 1;
+    const nextDeal = {
+      id,
+      title,
+      description,
+      type,
+      price: type === 'bogo' ? 0 : price,
+      originalPrice: type === 'bogo' ? 0 : originalPrice,
+      badge: badge || (type === 'bogo' ? 'Buy 1 Get 1 Free' : 'Special Deal'),
+      image: safeDealImage(rawImage || (existing && existing.image) || (type === 'bogo' ? './images/hero-3.jpg' : './images/hero-1.jpg')),
+      active: (document.getElementById('deal-active') || {}).checked !== false,
+      startsAt: startsAt ? startsAt.toISOString() : '',
+      endsAt: endsAt ? endsAt.toISOString() : ''
+    };
+    const previousDeals = deals;
+    deals = existing
+      ? deals.map((deal) => deal.id === id ? nextDeal : deal)
+      : [nextDeal, ...deals];
+    if (!saveData('deals', deals)) {
+      deals = previousDeals;
+      return;
+    }
+    renderDeals();
+    renderMenu();
+    renderAdminDeals();
+    cancelDealEdit();
+    showToast(existing ? 'Deal updated successfully' : 'Deal created and published');
+  }
+
+  function toggleDeal(id) {
+    const deal = deals.find((entry) => entry.id === Number(id));
+    if (!deal) return;
+    const previousDeals = deals;
+    deals = deals.map((entry) => entry.id === deal.id ? { ...entry, active: entry.active === false } : entry);
+    if (!saveData('deals', deals)) {
+      deals = previousDeals;
+      return;
+    }
+    renderDeals();
+    renderMenu();
+    renderAdminDeals();
+    showToast(`${deal.title} ${deal.active === false ? 'enabled' : 'disabled'}`);
+  }
+
+  function deleteDeal(id) {
+    const deal = deals.find((entry) => entry.id === Number(id));
+    if (!deal || !confirm(`Delete "${deal.title}"?`)) return;
+    const previousDeals = deals;
+    deals = deals.filter((entry) => entry.id !== deal.id);
+    if (!saveData('deals', deals)) {
+      deals = previousDeals;
+      return;
+    }
+    renderDeals();
+    renderMenu();
+    renderAdminDeals();
+    if (Number((document.getElementById('deal-edit-id') || {}).value) === deal.id) cancelDealEdit();
+    showToast('Deal deleted');
+  }
+
   // --- Delivery Zones Manager ---
   function renderAdminZones() {
     const list = document.getElementById('admin-zones-list');
@@ -3099,6 +3637,7 @@
       branches,
       zones,
       promos,
+      deals,
       orders,
       exportedAt: new Date().toISOString()
     };
@@ -3148,6 +3687,10 @@
           promos = data.promos;
           saveData('promos', promos);
         }
+        if (data.deals && Array.isArray(data.deals)) {
+          deals = normalizeDeals(data.deals);
+          saveData('deals', deals);
+        }
         if (data.orders && Array.isArray(data.orders)) {
           orders = data.orders;
           saveData('orders', orders);
@@ -3156,12 +3699,14 @@
         updateBrandLogos();
         renderCategories();
         renderMenu();
+        renderDeals();
         renderHeroSlide(0);
         renderBranches();
         renderAdminDashboard();
         renderAdminOrders();
         renderAdminMenuItems();
         renderAdminCoupons();
+        renderAdminDeals();
         renderAdminZones();
         renderAdminCategories();
         renderAdminHeroSlides();
@@ -3577,7 +4122,7 @@
   }
 
   function resetAllData() {
-    if (!confirm('Reset all menu items, slides, categories, and settings back to defaults?')) return;
+    if (!confirm('Reset all menu items, deals, slides, categories, and settings back to defaults?')) return;
     localStorage.clear();
     settings = { ...DEFAULT_SETTINGS };
     categories = [...DEFAULT_CATEGORIES];
@@ -3587,12 +4132,14 @@
     reviews = [...DEFAULT_REVIEWS];
     zones = [...DEFAULT_ZONES];
     promos = [...DEFAULT_PROMOS];
+    deals = JSON.parse(JSON.stringify(DEFAULT_DEALS));
     orders = [...DEFAULT_ORDERS];
     cart = [];
 
     updateBrandLogos();
     renderCategories();
     renderMenu();
+    renderDeals();
     renderHeroSlide(0);
     renderReviews();
     renderBranches();
@@ -3601,6 +4148,7 @@
     renderAdminOrders();
     renderAdminMenuItems();
     renderAdminCoupons();
+    renderAdminDeals();
     renderAdminZones();
     renderAdminCategories();
     renderAdminHeroSlides();
@@ -3749,12 +4297,17 @@
     startLiveOrderTicker();
     renderCategories();
     renderMenu();
+    renderDeals();
     renderReviews();
     renderBranches();
     updateCartUI();
     updateOrderTypeUI();
     initScrollEffects();
     initStatsCounters();
+    setInterval(() => {
+      renderDeals();
+      renderAdminDeals();
+    }, 60000);
 
     // Search Listeners
     const searchInput = document.getElementById('menu-search-input');
@@ -3789,6 +4342,7 @@
         closeCartDrawer();
         closeAdminModal();
         closeCustomizeModal();
+        closeBogoDealModal();
         closeReceiptModal();
         closeEditItemModal();
         if (typeof closeReviewModal === 'function') {
@@ -3807,6 +4361,12 @@
   window.LFC = {
     addToCart,
     addToCartById,
+    orderDealById,
+    orderMenuItemById,
+    closeBogoDealModal,
+    setBogoPizza,
+    setBogoSize,
+    addBogoDealToCart,
     openCustomizeModal,
     closeCustomizeModal,
     selectCustomizeSize,
@@ -3872,6 +4432,15 @@
     addNewPromoCode,
     togglePromoCode,
     deletePromoCode,
+    updateDealFormFields,
+    saveDeal,
+    editDeal,
+    cancelDealEdit,
+    uploadDealPhoto,
+    clearDealPhoto,
+    updateDealImagePreview,
+    toggleDeal,
+    deleteDeal,
     addNewDeliveryZone,
     deleteDeliveryZone,
     updateStoreStatus,

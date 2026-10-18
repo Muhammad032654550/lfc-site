@@ -82,8 +82,7 @@ Open the admin panel in any of these ways:
 
 **Default PIN: `5640`** (change it in *Admin → Settings*).
 
-You can manage: menu items (with photo upload), categories, hero slides, branch locations,
-logo/branding, WhatsApp & phone numbers, delivery fee, free-delivery threshold — all saved to the browser.
+You can manage: menu items (with photo upload), customer deals (create, edit, enable/disable or delete fixed-price combos and Buy 1 Get 1 Free pizza offers), coupon codes, categories, hero slides, branch locations, logo/branding, WhatsApp & phone numbers, delivery fee, and free-delivery threshold. Changes are saved in the browser; configure the Netlify publishing key to share supported site content across devices.
 
 ---
 
@@ -93,6 +92,7 @@ logo/branding, WhatsApp & phone numbers, delivery fee, free-delivery threshold �
 .
 ├── index.html                 # The whole page (markup + design)
 ├── app.js                     # All site logic (cart, WhatsApp, admin, animations)
+├── public/app.js              # Vite-served copy; keep it in sync with app.js
 ├── 404.html                   # Friendly "page not found" page
 ├── manifest.webmanifest       # PWA "Add to Home Screen" support
 ├── robots.txt / sitemap.xml   # SEO
@@ -101,9 +101,9 @@ logo/branding, WhatsApp & phone numbers, delivery fee, free-delivery threshold �
 └── .github/workflows/deploy.yml
 ```
 
-> `src/` and the Vite/Node config files are the **legacy React version** kept for reference.
-> The live website does **not** use them and requires no build — you can safely delete `src/`,
-> `package.json`, `vite.config.ts` and `tsconfig.json` if you want a pure static repo.
+> The root `index.html` and `app.js` are the zero-build static site. Vite serves `public/app.js`
+> in its development/build output, so keep that copy synchronized when changing site logic.
+> `src/` is a legacy React version kept for reference.
 
 ---
 
@@ -122,6 +122,7 @@ logo/branding, WhatsApp & phone numbers, delivery fee, free-delivery threshold �
 - **Live search** with a clear button and a "showing N items" result count.
 - WhatsApp order message now includes the selected order type.
 - **ESC** closes the cart/admin/review overlays; smoother mobile experience.
+- **Deals manager** — create and edit customer-facing combos and B1G1 pizza offers from Admin → Deals. Add a compressed photo or image URL, original and sale prices, badges, visibility, and optional start/end times. Customers can choose two available pizzas and sizes; the higher-priced pizza is charged and the other is marked free in the cart and WhatsApp order.
 
 **Performance & SEO**
 - Images optimised (≈4 MB of PNGs → ≈0.6 MB JPEGs) + `loading="lazy"`.
@@ -136,7 +137,7 @@ logo/branding, WhatsApp & phone numbers, delivery fee, free-delivery threshold �
 | What | Where |
 |---|---|
 | Phone / WhatsApp number, delivery fee, free-delivery threshold, logo, store name | **Admin → Settings** (or `DEFAULT_SETTINGS` in `app.js`) |
-| Menu items, categories, hero slides, branches | **Admin panel**, or the `DEFAULT_*` arrays at the top of `app.js` |
+| Menu items, deals, categories, hero slides, branches | **Admin panel**, or the `DEFAULT_*` arrays at the top of `app.js` |
 | Colors / fonts | Tailwind config + `<style>` block in `index.html` |
 
 ---

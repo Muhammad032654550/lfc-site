@@ -696,7 +696,8 @@
           <p class="text-gray-700 text-xs sm:text-sm mt-2 font-medium">Bigger portions, extra crunch, and unbeatable prices for family & friends.</p>
         </div>
 
-        <div class="reveal grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+        <div id="deals-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 sm:gap-8"></div>
+        <div class="hidden reveal grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
           
           <!-- Deal 1 -->
           <div class="p-5 sm:p-6 rounded-3xl bg-white border-2 border-amber-200/90 hover:border-amber-400 flex flex-col justify-between relative overflow-hidden group shadow-xl hover:shadow-[0_20px_45px_rgba(245,158,11,0.22)] transition-all duration-300">
@@ -1088,7 +1089,7 @@
                 <div class="grid grid-cols-2 gap-2">
                   <button onclick="window.LFC.switchAdminTab('orders')" class="lfc-quick-action"><span>🧾</span><span><b>Live Orders</b><small>Kitchen slips & status</small></span><i>↗</i></button>
                   <button onclick="window.LFC.switchAdminTab('menu')" class="lfc-quick-action"><span>🍔</span><span><b>Menu & Options</b><small>Prices, sizes & add-ons</small></span><i>↗</i></button>
-                  <button onclick="window.LFC.switchAdminTab('coupons')" class="lfc-quick-action"><span>🏷️</span><span><b>Coupons & Deals</b><small>LFC100 & promotions</small></span><i>↗</i></button>
+                  <button onclick="window.LFC.switchAdminTab('deals')" class="lfc-quick-action"><span>🏷️</span><span><b>Manage Deals</b><small>Add, edit & publish offers</small></span><i>↗</i></button>
                   <button onclick="window.LFC.switchAdminTab('zones')" class="lfc-quick-action"><span>🛵</span><span><b>Delivery Zones</b><small>Lahore rates & timings</small></span><i>↗</i></button>
                   <button onclick="window.LFC.switchAdminTab('branding')" class="lfc-quick-action"><span>🎨</span><span><b>Brand Identity</b><small>LFC logo & styles</small></span><i>↗</i></button>
                   <button onclick="window.LFC.switchAdminTab('settings')" class="lfc-quick-action"><span>⚙️</span><span><b>Store Settings</b><small>PIN (5640) & Backup</small></span><i>↗</i></button>
@@ -1131,6 +1132,7 @@
             </button>
             <button id="tab-btn-menu" onclick="window.LFC.switchAdminTab('menu')" class="px-3 sm:px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-wider text-gray-400 hover:text-white hover:bg-gray-800 transition flex-shrink-0">Menu & Multi-Options</button>
             <button id="tab-btn-coupons" onclick="window.LFC.switchAdminTab('coupons')" class="px-3 sm:px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-wider text-gray-400 hover:text-white hover:bg-gray-800 transition flex-shrink-0">Promo Codes</button>
+            <button id="tab-btn-deals" onclick="window.LFC.switchAdminTab('deals')" class="px-3 sm:px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-wider text-gray-400 hover:text-white hover:bg-gray-800 transition flex-shrink-0">Deals</button>
             <button id="tab-btn-zones" onclick="window.LFC.switchAdminTab('zones')" class="px-3 sm:px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-wider text-gray-400 hover:text-white hover:bg-gray-800 transition flex-shrink-0">Delivery Zones</button>
             <button id="tab-btn-categories" onclick="window.LFC.switchAdminTab('categories')" class="px-3 sm:px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-wider text-gray-400 hover:text-white hover:bg-gray-800 transition flex-shrink-0">Categories</button>
             <button id="tab-btn-hero" onclick="window.LFC.switchAdminTab('hero')" class="px-3 sm:px-4 py-2 rounded-xl font-bold text-xs uppercase tracking-wider text-gray-400 hover:text-white hover:bg-gray-800 transition flex-shrink-0">Hero Slides</button>
@@ -1391,6 +1393,88 @@
 
             <!-- Existing Coupons List -->
             <div id="admin-coupons-list" class="space-y-2.5"></div>
+          </div>
+
+          <!-- Tab: Deals Manager -->
+          <div id="tab-panel-deals" class="hidden space-y-5">
+            <div class="rounded-3xl border border-amber-500/30 bg-gradient-to-br from-[#171b29] via-[#121622] to-[#10131b] overflow-hidden">
+              <div class="p-4 sm:p-5 border-b border-white/5 flex items-center justify-between gap-3">
+                <div>
+                  <div class="text-[10px] font-black uppercase tracking-[.2em] text-amber-400">Offer Studio</div>
+                  <h4 id="admin-deal-form-title" class="font-black text-white text-base sm:text-lg mt-1">Create a deal</h4>
+                  <p class="text-[11px] text-gray-400 mt-1">Set up the offer, add a photo, and choose when it appears.</p>
+                </div>
+                <div class="hidden sm:grid w-11 h-11 rounded-2xl bg-amber-500/10 border border-amber-400/20 place-items-center text-xl">🔥</div>
+              </div>
+              <div class="p-4 sm:p-5 space-y-5">
+                <input type="hidden" id="deal-edit-id"/>
+                <input type="hidden" id="deal-image"/>
+                <div class="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_220px] gap-4">
+                  <div class="space-y-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <label class="space-y-1.5">
+                        <span class="block text-[10px] font-black uppercase tracking-wider text-gray-400">Deal name *</span>
+                        <input type="text" id="deal-title" maxlength="80" placeholder="e.g. Family Feast" class="w-full px-3 py-2.5 rounded-xl bg-[#08090E] border border-gray-800 text-xs text-white focus:outline-none focus:border-amber-500"/>
+                      </label>
+                      <label class="space-y-1.5">
+                        <span class="block text-[10px] font-black uppercase tracking-wider text-gray-400">Offer type</span>
+                        <select id="deal-type" onchange="window.LFC.updateDealFormFields()" class="w-full px-3 py-2.5 rounded-xl bg-[#08090E] border border-gray-800 text-xs text-white focus:outline-none focus:border-amber-500">
+                          <option value="standard">Fixed-price combo</option>
+                          <option value="bogo">Buy 1 Get 1 Free — pizzas</option>
+                        </select>
+                      </label>
+                    </div>
+                    <label class="block space-y-1.5">
+                      <span class="block text-[10px] font-black uppercase tracking-wider text-gray-400">Customer description *</span>
+                      <textarea id="deal-description" rows="3" maxlength="240" placeholder="List what is included. This text appears on your website." class="w-full px-3 py-2.5 rounded-xl bg-[#08090E] border border-gray-800 text-xs text-white focus:outline-none focus:border-amber-500"></textarea>
+                    </label>
+                    <div id="admin-deal-price-fields" class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <label class="space-y-1.5">
+                        <span class="block text-[10px] font-black uppercase tracking-wider text-gray-400">Deal price (Rs.) *</span>
+                        <input type="number" id="deal-price" min="1" step="1" placeholder="e.g. 1490" class="w-full px-3 py-2.5 rounded-xl bg-[#08090E] border border-gray-800 text-xs text-white focus:outline-none focus:border-amber-500"/>
+                      </label>
+                      <label class="space-y-1.5">
+                        <span class="block text-[10px] font-black uppercase tracking-wider text-gray-400">Was price (optional)</span>
+                        <input type="number" id="deal-original-price" min="0" step="1" placeholder="e.g. 1990" class="w-full px-3 py-2.5 rounded-xl bg-[#08090E] border border-gray-800 text-xs text-white focus:outline-none focus:border-amber-500"/>
+                      </label>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <label class="space-y-1.5">
+                        <span class="block text-[10px] font-black uppercase tracking-wider text-gray-400">Offer badge</span>
+                        <input type="text" id="deal-badge" maxlength="32" placeholder="e.g. Save 20% or Weekend Special" class="w-full px-3 py-2.5 rounded-xl bg-[#08090E] border border-gray-800 text-xs text-white focus:outline-none focus:border-amber-500"/>
+                      </label>
+                      <label class="flex items-center gap-3 rounded-xl bg-[#08090E] border border-gray-800 px-3 py-2.5 cursor-pointer">
+                        <input type="checkbox" id="deal-active" checked class="w-4 h-4 accent-amber-500"/>
+                        <span><span class="block text-xs font-bold text-white">Publish deal now</span><span class="block text-[10px] text-gray-500">Turn off to save as hidden</span></span>
+                      </label>
+                    </div>
+                  </div>
+                  <div class="space-y-2">
+                    <span class="block text-[10px] font-black uppercase tracking-wider text-gray-400">Deal photo</span>
+                    <img id="deal-image-preview" src="./images/hero-1.jpg" alt="Deal photo preview" class="w-full aspect-[4/3] rounded-2xl object-cover bg-[#08090E] border border-gray-700"/>
+                    <div class="flex flex-wrap gap-2">
+                      <label class="flex-1 text-center px-3 py-2 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 text-amber-300 border border-amber-500/30 text-[11px] font-bold cursor-pointer transition">📷 Upload photo<input type="file" accept="image/jpeg,image/png,image/webp" class="hidden" onchange="window.LFC.uploadDealPhoto(this)"/></label>
+                      <button type="button" onclick="window.LFC.clearDealPhoto()" class="px-3 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-[11px] font-bold">Reset</button>
+                    </div>
+                    <input type="text" id="deal-image-url" oninput="window.LFC.updateDealImagePreview(this.value)" placeholder="Or paste image URL" class="w-full px-3 py-2 rounded-xl bg-[#08090E] border border-gray-800 text-[11px] text-white focus:outline-none focus:border-amber-500"/>
+                    <p class="text-[10px] text-gray-500 leading-relaxed">Photos are resized automatically. Upload works on this browser; add your Publish key to share photos across devices.</p>
+                  </div>
+                </div>
+
+                <div class="rounded-2xl bg-[#0c101a] border border-gray-800 p-3.5">
+                  <div class="flex items-center gap-2 mb-3"><span class="text-sm">🗓️</span><div><span class="block text-xs font-black text-white">Schedule (optional)</span><span class="block text-[10px] text-gray-500">Leave blank to show the offer all the time.</span></div></div>
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <label class="space-y-1.5"><span class="block text-[10px] font-bold text-gray-400">Starts</span><input type="datetime-local" id="deal-starts-at" class="w-full px-3 py-2 rounded-xl bg-[#08090E] border border-gray-800 text-xs text-white focus:outline-none focus:border-amber-500"/></label>
+                    <label class="space-y-1.5"><span class="block text-[10px] font-bold text-gray-400">Ends</span><input type="datetime-local" id="deal-ends-at" class="w-full px-3 py-2 rounded-xl bg-[#08090E] border border-gray-800 text-xs text-white focus:outline-none focus:border-amber-500"/></label>
+                  </div>
+                </div>
+                <div class="flex gap-2">
+                  <button id="save-deal-button" onclick="window.LFC.saveDeal()" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-black text-xs uppercase tracking-wider transition">Create Deal</button>
+                  <button id="cancel-deal-edit-button" onclick="window.LFC.cancelDealEdit()" class="hidden px-4 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-white font-bold text-xs transition">Cancel</button>
+                </div>
+              </div>
+            </div>
+            <div id="admin-deals-list" class="space-y-2.5"></div>
           </div>
 
           <!-- Tab: Delivery Zones Manager -->
@@ -1727,6 +1811,40 @@
             <span>Add to Order</span>
             <span id="cust-modal-total-btn" class="font-heading font-extrabold text-sm sm:text-base">Rs. 490</span>
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Buy One Get One Pizza Picker -->
+    <div id="bogo-deal-modal" class="hidden fixed inset-0 bg-black/85 backdrop-blur-md z-[60] flex items-center justify-center p-3 sm:p-4" onclick="if(event.target===this) window.LFC.closeBogoDealModal()">
+      <div class="bg-[#101422] border border-amber-500/40 rounded-3xl w-full max-w-2xl overflow-hidden shadow-2xl flex flex-col max-h-[92vh]">
+        <div class="p-4 sm:p-5 border-b border-gray-800 flex items-start justify-between gap-3">
+          <div>
+            <span class="text-[10px] font-black uppercase tracking-widest text-amber-400">🍕 Buy 1 Get 1 Free</span>
+            <h3 id="bogo-deal-title" class="text-lg sm:text-xl font-black text-white mt-1">Choose your pizzas</h3>
+            <p id="bogo-deal-description" class="text-xs text-gray-400 mt-1"></p>
+          </div>
+          <button onclick="window.LFC.closeBogoDealModal()" class="text-gray-400 hover:text-white p-1" aria-label="Close">✕</button>
+        </div>
+        <div class="p-4 sm:p-5 overflow-y-auto space-y-4">
+          <p class="text-xs text-emerald-300 bg-emerald-950/40 border border-emerald-700/40 rounded-xl p-3">Choose any two pizzas and sizes. The higher-priced pizza is charged; the other is free.</p>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <div class="p-3 rounded-2xl bg-[#141824] border border-gray-800 space-y-2">
+              <label for="bogo-pizza-1" class="text-xs font-black uppercase tracking-wide text-amber-300">Pizza 1</label>
+              <select id="bogo-pizza-1" onchange="window.LFC.setBogoPizza(1,this.value)" class="w-full px-3 py-2 rounded-xl bg-[#08090E] border border-gray-700 text-xs text-white focus:outline-none focus:border-amber-500"></select>
+              <select id="bogo-size-1" onchange="window.LFC.setBogoSize(1,this.value)" aria-label="Pizza 1 size" class="w-full px-3 py-2 rounded-xl bg-[#08090E] border border-gray-700 text-xs text-white focus:outline-none focus:border-amber-500"></select>
+            </div>
+            <div class="p-3 rounded-2xl bg-[#141824] border border-gray-800 space-y-2">
+              <label for="bogo-pizza-2" class="text-xs font-black uppercase tracking-wide text-amber-300">Pizza 2 — Free</label>
+              <select id="bogo-pizza-2" onchange="window.LFC.setBogoPizza(2,this.value)" class="w-full px-3 py-2 rounded-xl bg-[#08090E] border border-gray-700 text-xs text-white focus:outline-none focus:border-amber-500"></select>
+              <select id="bogo-size-2" onchange="window.LFC.setBogoSize(2,this.value)" aria-label="Pizza 2 size" class="w-full px-3 py-2 rounded-xl bg-[#08090E] border border-gray-700 text-xs text-white focus:outline-none focus:border-amber-500"></select>
+            </div>
+          </div>
+          <div id="bogo-deal-total" class="rounded-xl bg-[#0b1018] border border-amber-500/30 p-3 text-center text-sm font-black text-amber-300">Select two pizzas to see your total.</div>
+        </div>
+        <div class="p-4 sm:p-5 border-t border-gray-800 flex gap-2">
+          <button onclick="window.LFC.closeBogoDealModal()" class="px-4 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-white font-bold text-xs">Keep Browsing</button>
+          <button id="bogo-add-button" onclick="window.LFC.addBogoDealToCart()" class="flex-1 py-3 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-black font-black text-xs uppercase tracking-wider disabled:opacity-40 disabled:cursor-not-allowed" disabled>Add Deal to Order</button>
         </div>
       </div>
     </div>
