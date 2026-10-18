@@ -344,12 +344,12 @@
     }
   ];
 
-  const LIVE_ORDER_TICKERS = [
-    '🔥 Usman in Gulberg III just ordered Family Feast Combo!',
-    '⚡ Sana in DHA Phase 5 placed an order for 2x Zinger Rolls!',
-    '🍗 Ahmed in Johar Town just grabbed a 9-Pc Zinger Bucket!',
-    '🍕 Ali in Model Town ordered Extra Cheese Loaded Pizza!',
-    '🌶️ Zaid in Cantt ordered Double Tower Supreme with Fries!'
+  const PROMO_TICKERS = [
+    '🔥 Big flavor. Golden crunch. That’s the LFC way.',
+    '🍗 Make tonight a crispy chicken night.',
+    '🌶️ Turn up the taste with bold Lahori flavor.',
+    '🍔 Find your new favorite bite on the LFC menu.',
+    '✨ Good food, great vibes, legendary LFC flavor.'
   ];
 
   // --- LocalStorage Persistence with Defaults Merging ---
@@ -1164,11 +1164,11 @@
     if (!tickerEl) return;
 
     tickerTimer = setInterval(() => {
-      tickerIndex = (tickerIndex + 1) % LIVE_ORDER_TICKERS.length;
+      tickerIndex = (tickerIndex + 1) % PROMO_TICKERS.length;
       tickerEl.style.opacity = '0';
       tickerEl.style.transform = 'translateY(5px)';
       setTimeout(() => {
-        tickerEl.textContent = LIVE_ORDER_TICKERS[tickerIndex];
+        tickerEl.textContent = PROMO_TICKERS[tickerIndex];
         tickerEl.style.opacity = '1';
         tickerEl.style.transform = 'translateY(0)';
       }, 300);
