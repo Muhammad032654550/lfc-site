@@ -123,6 +123,9 @@ You can manage: menu items (with photo upload), customer deals (create, edit, en
 - WhatsApp order message now includes the selected order type.
 - **ESC** closes the cart/admin/review overlays; smoother mobile experience.
 - **Deals manager** — create and edit customer-facing combos and B1G1 pizza offers from Admin → Deals. Add a compressed photo or image URL, original and sale prices, badges, visibility, and optional start/end times. Customers can choose two available pizzas and sizes; the higher-priced pizza is charged and the other is marked free in the cart and WhatsApp order.
+- **Expanded menu** — Includes the 16 Nut Deals, four family combos, and the supplied burger, wrap, chicken, pasta, sandwich, hot-shot, wings, nuggets, and sides catalog. Existing Standard/Signature pizza B1G1 and single-purchase pizzas remain available. Menu updates merge into saved items without removing custom products, stock settings, or uploaded photos.
+- **Mobile-first storefront** — The hero leads with food photography, a clear LFC message, delivery highlights, and a prominent menu button. Menu browsing uses larger single-column product cards on narrow phones and category filters that scroll horizontally.
+- **Clear WhatsApp orders** — the order message is formatted with customer and delivery details, item options, B1G1 paid/free pizza breakdown and savings, subtotal, delivery, discount, and total.
 
 **Performance & SEO**
 - Images optimised (≈4 MB of PNGs → ≈0.6 MB JPEGs) + `loading="lazy"`.

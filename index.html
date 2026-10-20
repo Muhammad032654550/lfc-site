@@ -405,6 +405,9 @@
       footer{background:linear-gradient(180deg,#121731,#070810)!important}
       #admin-menu-bulk,#admin-hero-list>*{animation:lfcUp .4s both}
       [id^="tab-btn-"]{border-radius:12px}
+      #mobile-drawer+section#hero-section{background:#10131d!important;background-image:none!important}
+      @media(max-width:639px){#hero-thumbs-wrap{display:none!important}}
+      @media(max-width:479px){#menu-grid{grid-template-columns:minmax(0,1fr)!important;gap:12px!important}#menu-grid>div .lfc-media{aspect-ratio:16/9;height:auto;max-height:205px}#menu-grid>div{border-radius:22px}#categories-container{scroll-padding-inline:12px}}
     </style>
 </head>
   <body class="bg-[#FAF8F5] text-gray-900 min-h-screen selection:bg-amber-400 selection:text-slate-950 pb-16 sm:pb-0" id="top">
@@ -495,65 +498,63 @@
     </div>
 
     <!-- Hero Section (Optimized for Mobile Glory with Radiant Food Halo & Fast CTAs) -->
-    <section class="relative overflow-hidden bg-gradient-to-b from-[#FFFDF7] via-[#FFF9E6] to-[#FAF8F5] py-6 sm:py-14 md:py-20 border-b border-amber-200/90">
+    <section id="hero-section" class="relative overflow-hidden bg-[#10131d] py-5 sm:py-12 md:py-16 border-b border-amber-500/30">
       
       <!-- Ambient Mineral Glow Orbs in Background -->
-      <div class="absolute -top-24 -left-24 w-96 h-96 bg-yellow-300/40 rounded-full blur-3xl pointer-events-none"></div>
-      <div class="absolute top-1/2 -right-24 w-96 h-96 bg-amber-400/25 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -top-24 -left-24 w-96 h-96 bg-amber-400/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute top-1/2 -right-24 w-96 h-96 bg-red-600/20 rounded-full blur-3xl pointer-events-none"></div>
 
       <div class="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 relative z-10">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-10 lg:gap-12 items-center">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-10 lg:gap-12 items-center">
           
           <!-- Left Presentation Content -->
-          <div class="lg:col-span-6 space-y-4 sm:space-y-6">
+          <div class="order-2 lg:order-1 lg:col-span-6 space-y-3 sm:space-y-5">
             
             <!-- Rating Pill Badge -->
-            <div class="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-white border border-amber-300 text-amber-900 text-[11px] sm:text-xs font-black uppercase tracking-wider shadow-sm">
-              <span class="animate-bounce">🍗</span>
-              <span id="hero-badge">#1 Crispy Chicken in Lahore</span>
-              <span class="text-amber-400">•</span>
-              <span id="hero-rating" class="text-gray-700 text-[10px] sm:text-[11px] font-bold">4.9 ★ (1,840+ reviews)</span>
+            <div class="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-white/10 border border-amber-400/40 text-amber-200 text-[10px] sm:text-xs font-black uppercase tracking-wider shadow-sm backdrop-blur">
+              <span>🍗</span>
+              <span id="hero-badge">Lahore’s crispy chicken favourite</span>
             </div>
 
             <!-- Main Headline -->
-            <h1 class="text-3xl sm:text-5xl lg:text-6xl font-black text-gray-950 tracking-tight leading-[1.08] sm:leading-none font-heading">
-              <span id="hero-title" class="block">THE ULTIMATE CRISPY</span>
-              <span id="hero-highlight" class="block text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 filter drop-shadow-sm">FAMILY FEAST</span>
+            <h1 class="text-[2rem] sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.02] sm:leading-none font-heading">
+              <span id="hero-title" class="block">CRISPY OUTSIDE.</span>
+              <span id="hero-highlight" class="block text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-400 to-red-400 filter drop-shadow-sm">LEGENDARY INSIDE.</span>
             </h1>
 
-            <p id="hero-subtitle" class="text-gray-700 text-xs sm:text-base lg:text-lg leading-relaxed max-w-xl font-medium">
-              Signature Zinger burger, golden crunch bucket, cheesy pizza slice, paratha roll and tender strips in one legendary combo.
+            <p id="hero-subtitle" class="text-gray-300 text-xs sm:text-base lg:text-lg leading-relaxed max-w-xl font-medium">
+              Freshly made burgers, golden fried chicken and loaded pizzas — your next LFC favourite is just a tap away.
             </p>
 
             <!-- Quick Delivery & Value Highlights (Mobile Friendly) -->
             <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-bold pt-0.5">
-              <span class="inline-flex items-center gap-1 bg-amber-100/90 border border-amber-300 px-2.5 py-1 rounded-full text-amber-950 font-black shadow-xs">
+              <span class="inline-flex items-center gap-1 bg-amber-300/10 border border-amber-300/30 px-2.5 py-1 rounded-full text-amber-100 font-black">
                 <span>⚡</span> Fast Delivery
               </span>
-              <span class="inline-flex items-center gap-1 bg-emerald-100/90 border border-emerald-300 px-2.5 py-1 rounded-full text-emerald-950 font-black shadow-xs">
+              <span class="inline-flex items-center gap-1 bg-emerald-300/10 border border-emerald-300/30 px-2.5 py-1 rounded-full text-emerald-100 font-black">
                 <span>🛵</span> Free Delivery > Rs. 1,000
               </span>
-              <span class="inline-flex items-center gap-1 bg-red-100/90 border border-red-300 px-2.5 py-1 rounded-full text-red-950 font-black shadow-xs">
+              <span class="hidden sm:inline-flex items-center gap-1 bg-red-300/10 border border-red-300/30 px-2.5 py-1 rounded-full text-red-100 font-black">
                 <span>🔥</span> 100% Fresh Halal
               </span>
             </div>
 
             <!-- Price and Call to Action (Optimized for Mobile Taps) -->
-            <div class="flex items-center gap-2.5 sm:gap-4 pt-1">
-              <div id="hero-price-box" class="bg-white px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-2xl border-2 border-amber-300 shadow-md flex-shrink-0">
-                <div class="text-[9px] sm:text-[10px] text-gray-500 font-bold uppercase tracking-wider" id="hero-price-label">Combo Price</div>
-                <div class="flex items-baseline gap-2"><div id="hero-price" class="text-lg sm:text-2xl font-black text-amber-700 font-heading">Rs. 2,890</div><span id="hero-old-price" class="hidden text-xs sm:text-sm font-bold text-gray-400 line-through"></span></div>
+            <div class="flex items-center gap-2 sm:gap-4 pt-1">
+              <div id="hero-price-box" class="bg-white px-3 sm:px-5 py-2.5 sm:py-3 rounded-2xl border-2 border-amber-300 shadow-md flex-shrink-0">
+                <div class="text-[9px] sm:text-[10px] text-gray-500 font-bold uppercase tracking-wider" id="hero-price-label">Starting at</div>
+                <div class="flex items-baseline gap-2"><div id="hero-price" class="text-lg sm:text-2xl font-black text-amber-700 font-heading">Zinger · Rs. 350</div><span id="hero-old-price" class="hidden text-xs sm:text-sm font-bold text-gray-400 line-through"></span></div>
               </div>
 
-              <button id="hero-cta-btn" class="flex-1 sm:flex-none group relative px-4 sm:px-8 py-3 sm:py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-red-600 hover:from-amber-400 hover:to-orange-500 text-white font-black text-xs sm:text-base shadow-xl shadow-orange-500/25 active:scale-95 transition overflow-hidden flex items-center justify-center gap-1.5 sm:gap-2.5 cursor-pointer">
+              <button id="hero-cta-btn" class="flex-1 sm:flex-none group relative px-3.5 sm:px-8 min-h-12 sm:min-h-14 sm:py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-red-600 hover:from-amber-400 hover:to-orange-500 text-white font-black text-xs sm:text-base shadow-xl shadow-orange-500/25 active:scale-95 transition overflow-hidden flex items-center justify-center gap-1.5 sm:gap-2.5 cursor-pointer">
                 <span class="relative z-10 flex items-center gap-1.5 sm:gap-2">
-                  <span id="hero-cta-text">Order Feast Now</span>
+                  <span id="hero-cta-text">Order a Zinger</span>
                   <svg class="w-4 h-4 sm:w-5 sm:h-5 transform group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
                 </span>
                 <div class="absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-1000 bg-gradient-to-r from-transparent via-white/25 to-transparent"></div>
               </button>
 
-              <a href="#menu" class="hidden sm:inline-flex px-4 py-3.5 rounded-2xl bg-white hover:bg-amber-50 text-gray-800 hover:text-amber-800 border-2 border-amber-200 text-xs font-black transition items-center gap-1 shadow-sm">
+              <a href="#menu" class="hidden sm:inline-flex px-4 py-3.5 rounded-2xl bg-white/10 hover:bg-white/15 text-white border border-white/20 text-xs font-black transition items-center gap-1">
                 <span>Menu</span>
                 <span>↓</span>
               </a>
@@ -561,9 +562,9 @@
 
             <!-- Slide Thumbnails Switcher -->
             <div id="hero-thumbs-wrap" class="pt-2">
-              <div class="text-[10px] sm:text-[11px] text-gray-600 font-bold uppercase tracking-wider mb-2 flex items-center justify-between">
+              <div class="text-[10px] sm:text-[11px] text-gray-400 font-bold uppercase tracking-wider mb-2 flex items-center justify-between">
                 <span>Explore Featured Highlights</span>
-                <span class="text-amber-700 text-[10px] font-extrabold">Tap to switch</span>
+                <span class="text-amber-300 text-[10px] font-extrabold">Tap to switch</span>
               </div>
               <div id="hero-thumbnails" class="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar"></div>
             </div>
@@ -571,12 +572,12 @@
           </div>
 
           <!-- Right Showcase Graphical Presentation -->
-          <div class="lg:col-span-6 relative flex items-center justify-center mt-2 sm:mt-0">
+          <div class="order-1 lg:order-2 lg:col-span-6 relative flex items-center justify-center mt-0 sm:mt-0">
             
             <!-- Radiant Food Halo Backdrop -->
             <div class="absolute inset-0 sm:inset-2 rounded-full bg-gradient-to-tr from-yellow-300/60 via-amber-400/40 to-orange-400/25 blur-3xl transform scale-110 pointer-events-none"></div>
 
-            <div class="relative w-full max-w-sm sm:max-w-md lg:max-w-lg aspect-square rounded-[28px] sm:rounded-3xl overflow-hidden border-2 border-amber-300 bg-white shadow-2xl glow-amber group mx-auto">
+            <div class="relative w-full max-w-xl lg:max-w-lg aspect-[16/10] sm:aspect-square rounded-[26px] sm:rounded-3xl overflow-hidden border border-amber-300/70 bg-[#201a18] shadow-2xl shadow-amber-950/40 group mx-auto">
               
               <!-- Floating Top Badges -->
               <div class="absolute top-3 left-3 sm:top-4 sm:left-4 z-20 bg-white/95 backdrop-blur-md px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full border border-amber-300 text-amber-900 text-[10px] sm:text-xs font-black flex items-center gap-1.5 shadow-md">
@@ -589,10 +590,10 @@
               </div>
 
               <!-- Main Hero Dish Image with Float Animation -->
-              <img id="hero-image" src="./images/hero-1.jpg" alt="Hero Dish" class="w-full h-full object-cover transform transition-all duration-700 group-hover:scale-105 animate-float" decoding="async" fetchpriority="high" />
+              <img id="hero-image" src="./images/hero-1.jpg" alt="Crispy LFC fried chicken and meal" class="w-full h-full object-cover transform transition-all duration-700 group-hover:scale-105 animate-float" decoding="async" fetchpriority="high" />
 
               <!-- Bottom Glass Feature Pill -->
-              <div class="absolute bottom-2.5 left-2.5 right-2.5 sm:bottom-4 sm:left-4 sm:right-4 bg-white/95 backdrop-blur-md p-2.5 sm:p-3.5 rounded-2xl border border-amber-200 flex items-center justify-around text-[9px] sm:text-xs font-black text-gray-800 shadow-lg">
+              <div class="absolute bottom-2 left-2 right-2 sm:bottom-4 sm:left-4 sm:right-4 bg-[#10131d]/90 backdrop-blur-md p-2 sm:p-3.5 rounded-2xl border border-white/15 flex items-center justify-around text-[8px] sm:text-xs font-black text-white shadow-lg">
                 <span class="flex items-center gap-1 text-amber-800">✨ Lahori Spice</span>
                 <span class="flex items-center gap-1 text-orange-700">🌶️ Crispy Crunch</span>
                 <span class="flex items-center gap-1 text-emerald-700">⚡ Fast Delivery</span>
@@ -643,13 +644,14 @@
     </div>
 
     <!-- Menu Section (2 Cards per row on Mobile!) -->
-    <section id="menu" class="py-10 sm:py-16 max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+    <section id="menu" class="py-8 sm:py-16 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
       
       <!-- Section Title & Desktop Search -->
       <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 sm:mb-8">
         <div>
-          <span class="text-amber-700 text-xs font-black uppercase tracking-widest bg-amber-100 px-3 py-1 rounded-full border border-amber-300 inline-block shadow-sm">Our Signature Menu</span>
-          <h2 class="text-2xl sm:text-4xl font-black text-gray-950 font-heading mt-2">Explore Lahore's Crunchiest Bites</h2>
+          <span class="text-amber-800 text-[10px] sm:text-xs font-black uppercase tracking-widest bg-amber-100 px-3 py-1.5 rounded-full border border-amber-300 inline-block shadow-sm">Made fresh at LFC</span>
+          <h2 class="text-2xl sm:text-4xl font-black text-gray-950 font-heading mt-2">Find your next favourite</h2>
+          <p class="text-xs sm:text-sm text-gray-600 mt-2 max-w-xl">Browse the menu by category, pick your favourites, and order in just a few taps.</p>
         </div>
 
         <!-- Desktop Search Bar -->
@@ -671,7 +673,7 @@
       <!-- Result count -->
       <div id="menu-result-count" class="text-[11px] text-gray-600 font-bold mb-4 sm:mb-6"></div>
 
-      <!-- Menu Items Grid: EXACTLY 2 items per row in Mobile (`grid-cols-2`)! -->
+      <!-- Menu Items Grid -->
       <div id="menu-grid" class="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-6"></div>
 
       <!-- Empty State -->
@@ -683,20 +685,20 @@
 
     </section>
 
-    <!-- Deals & Combos Section (Radiant White & Golden-Yellow Mineral Showcase) -->
-    <section id="deals" class="py-12 sm:py-16 bg-gradient-to-b from-[#FFFDF7] via-[#FFF9E6] to-[#FAF8F5] border-y border-amber-200/90 relative overflow-hidden">
+    <!-- Deals & Combos -->
+    <section id="deals" class="py-14 sm:py-20 bg-gradient-to-b from-[#fffaf0] via-white to-[#fff7e5] border-y border-amber-200 relative overflow-hidden">
       <!-- Ambient Mineral Glow -->
       <div class="absolute -top-20 -right-20 w-80 h-80 bg-yellow-300/30 rounded-full blur-3xl pointer-events-none"></div>
       <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-amber-400/25 rounded-full blur-3xl pointer-events-none"></div>
 
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div class="text-center max-w-2xl mx-auto mb-10 sm:mb-12">
-          <span class="text-amber-700 text-xs font-black uppercase tracking-widest bg-amber-100 px-3 py-1 rounded-full border border-amber-300 inline-block shadow-sm">Mega Savings</span>
-          <h2 class="text-2xl sm:text-4xl font-black text-gray-950 font-heading mt-2">Lahore Special Combos & Deals</h2>
-          <p class="text-gray-700 text-xs sm:text-sm mt-2 font-medium">Bigger portions, extra crunch, and unbeatable prices for family & friends.</p>
+        <div class="text-center max-w-3xl mx-auto mb-9 sm:mb-12">
+          <span class="text-amber-800 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] bg-amber-100 px-4 py-2 rounded-full border border-amber-300 inline-flex items-center gap-2 shadow-sm"><span>✦</span> Freshly made, better value</span>
+          <h2 class="text-3xl sm:text-5xl font-black text-gray-950 font-heading mt-4">Deals worth sharing</h2>
+          <p class="text-gray-600 text-sm sm:text-base mt-3 font-medium leading-relaxed">Choose a family combo or build your pizza Buy 1 Get 1 Free deal. For B1G1, select two Standard or Signature pizzas and sizes; the higher-priced pizza is charged.</p>
         </div>
 
-        <div id="deals-grid" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 sm:gap-8"></div>
+        <div id="deals-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6 lg:gap-8"></div>
         <div class="hidden reveal grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
           
           <!-- Deal 1 -->

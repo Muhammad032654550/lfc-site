@@ -9,6 +9,7 @@
   'use strict';
 
   // --- Initial Preset Data ---
+  const CATALOG_REVISION = '2026-10-21-v4';
   let syncing = false, syncPending = false, syncTimer = null, remoteSyncing = false, selfSaving = false, applyingRemote = false;
   const SYNC_KEYS = ['hero_slides', 'hero_config', 'menu_items', 'categories', 'settings', 'branches', 'deals'];
   const DEFAULT_SETTINGS = {
@@ -50,17 +51,25 @@
     { id: 1, title: 'Family Feast Mega Box', description: '4 Crispy Zinger Burgers, 4 Pcs Golden Fried Chicken, 1 Jumbo Fries, 2 Paratha Rolls, and 1.5L Chilled Soft Drink.', type: 'standard', price: 2890, originalPrice: 3850, badge: 'Save 25%', image: './images/hero-1.jpg', active: true, startsAt: '', endsAt: '' },
     { id: 2, title: 'Couple Crunch Deal', description: '2 Zinger Burgers, 2 Pcs Crunchy Fried Chicken, 1 Large Fries, and 2 Soft Drink cans (250ml).', type: 'standard', price: 1450, originalPrice: 1850, badge: 'Duo Pack', image: './images/hero-4.jpg', active: true, startsAt: '', endsAt: '' },
     { id: 3, title: 'Pizza & Chicken Platter', description: '1 Medium Cheesy Loaded Pizza + 5 Pcs Hot Tender Strips + 2 Garlic Dips + 2 Chilled Soft Drinks.', type: 'standard', price: 1690, originalPrice: 2100, badge: 'Hot Special', image: './images/hero-3.jpg', active: true, startsAt: '', endsAt: '' },
-    { id: 4, title: 'Pizza Buy 1 Get 1 Free', description: 'Choose any two available pizzas and sizes. The higher-priced pizza is charged; the other pizza is free.', type: 'bogo', price: 0, originalPrice: 0, badge: 'Buy 1 Get 1 Free', image: './images/hero-3.jpg', active: true, startsAt: '', endsAt: '' }
+    { id: 4, title: 'Pizza Buy 1 Get 1 Free', description: 'Choose any two Standard or Signature pizzas and sizes. Pay for the higher-priced pizza and get the other one free.', type: 'bogo', price: 0, originalPrice: 0, badge: 'Buy 1 Get 1 Free', image: './images/hero-3.jpg', active: true, startsAt: '', endsAt: '' },
+    { id: 5, title: 'Big Deal 1', description: '2 Paratha Rolls, 4 Zinger Burgers, 10 Pc Nuggets, 2 Family Fries, 2 Small Pizzas, and 2 x 1.5 Ltr Drinks.', type: 'standard', price: 4000, originalPrice: 0, badge: 'Family Combo', image: './images/hero-1.jpg', active: true, startsAt: '', endsAt: '', catalogRevision: CATALOG_REVISION },
+    { id: 6, title: 'Big Deal 2', description: '2 Paratha Rolls, 10 Pc Nuggets, 3 Zinger Burgers, 2 Chicken Pieces, 1 Single Large Pizza, 2 x 1.5 Ltr Drinks, and 2 Family Fries.', type: 'standard', price: 4500, originalPrice: 0, badge: 'Family Combo', image: './images/hero-4.jpg', active: true, startsAt: '', endsAt: '', catalogRevision: CATALOG_REVISION },
+    { id: 7, title: 'Turkish Doner Combo', description: 'Turkish Doner + 1 Regular Drink.', type: 'standard', price: 500, originalPrice: 0, badge: 'Combo', image: './images/hero-2.jpg', active: true, startsAt: '', endsAt: '', catalogRevision: CATALOG_REVISION },
+    { id: 8, title: 'Fillet Zinger Combo', description: 'Fillet Zinger with cheese and garlic sauce.', type: 'standard', price: 500, originalPrice: 0, badge: 'Combo', image: './images/hero-1.jpg', active: true, startsAt: '', endsAt: '', catalogRevision: CATALOG_REVISION },
+    { id: 9, title: 'Spin Roll Combo', description: 'Spin Roll + 1 Drink (500ml).', type: 'standard', price: 650, originalPrice: 0, badge: 'Combo', image: './images/hero-2.jpg', active: true, startsAt: '', endsAt: '', catalogRevision: CATALOG_REVISION }
   ];
 
   const DEFAULT_CATEGORIES = [
     { id: "all", name: "All Bites" },
-    { id: "burgers", name: "Burgers & Rolls" },
+    { id: "burgers", name: "Burgers" },
+    { id: "wraps", name: "Wraps & Rolls" },
     { id: "chicken", name: "Fried Chicken" },
-    { id: "wings", name: "Wings & Nuggets" },
-    { id: "pizzas", name: "Pizzas · B1G1" },
-    { id: "deals", name: "Hot Deals" },
-    { id: "family", name: "Family & Big Deals" },
+    { id: "wings", name: "Wings, Nuggets & Hot Shots" },
+    { id: "pasta", name: "Pasta" },
+    { id: "sandwiches", name: "Sandwiches" },
+    { id: "pizzas", name: "Pizzas & Crusts" },
+    { id: "deals", name: "Nut Deals" },
+    { id: "family", name: "Family Combos" },
     { id: "midnight", name: "Midnight Deals" },
     { id: "sides", name: "Sides & Drinks" }
   ];
@@ -68,16 +77,17 @@
   const DEFAULT_HERO_SLIDES = [
     {
       id: 1,
-      title: 'THE ULTIMATE CRISPY',
-      highlight: 'FAMILY FEAST',
-      subtitle: 'Signature Zinger burger, golden crunch bucket, cheesy pizza slice, paratha roll and tender strips in one legendary combo.',
-      badgeText: '#1 Crispy Chicken in Lahore',
+      title: 'CRISPY OUTSIDE.',
+      highlight: 'LEGENDARY INSIDE.',
+      subtitle: 'Freshly made burgers, golden fried chicken and loaded pizzas — your next LFC favourite is just a tap away.',
+      badgeText: 'Lahore’s crispy chicken favourite',
       image: './images/hero-1.jpg?v=20261017',
-      priceTag: 'Rs. 2,500',
-      tag: 'Grand Feast',
-      rating: '4.9 ★ (1,840+ reviews)',
-      ctaText: 'Order Feast Now',
-      targetDealId: 50
+      priceTag: 'Zinger · Rs. 350',
+      priceLabel: 'Starting at',
+      tag: 'The LFC Favourite',
+      rating: 'Freshly made · Full of flavour',
+      ctaText: 'Order a Zinger',
+      targetDealId: 1
     },
     {
       id: 2,
@@ -129,6 +139,30 @@
     return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
   }
   const M = (id, name, cat, price, desc, emoji, badge, spiciness, sizes, spiceLevels, addons) => ({ id, name, cat, price, desc, image: menuArt(emoji), art: emoji, badge, inStock: true, spiciness, sizes, spiceLevels, addons });
+  const P = (id, name, price, desc, group, bogoEligible) => ({
+    ...M(
+      id,
+      name,
+      'pizzas',
+      price,
+      desc,
+      '🍕',
+      bogoEligible ? 'Buy 1 Get 1 Free' : group,
+      0,
+      group === 'Standard · B1G1'
+        ? [{ name: 'Small 7"', price: 0 }, { name: 'Medium 10"', price: 850 }, { name: 'Large 13"', price: 1550 }, { name: 'Family 18"', price: 2450 }]
+        : group === 'Signature · B1G1'
+        ? [{ name: 'Small 7"', price: 0 }, { name: 'Medium 10"', price: 950 }, { name: 'Large 13"', price: 1650 }, { name: 'Family 18"', price: 2550 }]
+        : group === 'Premium · Single'
+        ? [{ name: 'Small', price: 0 }, { name: 'Medium', price: 650 }, { name: 'Large', price: 1050 }, { name: 'Family', price: 1500 }]
+        : [{ name: 'Small', price: 0 }, { name: 'Medium', price: 500 }, { name: 'Large', price: 900 }, { name: 'Family', price: 1300 }],
+      ['Regular'],
+      [{ name: 'Extra Cheese', price: 60 }, { name: 'Dip Sauce', price: 50 }]
+    ),
+    pizzaGroup: group,
+    bogoEligible,
+    catalogRevision: CATALOG_REVISION
+  });
   const DEFAULT_MENU_ITEMS = [
     M(1, "Zinger Burger", "burgers", 350, "Crispy golden zinger fillet with fresh lettuce and creamy sauce in a soft toasted bun.", "🍔🍗", "Bestseller", 2, [], ["Regular", "Extra Spicy"], [{"name": "Extra Cheese", "price": 60}, {"name": "Dip Sauce", "price": 50}, {"name": "Extra Bun", "price": 60}, {"name": "Reg. Drink", "price": 70}]),
     M(2, "Mighty Zinger", "burgers", 600, "Our biggest zinger — a thick, juicy crunchy fillet stacked high for serious appetites.", "🍔", "Mighty", 2, [], ["Regular", "Extra Spicy"], [{"name": "Extra Cheese", "price": 60}, {"name": "Dip Sauce", "price": 50}, {"name": "Extra Bun", "price": 60}, {"name": "Reg. Drink", "price": 70}]),
@@ -147,21 +181,21 @@
     M(15, "Hot Wings", "wings", 300, "Fiery, crispy chicken wings tossed in our signature hot sauce.", "🍗🔥", "Hot", 2, [{"name": "5 Pcs.", "price": 0}, {"name": "10 Pcs.", "price": 300}], ["Regular"], [{"name": "Dip Sauce", "price": 50}]),
     M(16, "Hot Shots", "wings", 300, "Bite-size crunchy chicken shots with a spicy kick.", "🍗", "", 2, [{"name": "5 Pcs.", "price": 0}, {"name": "10 Pcs.", "price": 300}], ["Regular"], [{"name": "Dip Sauce", "price": 50}]),
     M(17, "Nuggets", "wings", 300, "Golden crispy chicken nuggets, perfect for sharing.", "🍗", "", 0, [{"name": "5 Pcs.", "price": 0}, {"name": "10 Pcs.", "price": 300}], ["Regular"], [{"name": "Dip Sauce", "price": 50}]),
-    M(18, "Chicken Tikka", "pizzas", 1000, "Chicken tikka, onion, black olives, cheese and green capsicum.", "🍕", "Buy 1 Get 1 Free", 1, [{"name": "Small 7\"", "price": 0}, {"name": "Medium 10\"", "price": 800}, {"name": "Large 13\"", "price": 1400}], ["Regular"], [{"name": "Extra Cheese", "price": 60}, {"name": "Dip Sauce", "price": 50}]),
-    M(19, "Chicken Fajita", "pizzas", 1000, "Chicken fajita, onion, tomato, mushroom and cheese.", "🍕", "Buy 1 Get 1 Free", 1, [{"name": "Small 7\"", "price": 0}, {"name": "Medium 10\"", "price": 800}, {"name": "Large 13\"", "price": 1400}], ["Regular"], [{"name": "Extra Cheese", "price": 60}, {"name": "Dip Sauce", "price": 50}]),
-    M(20, "Chicken Creamy", "pizzas", 1050, "Chicken, onion, cream and cheese.", "🍕", "Buy 1 Get 1 Free", 0, [{"name": "Small 7\"", "price": 0}, {"name": "Medium 10\"", "price": 800}, {"name": "Large 13\"", "price": 1400}], ["Regular"], [{"name": "Extra Cheese", "price": 60}, {"name": "Dip Sauce", "price": 50}]),
-    M(21, "Supreme Pizza", "pizzas", 1050, "Chicken tikka, onion, pepperoni, olives and cheese.", "🍕", "Buy 1 Get 1 Free", 1, [{"name": "Small 7\"", "price": 0}, {"name": "Medium 10\"", "price": 800}, {"name": "Large 13\"", "price": 1400}], ["Regular"], [{"name": "Extra Cheese", "price": 60}, {"name": "Dip Sauce", "price": 50}]),
-    M(22, "Malai Boti Pizza", "pizzas", 1050, "Chicken malai boti, onion and cheese.", "🍕", "Buy 1 Get 1 Free", 0, [{"name": "Small 7\"", "price": 0}, {"name": "Medium 10\"", "price": 850}, {"name": "Large 13\"", "price": 1550}], ["Regular"], [{"name": "Extra Cheese", "price": 60}, {"name": "Dip Sauce", "price": 50}]),
-    M(23, "Seekh Kabab Pizza", "pizzas", 1050, "Chicken seekh kabab, onion, green capsicum and cheese.", "🍕", "Buy 1 Get 1 Free", 1, [{"name": "Small 7\"", "price": 0}, {"name": "Medium 10\"", "price": 850}, {"name": "Large 13\"", "price": 1500}], ["Regular"], [{"name": "Extra Cheese", "price": 60}, {"name": "Dip Sauce", "price": 50}]),
-    M(24, "Chicken Hot & Spicy Pizza", "pizzas", 1000, "Spicy chicken, onion, olives, green capsicum and cheese.", "🍕🔥", "Buy 1 Get 1 Free", 2, [{"name": "Small 7\"", "price": 0}, {"name": "Medium 10\"", "price": 800}, {"name": "Large 13\"", "price": 1400}], ["Regular"], [{"name": "Extra Cheese", "price": 60}, {"name": "Dip Sauce", "price": 50}]),
-    M(25, "Kabab Crust Pizza", "pizzas", 1150, "Cheesy pizza with a seekh kabab stuffed crust.", "🍕", "Buy 1 Get 1 Free", 1, [{"name": "Small 7\"", "price": 0}, {"name": "Medium 10\"", "price": 950}, {"name": "Large 13\"", "price": 1650}], ["Regular"], [{"name": "Extra Cheese", "price": 60}, {"name": "Dip Sauce", "price": 50}]),
-    M(26, "Lazania Pizza", "pizzas", 1150, "Lasagna-style pizza with creamy layers and melted cheese.", "🍝🍕", "Buy 1 Get 1 Free", 0, [{"name": "Small 7\"", "price": 0}, {"name": "Medium 10\"", "price": 950}, {"name": "Large 13\"", "price": 1650}], ["Regular"], [{"name": "Extra Cheese", "price": 60}, {"name": "Dip Sauce", "price": 50}]),
-    M(27, "LFC Special Pizza", "pizzas", 1000, "Chicken tikka, green capsicum, onion, tomato, pepperoni, mushrooms and olives.", "🍕⭐", "LFC Special", 1, [{"name": "Small 7\"", "price": 0}, {"name": "Medium 10\"", "price": 900}, {"name": "Large 13\"", "price": 1500}], ["Regular"], [{"name": "Extra Cheese", "price": 60}, {"name": "Dip Sauce", "price": 50}]),
-    M(28, "Single Side Filling Pizza", "pizzas", 600, "Cheese, chicken tikka, olives, onion and green capsicum.", "🍕", "", 0, [{"name": "Small 7\"", "price": 0}, {"name": "Medium 10\"", "price": 500}, {"name": "Large 13\"", "price": 850}], ["Regular"], [{"name": "Extra Cheese", "price": 60}, {"name": "Dip Sauce", "price": 50}]),
-    M(29, "Malai Pizza (Single)", "pizzas", 550, "Creamy malai chicken pizza, single.", "🍕", "", 0, [{"name": "Small 7\"", "price": 0}, {"name": "Medium 10\"", "price": 550}, {"name": "Large 13\"", "price": 950}], ["Regular"], [{"name": "Extra Cheese", "price": 60}, {"name": "Dip Sauce", "price": 50}]),
-    M(30, "Single Pizza", "pizzas", 500, "Classic single pizza, cheesy and fresh.", "🍕", "", 0, [{"name": "Small 7\"", "price": 0}, {"name": "Medium 10\"", "price": 450}, {"name": "Large 13\"", "price": 800}], ["Regular"], [{"name": "Extra Cheese", "price": 60}, {"name": "Dip Sauce", "price": 50}]),
-    M(31, "Kabab Crust Pizza (Single)", "pizzas", 600, "Single kabab crust pizza.", "🍕", "", 0, [{"name": "Small 7\"", "price": 0}, {"name": "Medium 10\"", "price": 500}, {"name": "Large 13\"", "price": 950}], ["Regular"], [{"name": "Extra Cheese", "price": 60}, {"name": "Dip Sauce", "price": 50}]),
-    M(32, "Crown Crust Pizza (Single)", "pizzas", 600, "Single crown crust pizza with a cheese-stuffed border.", "🍕", "", 0, [{"name": "Small 7\"", "price": 0}, {"name": "Medium 10\"", "price": 550}, {"name": "Large 13\"", "price": 950}], ["Regular"], [{"name": "Extra Cheese", "price": 60}, {"name": "Dip Sauce", "price": 50}]),
+    P(18, "Chicken Tikka", 1050, "Chicken tikka, onion, black olives, cheese and green capsicum.", "Standard · B1G1", true),
+    P(19, "Chicken Fajita", 1050, "Chicken fajita, onion, tomato, mushroom and cheese.", "Standard · B1G1", true),
+    P(20, "Super Supreme", 1050, "Loaded with chicken, vegetables, olives and cheese.", "Standard · B1G1", true),
+    P(21, "Vegetable", 1050, "A colorful mix of vegetables, olives and melted cheese.", "Standard · B1G1", true),
+    P(22, "Hot & Spicy", 1050, "Spicy chicken, onion, olives, green capsicum and cheese.", "Standard · B1G1", true),
+    P(23, "Cheese Lover", 1050, "A rich, extra-cheesy pizza made for cheese lovers.", "Standard · B1G1", true),
+    P(24, "Malai Boti", 1150, "Creamy chicken malai boti with onion and cheese.", "Signature · B1G1", true),
+    P(25, "Seekh Kabab", 1150, "Chicken seekh kabab, onion, green capsicum and cheese.", "Signature · B1G1", true),
+    P(26, "LFC Special", 1150, "LFC special chicken, vegetables and cheese.", "Signature · B1G1", true),
+    P(27, "Chicken Creamy", 1150, "Creamy chicken, onion and melted cheese.", "Signature · B1G1", true),
+    P(28, "Crown Crust", 600, "Classic pizza with a cheesy crown crust.", "Premium · Single", false),
+    P(29, "Kabab Crust", 600, "Classic pizza with a flavorful seekh kabab crust.", "Premium · Single", false),
+    P(30, "Cheese Stuffer", 600, "A cheese-stuffed crust with a golden baked finish.", "Premium · Single", false),
+    P(31, "Chicken Cheese Stuffer", 600, "Chicken pizza with a cheesy stuffed crust.", "Premium · Single", false),
+    P(32, "LFC Special", 600, "LFC special flavor on a premium crust.", "Premium · Single", false),
     M(33, "Hot Deal 1", "deals", 550, "1 Zinger, 1 Reg Fries, 1 (500ml) Drink", "🍔🍟🥤", "Value Deal", 1, [], ["Regular"], [{"name": "Extra Cheese", "price": 60}, {"name": "Dip Sauce", "price": 50}]),
     M(34, "Hot Deal 2", "deals", 700, "1 Tower Zinger, 1 Reg Fries, 1 (500ml) Drink", "🍔🍟🥤", "Hot Deal", 1, [], ["Regular"], [{"name": "Extra Cheese", "price": 60}, {"name": "Dip Sauce", "price": 50}]),
     M(35, "Hot Deal 3", "deals", 620, "1 Zinger, 1 Pc. Chicken, 1 Reg Fries, 1 (500ml) Drink", "🍔🍗🍟", "Hot Deal", 1, [], ["Regular"], [{"name": "Extra Cheese", "price": 60}, {"name": "Dip Sauce", "price": 50}]),
@@ -181,8 +215,8 @@
     M(49, "Family Combo 2", "family", 2050, "5 Zinger, 1 Family Fries, 1 1.5 Ltr. Drink", "🍗🍔🍟🥤", "Family", 1, [], ["Regular"], [{"name": "Dip Sauce", "price": 50}, {"name": "Extra Cheese", "price": 60}]),
     M(50, "Family Combo 3", "family", 2500, "5 Pc. Chicken, 3 Zinger, 1 Family Fries, 1 1.5 Ltr. Drink", "🍗🍔🍟🥤", "Most Ordered", 1, [], ["Regular"], [{"name": "Dip Sauce", "price": 50}, {"name": "Extra Cheese", "price": 60}]),
     M(51, "Family Combo 4", "family", 4400, "1 Single Medium Zinger Burger, 1 Family Fries, 2 1.5 Ltr Drinks, 6 Pc Chicken", "🍗🍔🍟🥤", "Family", 1, [], ["Regular"], [{"name": "Dip Sauce", "price": 50}, {"name": "Extra Cheese", "price": 60}]),
-    M(52, "Big Deal 1", "family", 3700, "2 P. Roll, 2 Zinger, 10 Hot Wings, 10 Nuggets, F. Fries, 2 x S. Pizza, 2 1.5 Ltr. Drink", "🍕🍗🍟🥤", "Mega Deal", 1, [], ["Regular"], []),
-    M(53, "Big Deal 2", "family", 5400, "3 P. Roll, 10 Pc Hotwing, 10 Pc Nuggets, 5 Zinger, 1 Single Large, 2 1.5 Ltr. Drink, 2 Family Fries", "🍕🍗🍟🥤", "Mega Deal", 1, [], ["Regular"], []),
+    { ...M(52, "Big Deal 1", "family", 4000, "2 Paratha Rolls, 4 Zinger Burgers, 10 Pc Nuggets, 2 Family Fries, 2 Small Pizzas, 2 x 1.5 Ltr Drinks.", "🍕🍗🍟🥤", "Mega Deal", 1, [], ["Regular"], []), catalogRevision: CATALOG_REVISION },
+    { ...M(53, "Big Deal 2", "family", 4500, "2 Paratha Rolls, 10 Pc Nuggets, 3 Zinger Burgers, 2 Chicken Pieces, 1 Single Large Pizza, 2 x 1.5 Ltr Drinks, 2 Family Fries.", "🍕🍗🍟🥤", "Mega Deal", 1, [], ["Regular"], []), catalogRevision: CATALOG_REVISION },
     M(54, "Grill Burger", "midnight", 500, "Midnight special — flame-grilled chicken burger with melted cheese.", "🍔🔥", "Midnight", 1, [], ["Regular"], [{"name": "Extra Cheese", "price": 60}, {"name": "Dip Sauce", "price": 50}, {"name": "Extra Bun", "price": 60}, {"name": "Reg. Drink", "price": 70}]),
     M(55, "Loaded Fries", "midnight", 500, "Crispy fries loaded with chicken, cheese and drizzled sauces.", "🍟🧀", "Midnight", 1, [], ["Regular"], []),
     M(56, "Zinger Wrap", "midnight", 500, "Crispy zinger strips wrapped with fresh veggies and sauce.", "🌯", "Midnight", 1, [], ["Regular"], []),
@@ -199,8 +233,97 @@
     M(67, "Extra Bread", "sides", 60, "Extra bread.", "🍞", "", 0, [], ["Regular"], []),
     M(68, "Extra Bun", "sides", 60, "Extra burger bun.", "🍞", "", 0, [], ["Regular"], []),
     M(69, "Extra Paratha", "sides", 60, "Extra fresh paratha.", "🫓", "", 0, [], ["Regular"], []),
-    M(70, "Disposable Glass", "sides", 10, "Disposable glass.", "🥛", "", 0, [], ["Regular"], [])
+    M(70, "Disposable Glass", "sides", 10, "Disposable glass.", "🥛", "", 0, [], ["Regular"], []),
+    P(71, "Chicken Tikka (Regular Pizza)", 500, "Classic Chicken Tikka pizza, available as a single pizza.", "Regular · Single", false),
+    M(72, "Malawa Burger", "burgers", 700, "A signature Malawa burger with a rich, satisfying flavor.", "🍔", "New Arrival", 1, [], ["Regular"], [{ name: "Extra Cheese", price: 60 }, { name: "Garlic Sauce", price: 50 }]),
+    M(73, "Jalapeno Burger", "burgers", 600, "Juicy burger with a bright jalapeno kick and creamy sauce.", "🍔🌶️", "New Arrival", 2, [], ["Regular", "Extra Spicy"], [{ name: "Extra Cheese", price: 60 }, { name: "Garlic Sauce", price: 50 }]),
+    M(74, "Fish Burger", "burgers", 700, "Crispy golden fish fillet with fresh salad and house sauce.", "🍔🐟", "New Arrival", 0, [], ["Regular"], [{ name: "Extra Cheese", price: 60 }, { name: "Garlic Sauce", price: 50 }]),
+    M(75, "Turkish Doner", "burgers", 600, "Flavorful Turkish-style doner served with fresh toppings and sauce.", "🥙", "New Arrival", 1, [], ["Regular"], [{ name: "Garlic Sauce", price: 50 }]),
+    M(76, "Turkish Doner Combo", "deals", 500, "Turkish Doner + 1 Regular Drink.", "🥙🥤", "Combo", 1, [], ["Regular"], []),
+    M(77, "Fillet Zinger Combo", "deals", 500, "Fillet Zinger with cheese and garlic sauce.", "🍔🧀", "Combo", 1, [], ["Regular"], []),
+    M(78, "Spin Roll Combo", "deals", 650, "Spin Roll + 1 Drink (500ml).", "🌯🥤", "Combo", 1, [], ["Regular"], []),
+    P(79, "Malai Boti", 600, "Creamy chicken malai boti flavor on a premium crust.", "Premium · Single", false)
   ];
+
+  const C = (id, name, cat, price, description, emoji, legacyIds = [], aliases = [], sizes = []) => ({
+    ...M(id, name, cat, price, description, emoji, cat === 'deals' ? 'Nut Deal' : cat === 'family' ? 'Family Combo' : '', 0, sizes, ['Regular'], []),
+    catalogRevision: CATALOG_REVISION,
+    legacyIds,
+    migrationAliases: aliases
+  });
+  const NEW_MENU_CATALOG = [
+    C(80, 'Nut Deal 1', 'deals', 550, '1 Zinger + 1 Reg Fries + 1 Reg Drink.', '🍔🍟🥤', [33], ['Hot Deal 1']),
+    C(81, 'Nut Deal 2', 'deals', 750, '1 Tower Zinger + 1 Reg Fries + 1 Reg Drink.', '🍔🍟🥤', [34], ['Hot Deal 2']),
+    C(82, 'Nut Deal 3', 'deals', 630, '1 Zinger + 1 Pc. Chicken + 1 Reg Drink.', '🍔🍗🥤', [35], ['Hot Deal 3']),
+    C(83, 'Nut Deal 4', 'deals', 450, '1 Chicken Burger + 1 Reg Fries + 1 Reg Drink.', '🍔🍟🥤', [36], ['Hot Deal 4']),
+    C(84, 'Nut Deal 5', 'deals', 800, '2 Zinger + 1 Drink (500ml).', '🍔🍔🥤', [37], ['Hot Deal 5']),
+    C(85, 'Nut Deal 6', 'deals', 500, '1 Chapli Burger + 1 Reg Fries + 1 Reg Drink.', '🍔🍟🥤', [38], ['Hot Deal 6']),
+    C(86, 'Nut Deal 7', 'deals', 850, '1 Mighty Zinger + 1 Reg Fries + 1 Reg Drink.', '🍔🍟🥤', [39], ['Hot Deal 7']),
+    C(87, 'Nut Deal 8', 'deals', 1050, '1 Small Pizza + 1 Zinger Burger + 1 Reg Fries + 1 Drink (0.5 Ltr.).', '🍕🍔🍟🥤', [40], ['Hot Deal 8']),
+    C(88, 'Nut Deal 9', 'deals', 2200, '1 Large Pizza + 2 Zinger Burgers + 1 Drink (1.5 Ltr.).', '🍕🍔🥤', [41], ['Hot Deal 9']),
+    C(89, 'Nut Deal 10', 'deals', 750, '3 Pcs Chicken + 1 Reg Drink.', '🍗🥤', [42], ['Hot Deal 10']),
+    C(90, 'Nut Deal 11', 'deals', 1500, '1 Small Pizza + 5 Nuggets + 5 Hot Wings + 1 Family Fries + 1 Drink (500ml).', '🍕🍗🍟🥤', [43], ['Hot Deal 11']),
+    C(91, 'Nut Deal 12', 'deals', 2250, '1 Medium Pizza + 10 Nuggets + 1 Drink (1.5 Ltr.) + 2 Paratha Rolls.', '🍕🍗🌯🥤', [44], ['Hot Deal 12']),
+    C(92, 'Nut Deal 13', 'deals', 650, '1 Max Burger + 1 Reg Fries + 1 Reg Drink.', '🍔🍟🥤', [45], ['Hot Deal 13']),
+    C(93, 'Nut Deal 14', 'deals', 750, '10 Pcs Hot Wings + 1 Reg Drink.', '🍗🥤', [46], ['Hot Deal 14']),
+    C(94, 'Nut Deal 15', 'deals', 3150, '5 Tower Zinger + 1 Family Fries + 1 Drink (1.5 Ltr.).', '🍔🍟🥤', [47], ['Hot Deal 15']),
+    C(95, 'Nut Deal 16', 'deals', 800, '1 Tikka Tower Burger + 1 Reg Fries + 1 Reg Drink.', '🍔🍟🥤'),
+    C(96, 'Family Combo 1', 'family', 1800, '4 C. Patty Burgers + 1 Family Fries + 10 Nuggets + 1 Drink (1.5 Ltr.).', '🍔🍟🥤', [48]),
+    C(97, 'Family Combo 2', 'family', 2200, '5 Zinger + 1 Family Fries + 1 Drink (1.5 Ltr.).', '🍔🍟🥤', [49]),
+    C(98, 'Family Combo 3', 'family', 2400, '1 Medium Pizza + 1 Zinger Burger + 1 Chapli Patty Burger + 2 Chicken Pcs + 1 Reg Fries + 1 Drink (1.5 Ltr.).', '🍕🍔🍗🍟🥤', [50]),
+    C(99, 'Family Combo 4', 'family', 3150, '1 Large Pizza + 3 Zinger + 10 Hot Wings + 1 Drink (1.5 Ltr.).', '🍕🍔🍗🥤', [51]),
+    C(100, 'Zinger', 'burgers', 350, 'Crispy chicken fillet with fresh toppings and creamy sauce.', '🍔', [1], ['Zinger Burger']),
+    C(101, 'Crispy Jalapeno', 'burgers', 370, 'Crispy chicken with jalapeno heat and creamy sauce.', '🍔🌶️', [73], ['Jalapeno Burger']),
+    C(102, 'Mighty Zinger', 'burgers', 650, 'A big, crunchy Zinger stacked for a serious appetite.', '🍔', [2]),
+    C(103, 'Tower Zinger', 'burgers', 550, 'Crispy Zinger layered with a cheesy tower and house sauce.', '🍔🧀', [3]),
+    C(104, 'Pizza Burger', 'burgers', 500, 'Crispy chicken burger with pizza sauce and melted cheese.', '🍔🍕', [9]),
+    C(105, 'C. Patty Burger', 'burgers', 250, 'Classic chicken patty burger with fresh vegetables and mayo.', '🍔', [5], ['Chicken Burger']),
+    C(106, 'Chapli Burger', 'burgers', 300, 'Juicy chapli patty burger with fresh salad and sauce.', '🍔', [], ['Chapli Patty Burger']),
+    C(107, 'Grill Burger', 'burgers', 500, 'Flame-grilled chicken burger with melted cheese.', '🍔🔥', [54]),
+    C(108, 'Beef Burger', 'burgers', 500, 'Savory beef patty with fresh toppings and house sauce.', '🍔'),
+    C(109, 'Fish Burger', 'burgers', 650, 'Crispy golden fish fillet with fresh salad and house sauce.', '🍔🐟', [74]),
+    C(110, 'Max Burger', 'burgers', 450, 'A generously stacked burger packed with bold flavor.', '🍔'),
+    C(111, 'Spin Roll', 'wraps', 600, 'A savory spin roll wrapped fresh with flavorful filling.', '🌯'),
+    C(112, 'Bihari Roll', 'wraps', 700, 'Bihari-style spiced chicken wrapped with fresh salad and sauce.', '🌯🔥'),
+    C(113, 'Tortilla Wrap (L)', 'wraps', 500, 'A large tortilla wrap filled with seasoned chicken and fresh toppings.', '🌯'),
+    C(114, 'Tortilla Wrap (S)', 'wraps', 400, 'A small tortilla wrap filled with seasoned chicken and fresh toppings.', '🌯'),
+    C(115, 'Grill Wrap', 'wraps', 550, 'Grilled chicken, fresh vegetables and house sauce in a warm wrap.', '🌯🔥'),
+    C(116, 'Nuggets Wrap', 'wraps', 500, 'Crunchy chicken nuggets wrapped with salad and signature sauce.', '🌯🍗'),
+    C(117, 'Pizza Wrap', 'wraps', 400, 'Pizza-seasoned filling with cheese rolled in a soft wrap.', '🌯🍕'),
+    C(118, 'Chicken Paratha Roll', 'wraps', 330, 'Seasoned chicken, fresh salad and sauce in a flaky paratha.', '🌯', [10]),
+    C(119, 'Zinger Paratha Roll', 'wraps', 350, 'Crispy Zinger fillet rolled in a hot flaky paratha.', '🫓🍗', [58]),
+    C(120, 'Pizza Paratha', 'wraps', 600, 'Flaky paratha with pizza-style chicken, melted cheese and tangy sauce.', '🫓🍕', [4]),
+    C(121, 'Kabab Paratha Roll', 'wraps', 350, 'Smoky kabab wrapped in a crispy paratha with chutney and onions.', '🫓🍢', [11], ['Kabab Paratha']),
+    C(122, 'Cheese Paratha Roll', 'wraps', 400, 'Chicken and melted cheese wrapped in a fresh paratha.', '🫓🧀'),
+    C(123, 'Chicken Shawarma', 'wraps', 300, 'Juicy chicken shawarma with garlic sauce and pickles.', '🌯', [12]),
+    C(124, 'Zinger Shawarma', 'wraps', 350, 'Crispy Zinger strips with garlic sauce in a warm wrap.', '🌯🍗', [60], ['Zinger Shawarma (Large)']),
+    C(125, 'Cheese Shawarma', 'wraps', 380, 'Chicken shawarma with melted cheese and garlic sauce.', '🌯🧀'),
+    C(126, 'EX. Topping Paratha Roll', 'wraps', 400, 'Paratha roll finished with extra flavorful toppings.', '🫓'),
+    C(127, 'Boneless Pc', 'chicken', 300, 'Tender boneless chicken piece with a crunchy golden coating.', '🍗', [14], ['Chicken Boneless Pc']),
+    C(128, '1 Pc. Chicken', 'chicken', 250, 'One piece of crispy, freshly fried chicken.', '🍗', [13], ['Fried Chicken (Pieces)']),
+    C(129, '5 Pcs. Chicken', 'chicken', 1150, 'Five pieces of crispy, freshly fried chicken.', '🍗🍗'),
+    C(130, 'Creamy Pasta', 'pasta', 350, 'Creamy pasta with a smooth, savory sauce.', '🍝', [], [], [{ name: 'Small', price: 0 }, { name: 'Large', price: 300 }]),
+    C(131, 'Tikka Pasta', 'pasta', 350, 'Chicken tikka pasta with a bold, savory sauce.', '🍝🔥', [], [], [{ name: 'Small', price: 0 }, { name: 'Large', price: 300 }]),
+    C(132, 'Crunchy Pasta', 'pasta', 400, 'Creamy pasta topped with crunchy chicken bites.', '🍝🍗', [], [], [{ name: 'Small', price: 0 }, { name: 'Large', price: 300 }]),
+    C(133, 'Flaming Pasta', 'pasta', 400, 'A spicy, fiery pasta with a rich sauce.', '🍝🌶️', [], [], [{ name: 'Small', price: 0 }, { name: 'Large', price: 300 }]),
+    C(134, 'Tikka Sandwich', 'sandwiches', 450, 'Chicken tikka sandwich with fresh vegetables and sauce.', '🥪'),
+    C(135, 'Club Sandwich', 'sandwiches', 450, 'A satisfying club sandwich layered with chicken and fresh fillings.', '🥪🍟', [61]),
+    C(136, 'Grill Sandwich', 'sandwiches', 500, 'Grilled sandwich with savory chicken and melted cheese.', '🥪🔥'),
+    C(137, 'Pizza Sandwich', 'sandwiches', 600, 'Pizza-inspired sandwich with chicken, sauce and melted cheese.', '🥪🍕'),
+    C(138, '5 Pcs. Hot Shot', 'wings', 370, 'Five crunchy hot shots with a spicy kick.', '🍗🔥', [16], ['Hot Shots']),
+    C(139, '10 Pcs. Hot Shot', 'wings', 750, 'Ten crunchy hot shots, great for sharing.', '🍗🔥'),
+    C(140, '5 Pcs. Hot Wings', 'wings', 380, 'Five crispy hot wings tossed in signature seasoning.', '🍗🔥', [15], ['Hot Wings']),
+    C(141, '10 Pcs. Hot Wings', 'wings', 700, 'Ten crispy hot wings tossed in signature seasoning.', '🍗🔥'),
+    C(142, '10 Pcs. Grill Wings', 'wings', 750, 'Ten grilled wings coated in savory seasoning.', '🍗'),
+    C(143, '10 Pcs. Peri Peri Wings', 'wings', 750, 'Ten wings seasoned with tangy peri peri spice.', '🍗🌶️'),
+    C(144, '5 Pcs. Nuggets', 'wings', 300, 'Five golden, crunchy chicken nuggets.', '🍗', [17], ['Nuggets']),
+    C(145, '10 Pcs. Nuggets', 'wings', 600, 'Ten golden, crunchy chicken nuggets to share.', '🍗🍗'),
+    C(146, 'Loaded Fries Large', 'sides', 650, 'Large crispy fries loaded with chicken, cheese and sauces.', '🍟🧀', [55], ['Loaded Fries']),
+    C(147, 'Loaded Fries Small', 'sides', 350, 'A small serving of crispy fries loaded with chicken, cheese and sauces.', '🍟🧀'),
+    C(148, 'Reg. Fries', 'sides', 200, 'A regular serving of hot, crispy golden fries.', '🍟', [62], ['French Fries']),
+    C(149, 'Family Fries', 'sides', 400, 'A family-sized serving of hot, crispy golden fries.', '🍟🍟')
+  ];
+  DEFAULT_MENU_ITEMS.push(...NEW_MENU_CATALOG.filter((item) => !item.legacyIds.length).map(({ legacyIds, migrationAliases, ...item }) => item));
 
   const DEFAULT_BRANCHES = [
     {
@@ -386,7 +509,7 @@
   function normalizeDeals(value) {
     if (!Array.isArray(value)) return JSON.parse(JSON.stringify(DEFAULT_DEALS));
     const usedIds = new Set();
-    return value.filter((deal) => deal && typeof deal === 'object').map((deal, idx) => {
+    const normalized = value.filter((deal) => deal && typeof deal === 'object').map((deal, idx) => {
       let id = Number.isSafeInteger(Number(deal.id)) ? Number(deal.id) : Date.now() + idx;
       while (usedIds.has(id)) id += 1;
       usedIds.add(id);
@@ -406,9 +529,18 @@
         image: safeDealImage(deal.image),
         startsAt: normalizeDate(deal.startsAt),
         endsAt: normalizeDate(deal.endsAt),
-        active: deal.active !== false
+        active: deal.active !== false,
+        ...(deal.catalogRevision ? { catalogRevision: String(deal.catalogRevision) } : {})
       };
     });
+    DEFAULT_DEALS.filter((deal) => deal.catalogRevision === CATALOG_REVISION).forEach((deal) => {
+      if (normalized.some((entry) => entry.title.toLowerCase() === deal.title.toLowerCase())) return;
+      const addedDeal = JSON.parse(JSON.stringify(deal));
+      if (usedIds.has(addedDeal.id)) addedDeal.id = Math.max(0, ...usedIds) + 1;
+      usedIds.add(addedDeal.id);
+      normalized.push(addedDeal);
+    });
+    return normalized;
   }
 
   function loadData(key, fallback) {
@@ -469,6 +601,107 @@
     }
   }
 
+  function migrateMenuCatalog(value) {
+    const items = Array.isArray(value) ? value.map((item) => ({ ...item })) : [];
+    let changed = false;
+    [...DEFAULT_MENU_ITEMS.filter((item) => item.catalogRevision === CATALOG_REVISION), ...NEW_MENU_CATALOG].forEach((catalogItem) => {
+      const aliases = [catalogItem.name, ...(catalogItem.migrationAliases || [])].map((name) => name.toLowerCase());
+      let index = -1;
+      if (Array.isArray(catalogItem.legacyIds)) {
+        index = items.findIndex((item) =>
+          catalogItem.legacyIds.includes(Number(item.id)) &&
+          (aliases.includes(String(item.name || '').toLowerCase()) || item.catalogRevision === '2026-10-21-v1')
+        );
+      }
+      if (index < 0) {
+        index = items.findIndex((item) => aliases.includes(String(item.name || '').toLowerCase()));
+      }
+      if (index >= 0) {
+        const existing = items[index];
+        if (existing.catalogRevision === CATALOG_REVISION) return;
+        const { legacyIds, migrationAliases, ...catalogFields } = catalogItem;
+        items[index] = {
+          ...existing,
+          ...catalogFields,
+          id: existing.id,
+          image: existing.image && !existing.image.startsWith('data:image/svg') ? existing.image : catalogItem.image,
+          art: existing.art || catalogItem.art,
+          inStock: existing.inStock !== false,
+          addons: existing.addons && existing.addons.length ? existing.addons : catalogItem.addons,
+          spiceLevels: existing.spiceLevels && existing.spiceLevels.length ? existing.spiceLevels : catalogItem.spiceLevels
+        };
+        changed = true;
+        return;
+      }
+
+      const { legacyIds, migrationAliases, ...catalogFields } = catalogItem;
+      let nextItem = { ...catalogFields };
+      if (items.some((item) => String(item.id) === String(nextItem.id))) {
+        nextItem.id = Math.max(0, ...items.map((item) => Number(item.id) || 0)) + 1;
+      }
+      items.push(nextItem);
+      changed = true;
+    });
+    const catalogNames = new Set(NEW_MENU_CATALOG.map((item) => `${item.cat}:${item.name.toLowerCase()}`));
+    const seenCatalogNames = new Set();
+    const deduplicatedItems = items.filter((item) => {
+      const key = `${item.cat}:${String(item.name || '').toLowerCase()}`;
+      if (!catalogNames.has(key)) return true;
+      if (seenCatalogNames.has(key)) {
+        changed = true;
+        return false;
+      }
+      seenCatalogNames.add(key);
+      return true;
+    });
+    return { items: deduplicatedItems, changed };
+  }
+
+  function mergeCatalogCategories(value) {
+    const categories = Array.isArray(value) ? value.map((category) => ({ ...category })) : [];
+    let changed = false;
+    DEFAULT_CATEGORIES.forEach((defaultCategory) => {
+      const existing = categories.find((category) => category.id === defaultCategory.id);
+      if (existing) {
+        const oldDefaultNames = {
+          burgers: 'Burgers & Rolls',
+          deals: 'Hot Deals',
+          family: 'Family & Big Deals',
+          wings: 'Wings & Nuggets'
+        };
+        if (oldDefaultNames[defaultCategory.id] && existing.name === oldDefaultNames[defaultCategory.id]) {
+          existing.name = defaultCategory.name;
+          changed = true;
+        }
+        return;
+      }
+      categories.push({ ...defaultCategory });
+      changed = true;
+    });
+    return { categories, changed };
+  }
+
+  function refreshDefaultHeroCopy(slides) {
+    const first = Array.isArray(slides) ? slides.find((slide) => Number(slide.id) === 1) : null;
+    const knownDefaultTitle = first && (
+      (first.title === 'THE ULTIMATE CRISPY' && first.highlight === 'FAMILY FEAST') ||
+      (first.title === 'CRISPY OUTSIDE.' && first.highlight === 'LEGENDARY INSIDE.')
+    );
+    if (!knownDefaultTitle) return slides;
+    Object.assign(first, {
+      title: 'CRISPY OUTSIDE.',
+      highlight: 'LEGENDARY INSIDE.',
+      subtitle: 'Freshly made burgers, golden fried chicken and loaded pizzas — your next LFC favourite is just a tap away.',
+      badgeText: 'Lahore’s crispy chicken favourite',
+      priceTag: 'Zinger · Rs. 350',
+      priceLabel: 'Starting at',
+      rating: 'Freshly made · Full of flavour',
+      ctaText: 'Order a Zinger',
+      targetDealId: 1
+    });
+    return slides;
+  }
+
   // --- App State ---
   let settings = loadData('settings', DEFAULT_SETTINGS);
   const MENU_VERSION = '2026-10-17-v2';
@@ -479,12 +712,21 @@
       localStorage.setItem('lfc_menu_version', MENU_VERSION); menuWasReset = true;
     }
   } catch (e) {}
-  let categories = loadData('categories', DEFAULT_CATEGORIES);
-  let heroSlides = loadData('hero_slides', DEFAULT_HERO_SLIDES);
+  const categoryMigration = mergeCatalogCategories(loadData('categories', DEFAULT_CATEGORIES));
+  let categories = categoryMigration.categories;
+  if (categoryMigration.changed) saveData('categories', categories);
+  const loadedHeroSlides = loadData('hero_slides', DEFAULT_HERO_SLIDES);
+  const originalFirstHeroCopy = JSON.stringify(Array.isArray(loadedHeroSlides) && loadedHeroSlides.find((slide) => Number(slide.id) === 1));
+  let heroSlides = refreshDefaultHeroCopy(loadedHeroSlides);
+  if (originalFirstHeroCopy !== JSON.stringify(Array.isArray(heroSlides) && heroSlides.find((slide) => Number(slide.id) === 1))) {
+    saveData('hero_slides', heroSlides);
+  }
   let heroConfig = loadData('hero_config', { autoplay: true, interval: 6, showThumbs: true, showPrice: true });
   if (menuWasReset) { heroSlides.forEach((s, i) => { const d = DEFAULT_HERO_SLIDES[i]; if (d) { s.targetDealId = d.targetDealId; s.priceTag = d.priceTag; } }); saveData('hero_slides', heroSlides); }
   function activeSlides() { const a = heroSlides.filter((s) => s.enabled !== false); return a.length ? a : heroSlides; }
-  let menuItems = loadData('menu_items', DEFAULT_MENU_ITEMS);
+  const catalogMigration = migrateMenuCatalog(loadData('menu_items', DEFAULT_MENU_ITEMS));
+  let menuItems = catalogMigration.items;
+  if (catalogMigration.changed) saveData('menu_items', menuItems);
   let branches = loadData('branches', DEFAULT_BRANCHES);
   let reviews = loadData('reviews', DEFAULT_REVIEWS);
   let zones = loadData('zones', DEFAULT_ZONES);
@@ -905,7 +1147,11 @@
   }
 
   function getBogoPizzas() {
-    return menuItems.filter((item) => item.cat === 'pizzas' && item.inStock !== false);
+    return menuItems.filter((item) =>
+      item.cat === 'pizzas' &&
+      item.inStock !== false &&
+      (item.bogoEligible === true || String(item.badge || '').toLowerCase().includes('buy 1 get 1 free'))
+    );
   }
 
   function getBogoSizes(item) {
@@ -935,7 +1181,7 @@
       const select = document.getElementById(`bogo-pizza-${slot}`);
       if (select) {
         select.innerHTML = pizzas.map((pizza) =>
-          `<option value="${escapeHtml(pizza.id)}">${escapeHtml(pizza.name)} — from Rs. ${Number(pizza.price).toLocaleString()}</option>`
+          `<option value="${escapeHtml(pizza.id)}">${escapeHtml(pizza.pizzaGroup || 'B1G1 Pizza')} · ${escapeHtml(pizza.name)} — from Rs. ${Number(pizza.price).toLocaleString()}</option>`
         ).join('');
         select.value = bogoPizzaIds[slot - 1];
       }
@@ -1029,6 +1275,12 @@
       selectedSpice: null,
       selectedAddons: [],
       specialNotes: '',
+      dealInfo: {
+        type: 'bogo',
+        paidPizza: { name: paid.item.name, size: paid.size.name, price: paid.price },
+        freePizza: { name: free.item.name, size: free.size.name, price: free.price },
+        savings: free.price
+      },
       qty: 1
     });
     saveData('cart', cart);
@@ -1140,6 +1392,9 @@
                 ? '+ ' + i.selectedAddons.map((a) => escapeHtml(a.name)).join(', ')
                 : '';
             const noteTag = i.specialNotes ? `Note: "${escapeHtml(i.specialNotes)}"` : '';
+            const bogoDetails = i.dealInfo && i.dealInfo.type === 'bogo'
+              ? `<div class="text-[10px] text-gray-600 mt-1">Paid: ${escapeHtml(i.dealInfo.paidPizza.name)} (${escapeHtml(i.dealInfo.paidPizza.size)})<br>Free: ${escapeHtml(i.dealInfo.freePizza.name)} (${escapeHtml(i.dealInfo.freePizza.size)})</div>`
+              : '';
 
             return `
             <div class="flex items-start gap-3 p-3.5 rounded-2xl bg-white border border-amber-200/90 shadow-sm hover:border-amber-400 transition">
@@ -1156,6 +1411,7 @@
                       : ''
                   }
                   ${addonsText ? `<div class="text-emerald-700 font-medium">${addonsText}</div>` : ''}
+                  ${bogoDetails}
                   ${noteTag ? `<div class="text-gray-500 italic">${noteTag}</div>` : ''}
                 </div>
               </div>
@@ -1448,7 +1704,7 @@
     if (!grid) return;
     const activeDeals = deals.filter(isDealAvailable);
     if (!activeDeals.length) {
-      grid.innerHTML = '<div class="md:col-span-2 xl:col-span-4 text-center p-8 rounded-3xl bg-white/80 border border-amber-200 text-gray-600">No active deals right now. Please check back soon!</div>';
+      grid.innerHTML = '<div class="md:col-span-2 xl:col-span-3 text-center p-8 rounded-3xl bg-white/90 border border-amber-200 text-gray-600">No active deals right now. Please check back soon!</div>';
       return;
     }
 
@@ -1467,19 +1723,21 @@
       const buttonLabel = isBogo ? 'Choose Pizzas' : 'Order Deal';
 
       return `
-        <article class="p-5 sm:p-6 rounded-3xl bg-white border-2 border-amber-200/90 hover:border-amber-400 flex flex-col justify-between relative overflow-hidden group shadow-xl hover:shadow-[0_20px_45px_rgba(245,158,11,0.22)] transition-all duration-300">
-          <span class="absolute top-4 right-4 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-slate-950 font-black text-[10px] sm:text-xs px-3.5 py-1 rounded-full uppercase tracking-wider shadow-md z-10 border border-yellow-300">${badge}</span>
+        <article class="rounded-3xl bg-white border border-amber-200 hover:border-amber-400 flex flex-col justify-between relative overflow-hidden group shadow-lg hover:shadow-2xl hover:shadow-amber-900/10 transition-all duration-300 ${isBogo ? 'ring-2 ring-amber-400/60' : ''}">
+          <span class="absolute top-3 left-3 bg-slate-950/90 text-white font-black text-[10px] sm:text-xs px-3 py-1.5 rounded-full uppercase tracking-wider shadow-md z-10">${badge}</span>
           <div>
-            <div class="relative overflow-hidden rounded-2xl mb-4 border border-amber-100 group-hover:border-amber-300 transition">
-              <img src="${image}" alt="${title}" loading="lazy" decoding="async" class="w-full h-40 sm:h-44 object-cover group-hover:scale-108 transition duration-500" onerror="this.onerror=null; this.src='./images/hero-1.jpg'"/>
-              <div class="absolute inset-0 bg-gradient-to-t from-white/60 via-transparent to-transparent opacity-60"></div>
+            <div class="relative overflow-hidden aspect-[16/9] bg-amber-50">
+              <img src="${image}" alt="${title}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.onerror=null; this.src='./images/hero-1.jpg'"/>
+              <div class="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent"></div>
             </div>
-            <h3 class="text-lg sm:text-xl font-black text-gray-950 font-heading group-hover:text-amber-700 transition">${title}</h3>
-            <p class="text-gray-600 text-xs mt-2 leading-relaxed">${description}</p>
+            <div class="p-5 pb-0">
+              <h3 class="text-lg sm:text-xl font-black text-gray-950 font-heading group-hover:text-amber-700 transition">${title}</h3>
+              <p class="text-gray-600 text-xs mt-2 leading-relaxed min-h-10">${description}</p>
+            </div>
           </div>
-          <div class="pt-4 mt-4 border-t border-amber-100 flex items-center justify-between gap-3">
+          <div class="p-5 pt-4 mt-4 border-t border-amber-100 flex items-center justify-between gap-3">
             <div>${oldPrice}${price}</div>
-            <button onclick="window.LFC.orderDealById(${deal.id})" class="px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 hover:from-amber-300 hover:to-yellow-200 text-slate-950 font-black text-xs uppercase tracking-wider transition shadow-md shadow-amber-400/30 active:scale-95 cursor-pointer">${buttonLabel}</button>
+            <button onclick="window.LFC.orderDealById(${deal.id})" class="px-4 sm:px-5 py-2.5 rounded-xl ${isBogo ? 'bg-slate-950 hover:bg-amber-600 text-white' : 'bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 hover:from-amber-300 hover:to-yellow-200 text-slate-950'} font-black text-xs uppercase tracking-wider transition shadow-md active:scale-95 cursor-pointer">${buttonLabel}</button>
           </div>
         </article>
       `;
@@ -1528,6 +1786,9 @@
               ${escapeHtml(badgeText)}
              </span>`
           : '';
+        const groupHtml = item.pizzaGroup
+          ? `<span class="inline-flex mb-2 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-[9px] sm:text-[10px] font-black text-amber-900">${escapeHtml(item.pizzaGroup)}</span>`
+          : '';
 
         const stockOverlay = !item.inStock
           ? `<div class="absolute inset-0 bg-slate-950/80 backdrop-blur-[2px] flex items-center justify-center rounded-3xl z-20">
@@ -1554,6 +1815,7 @@
                   <h3 onclick="window.LFC.orderMenuItemById(${item.id})" class="font-extrabold text-sm sm:text-base text-gray-900 group-hover:text-amber-600 transition leading-snug line-clamp-1 font-heading cursor-pointer">${escapeHtml(item.name)}</h3>
                   ${spicinessDots}
                 </div>
+                ${groupHtml}
                 <p class="text-gray-600 text-[11px] sm:text-xs line-clamp-2 leading-relaxed mb-3">${escapeHtml(item.desc)}</p>
                 
                 ${
@@ -1811,49 +2073,53 @@
     orders.unshift(newOrder);
     saveData('orders', orders);
 
-    // Build rich formatted WhatsApp message
-    let msg = `🍗 *NEW ORDER: ${orderId} - ${settings.storeName.toUpperCase()}* 🍗\n`;
-    msg += `-----------------------------------------\n`;
+    const orderTypeLabel = orderType === 'delivery' ? 'Home delivery' : orderType === 'pickup' ? 'Pickup' : 'Dine-in';
+    const line = '────────────────────────';
+    let msg = `🍗 *${settings.storeName.toUpperCase()} — NEW ORDER* 🍗\n`;
+    msg += `*Order ${orderId}* · ${new Date().toLocaleString()}\n${line}\n`;
     msg += `👤 *Customer:* ${customerName}\n`;
     msg += `📞 *Phone:* ${customerPhone}\n`;
-    msg += `🧾 *Order Type:* ${
-      orderType === 'delivery' ? '🛵 Home Delivery' : orderType === 'pickup' ? '🥡 Pickup' : '🍽️ Dine-In'
-    }\n`;
+    msg += `🛍️ *Order type:* ${orderTypeLabel}\n`;
     if (orderType === 'delivery') {
-      msg += `📍 *Delivery Area:* ${zone.name} (${zone.time})\n`;
+      msg += `📍 *Area:* ${zone.name} · ${zone.time}\n`;
       msg += `🏠 *Address:* ${customerAddress}\n`;
     }
     if (specialNotes) {
-      msg += `📝 *Notes:* ${specialNotes}\n`;
+      msg += `📝 *Order note:* ${specialNotes}\n`;
     }
-    msg += `-----------------------------------------\n`;
-    msg += `📋 *ORDER SPECIFICATIONS:*\n`;
+    msg += `${line}\n🧾 *YOUR ORDER (${getCartCount()} items)*\n`;
 
     cart.forEach((i, idx) => {
-      msg += `${idx + 1}. *${i.qty}x ${i.name}* - Rs. ${(i.price * i.qty).toLocaleString()}\n`;
+      msg += `\n*${idx + 1}. ${i.qty} × ${i.name}*\n`;
+      msg += `   Amount: Rs. ${(i.price * i.qty).toLocaleString()}\n`;
+      if (i.dealInfo && i.dealInfo.type === 'bogo') {
+        msg += `   ✅ Paid pizza: ${i.dealInfo.paidPizza.name} (${i.dealInfo.paidPizza.size})\n`;
+        msg += `   🎁 Free pizza: ${i.dealInfo.freePizza.name} (${i.dealInfo.freePizza.size})\n`;
+        msg += `   💛 B1G1 savings: Rs. ${(i.dealInfo.savings * i.qty).toLocaleString()}\n`;
+      }
       if (i.selectedSize && i.selectedSize.name) {
-        msg += `   └ Portion: ${i.selectedSize.name}\n`;
+        msg += `   • Size: ${i.selectedSize.name}\n`;
       }
       if (i.selectedSpice) {
-        msg += `   └ Spice: ${i.selectedSpice}\n`;
+        msg += `   • Spice: ${i.selectedSpice}\n`;
       }
       if (i.selectedAddons && i.selectedAddons.length) {
-        msg += `   └ Extras: ${i.selectedAddons.map((a) => a.name).join(', ')}\n`;
+        msg += `   • Extras: ${i.selectedAddons.map((a) => a.name).join(', ')}\n`;
       }
       if (i.specialNotes) {
-        msg += `   └ Custom note: "${i.specialNotes}"\n`;
+        msg += `   • Item note: ${i.specialNotes}\n`;
       }
     });
 
-    msg += `-----------------------------------------\n`;
-    msg += `💰 Subtotal: Rs. ${subtotal.toLocaleString()}\n`;
-    msg += `🚚 Delivery: ${delivery === 0 ? 'FREE' : 'Rs. ' + delivery}\n`;
+    msg += `\n${line}\n`;
+    msg += `🛒 *Subtotal:* Rs. ${subtotal.toLocaleString()}\n`;
+    msg += `🚚 *Delivery:* ${delivery === 0 ? 'FREE' : 'Rs. ' + delivery.toLocaleString()}\n`;
     if (discount > 0) {
-      msg += `🏷️ Discount (${appliedPromo.code}): -Rs. ${discount}\n`;
+      msg += `🏷️ *Discount${appliedPromo ? ` (${appliedPromo.code})` : ''}:* −Rs. ${discount.toLocaleString()}\n`;
     }
-    msg += `💵 *TOTAL PAYABLE: Rs. ${total.toLocaleString()}*\n`;
-    msg += `-----------------------------------------\n`;
-    msg += `Please confirm my order and send estimated delivery updates!`;
+    msg += `💵 *TOTAL TO PAY: Rs. ${total.toLocaleString()}*\n`;
+    msg += `${line}\n`;
+    msg += `Please confirm this order and share the estimated ${orderType === 'delivery' ? 'delivery' : 'preparation'} time. Thank you!`;
 
     const safeCheckoutWa = settings && settings.whatsappNumber ? String(settings.whatsappNumber) : '0322-4940181';
     let rawPhone = safeCheckoutWa.replace(/[^0-9]/g, '');
@@ -2064,7 +2330,8 @@
       if (Array.isArray(d.branches)) { branches = d.branches; saveData('branches', branches); }
       if (Array.isArray(d.deals)) { deals = normalizeDeals(d.deals); saveData('deals', deals); }
       if (Array.isArray(d.menuItems)) {
-        menuItems = d.menuItems.map((m) => (!m.image || m.image.startsWith('data:image/svg') ? { ...m, image: menuArt(m.art || '🍽️') } : m));
+        const remoteMenu = d.menuItems.map((m) => (!m.image || m.image.startsWith('data:image/svg') ? { ...m, image: menuArt(m.art || '🍽️') } : m));
+        menuItems = migrateMenuCatalog(remoteMenu).items;
         saveData('menu_items', menuItems);
       }
       if (d.logoUrl) { settings.logoUrl = d.logoUrl; saveData('settings', settings); }
@@ -3663,7 +3930,7 @@
           saveData('settings', settings);
         }
         if (data.menuItems && Array.isArray(data.menuItems)) {
-          menuItems = data.menuItems;
+          menuItems = migrateMenuCatalog(data.menuItems).items;
           saveData('menu_items', menuItems);
         }
         if (data.categories && Array.isArray(data.categories)) {
@@ -4127,7 +4394,7 @@
     settings = { ...DEFAULT_SETTINGS };
     categories = [...DEFAULT_CATEGORIES];
     heroSlides = JSON.parse(JSON.stringify(DEFAULT_HERO_SLIDES));
-    menuItems = [...DEFAULT_MENU_ITEMS];
+    menuItems = migrateMenuCatalog(DEFAULT_MENU_ITEMS).items;
     branches = [...DEFAULT_BRANCHES];
     reviews = [...DEFAULT_REVIEWS];
     zones = [...DEFAULT_ZONES];
