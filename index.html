@@ -405,10 +405,141 @@
       footer{background:linear-gradient(180deg,#121731,#070810)!important}
       #admin-menu-bulk,#admin-hero-list>*{animation:lfcUp .4s both}
       [id^="tab-btn-"]{border-radius:12px}
+      #floating-whatsapp{transition:opacity .2s ease,transform .2s ease}
+      #floating-whatsapp.is-obscured{opacity:0;pointer-events:none;transform:translateY(8px)}
       #mobile-drawer+section#hero-section{background:#10131d!important;background-image:none!important}
       @media(max-width:639px){#hero-thumbs-wrap{display:none!important}}
       @media(max-width:479px){#menu-grid{grid-template-columns:minmax(0,1fr)!important;gap:12px!important}#menu-grid>div .lfc-media{aspect-ratio:16/9;height:auto;max-height:205px}#menu-grid>div{border-radius:22px}#categories-container{scroll-padding-inline:12px}}
     </style>
+<style id="lfc-v2">
+/* ===================== LFC v2 — deals, menu, categories ===================== */
+:root{--lfc-red:#e11d2e;--lfc-red-d:#9f1239;--lfc-yel:#facc15;--lfc-amb:#f59e0b;--lfc-ink:#0b0d16;--lfc-ink2:#151a2e;--lfc-hdr:64px}
+@media(min-width:640px){:root{--lfc-hdr:72px}}
+
+/* ---- section headings ---- */
+.lfc-eyebrow{display:inline-flex;align-items:center;gap:.45rem;padding:.42rem .95rem;border-radius:999px;font-size:.66rem;font-weight:900;letter-spacing:.18em;text-transform:uppercase;background:linear-gradient(180deg,#fff7d6,#ffe9a8);color:#7c2d12;border:1px solid #fcd34d;box-shadow:0 2px 0 rgba(180,83,9,.25)}
+.lfc-title{font-weight:900;line-height:1.05;letter-spacing:-.02em;font-size:clamp(1.85rem,5vw,3.1rem);margin:.7rem 0 0;color:#111827}
+.lfc-title em{font-style:normal;background:linear-gradient(90deg,#e11d2e,#f59e0b);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lfc-sub{color:#4b5563;font-size:.9rem;line-height:1.6;max-width:36rem}
+
+/* ---- trust strip ---- */
+.lfc-stats{background:linear-gradient(180deg,#151a2e,#0b0d16)!important;border-bottom:3px solid #f59e0b!important;box-shadow:none!important}
+.lfc-stats .text-amber-600{background:linear-gradient(180deg,#fde68a,#f59e0b);-webkit-background-clip:text;background-clip:text;color:transparent!important}
+.lfc-stats .text-gray-600{color:#9ca3af!important}
+
+/* ---- category pills (sticky) ---- */
+#categories-container{position:sticky;top:var(--lfc-hdr);z-index:30;margin:0 -14px 14px!important;padding:10px 14px!important;gap:8px!important;background:linear-gradient(180deg,rgba(250,248,245,.97),rgba(250,248,245,.88));backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid rgba(245,158,11,.25);scroll-snap-type:x proximity}
+@media(min-width:640px){#categories-container{margin:0 0 18px!important;padding:12px 4px!important;border-radius:0 0 18px 18px}}
+.lfc-pill{flex:0 0 auto;display:inline-flex;align-items:center;gap:.4rem;padding:.55rem .95rem;border-radius:999px;font-weight:800;font-size:.78rem;white-space:nowrap;cursor:pointer;scroll-snap-align:start;background:#fff;color:#1f2937;border:1.5px solid #fde68a;box-shadow:0 2px 0 rgba(0,0,0,.06);transition:transform .15s,box-shadow .15s,background .2s,color .2s,border-color .2s}
+.lfc-pill:hover{border-color:#f59e0b;transform:translateY(-1px)}
+.lfc-pill .ico{font-size:1rem;line-height:1}
+.lfc-pill.is-active{background:linear-gradient(135deg,#e11d2e,#f97316 60%,#facc15);color:#fff;border-color:transparent;box-shadow:0 6px 16px -4px rgba(225,29,46,.55),0 2px 0 #9f1239;text-shadow:0 1px 0 rgba(0,0,0,.25)}
+
+/* ---- menu grid + card ---- */
+#menu-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media(min-width:768px){#menu-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:20px}}
+@media(min-width:1024px){#menu-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:22px}}
+.lfc-card{position:relative;display:flex;flex-direction:column;overflow:hidden;border-radius:24px;background:#fff;border:1px solid #fde7b0;box-shadow:0 1px 0 #fff inset,0 10px 24px -12px rgba(124,45,18,.28);transition:transform .3s,box-shadow .3s,border-color .3s}
+.lfc-card:hover{transform:translateY(-6px);border-color:#f59e0b;box-shadow:0 22px 40px -16px rgba(225,29,46,.38)}
+.lfc-card__media{position:relative;aspect-ratio:4/3;overflow:hidden;cursor:pointer}
+.lfc-card__media img{position:relative;z-index:2;width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.22,1,.36,1)}
+.lfc-card:hover .lfc-card__media img{transform:scale(1.08)}
+.lfc-card__shade{position:absolute;left:0;right:0;bottom:0;height:42%;z-index:3;pointer-events:none;background:linear-gradient(0deg,rgba(60,8,8,.55),transparent)}
+.lfc-tag{position:absolute;z-index:4;top:10px;left:10px;max-width:70%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:.3rem .65rem;border-radius:999px;font-size:.6rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:linear-gradient(135deg,#e11d2e,#be123c);box-shadow:0 4px 10px rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.35)}
+.lfc-tag--gold{background:linear-gradient(135deg,#facc15,#f59e0b);color:#3b1304;border-color:#fde68a}
+.lfc-spice{position:absolute;z-index:4;top:10px;right:10px;display:flex;gap:1px;padding:.25rem .5rem;border-radius:999px;font-size:.62rem;background:rgba(11,13,22,.72);backdrop-filter:blur(6px);color:#fff;box-shadow:0 4px 10px rgba(0,0,0,.3)}
+.lfc-card__body{display:flex;flex:1;flex-direction:column;padding:12px 12px 14px}
+@media(min-width:640px){.lfc-card__body{padding:16px 16px 18px}}
+.lfc-card__name{margin:0;font-weight:900;font-size:.95rem;line-height:1.2;color:#111827;cursor:pointer;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;transition:color .2s}
+@media(min-width:640px){.lfc-card__name{font-size:1.05rem}}
+.lfc-card:hover .lfc-card__name{color:#be123c}
+.lfc-card__desc{margin:.4rem 0 0;font-size:.72rem;line-height:1.5;color:#6b7280;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lfc-chips{display:flex;flex-wrap:wrap;gap:5px;margin-top:.55rem}
+.lfc-chip{display:inline-flex;align-items:center;gap:4px;padding:.18rem .5rem;border-radius:999px;font-size:.6rem;font-weight:800;background:#fff7ed;color:#9a3412;border:1px solid #fed7aa}
+.lfc-card__foot{margin-top:auto;padding-top:12px;display:flex;align-items:flex-end;justify-content:space-between;gap:8px}
+.lfc-price small{display:block;font-size:.55rem;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:#9ca3af}
+.lfc-price b{display:block;font-family:'Outfit',sans-serif;font-weight:900;font-size:1.1rem;line-height:1.1;letter-spacing:-.01em;background:linear-gradient(90deg,#be123c,#ea580c);-webkit-background-clip:text;background-clip:text;color:transparent}
+@media(min-width:640px){.lfc-price b{font-size:1.3rem}}
+.lfc-add{display:inline-flex;align-items:center;gap:.3rem;border:0;cursor:pointer;padding:.55rem .85rem;border-radius:14px;font-weight:900;font-size:.72rem;letter-spacing:.05em;text-transform:uppercase;color:#3b1304;background:linear-gradient(180deg,#fde047,#f59e0b);box-shadow:0 3px 0 #b45309,0 8px 14px -6px rgba(245,158,11,.7);transition:transform .15s,box-shadow .15s}
+.lfc-add span{font-size:1rem;line-height:1}
+.lfc-add:hover{transform:translateY(-1px)}
+.lfc-add:active{transform:translateY(3px);box-shadow:0 0 0 #b45309}
+.lfc-add:disabled{background:#e5e7eb;color:#9ca3af;box-shadow:none;cursor:not-allowed}
+.lfc-soldout{position:absolute;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;background:rgba(11,13,22,.78);backdrop-filter:blur(2px)}
+.lfc-soldout span{background:#dc2626;color:#fff;font-weight:900;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;padding:.4rem .9rem;border-radius:999px}
+@media(max-width:479px){
+  #menu-grid{grid-template-columns:minmax(0,1fr)!important;gap:14px!important}
+  .lfc-card__media{aspect-ratio:16/10!important;max-height:none!important}
+  .lfc-card{border-radius:22px}
+  .lfc-card__name{font-size:1.05rem}
+  .lfc-card__desc{font-size:.78rem}
+  .lfc-price b{font-size:1.3rem}
+  .lfc-add{padding:.65rem 1.1rem;font-size:.78rem}
+}
+
+/* ---- deals section (dark cinematic) ---- */
+#deals.lfc-deals{position:relative;overflow:hidden;padding:64px 0 72px;border:0!important;background:radial-gradient(900px 420px at 85% -10%,rgba(225,29,46,.38),transparent 60%),radial-gradient(800px 420px at 8% 110%,rgba(245,158,11,.30),transparent 60%),linear-gradient(180deg,#0b0d16,#14091a 55%,#0b0d16)!important}
+#deals.lfc-deals::before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.5;background-image:radial-gradient(rgba(255,255,255,.07) 1px,transparent 1px);background-size:22px 22px;-webkit-mask-image:linear-gradient(180deg,#000,transparent 85%);mask-image:linear-gradient(180deg,#000,transparent 85%)}
+.lfc-deals__inner{position:relative;z-index:2;max-width:80rem;margin:0 auto;padding:0 16px}
+@media(min-width:640px){.lfc-deals__inner{padding:0 24px}}
+.lfc-deals__head{text-align:center;max-width:46rem;margin:0 auto 36px}
+.lfc-deals .lfc-eyebrow{background:rgba(250,204,21,.12);color:#fde68a;border:1px solid rgba(250,204,21,.4);box-shadow:none}
+#deals.lfc-deals h2.lfc-title{color:#fff!important;background:none!important;-webkit-text-fill-color:#fff}
+#deals.lfc-deals h2.lfc-title em{background:linear-gradient(90deg,#fde047,#fb923c 55%,#f43f5e);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.lfc-deals .lfc-sub{color:#cbd5e1;margin:.9rem auto 0}
+.lfc-perks{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-top:18px}
+.lfc-perks span{font-size:.7rem;font-weight:800;color:#fde68a;padding:.4rem .8rem;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
+#deals-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:18px}
+@media(min-width:640px){#deals-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:22px}}
+@media(min-width:1180px){#deals-grid{grid-template-columns:repeat(3,minmax(0,1fr));gap:26px}}
+.lfc-deal{position:relative;display:flex;flex-direction:column;overflow:hidden;border-radius:26px;background:linear-gradient(180deg,#1b2038,#10131f);border:1px solid rgba(255,255,255,.1);box-shadow:0 20px 40px -18px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.08);transition:transform .35s,box-shadow .35s,border-color .35s}
+.lfc-deal:hover{transform:translateY(-8px);border-color:rgba(250,204,21,.65);box-shadow:0 30px 50px -18px rgba(225,29,46,.55),0 0 0 1px rgba(250,204,21,.25)}
+.lfc-deal--bogo{border-color:rgba(250,204,21,.7);box-shadow:0 0 0 1px rgba(250,204,21,.35),0 24px 48px -18px rgba(245,158,11,.5)}
+.lfc-deal__media{position:relative;aspect-ratio:16/10;overflow:hidden;background:radial-gradient(circle at 50% 42%,#fef08a,#facc15 38%,#ef4444 80%,#7f1d1d)}
+.lfc-deal__media img{width:100%;height:100%;object-fit:cover;transition:transform .7s cubic-bezier(.22,1,.36,1)}
+.lfc-deal:hover .lfc-deal__media img{transform:scale(1.07)}
+.lfc-deal__media::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(0deg,#10131f 0%,rgba(16,19,31,.2) 45%,transparent 70%)}
+.lfc-deal__badge{position:absolute;z-index:3;left:12px;top:12px;max-width:68%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:.38rem .8rem;border-radius:999px;font-size:.62rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:#3b1304;background:linear-gradient(135deg,#fde047,#f59e0b);box-shadow:0 6px 14px rgba(0,0,0,.4);border:1px solid #fff3b0}
+.lfc-deal__save{position:absolute;z-index:3;right:12px;top:12px;width:58px;height:58px;border-radius:50%;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1;color:#fff;font-family:'Outfit',sans-serif;font-weight:900;font-size:1.05rem;background:radial-gradient(circle at 30% 25%,#fb7185,#e11d2e 60%,#9f1239);border:2px solid #fff;box-shadow:0 8px 18px rgba(225,29,46,.55);transform:rotate(8deg)}
+.lfc-deal__save small{font-size:.5rem;font-weight:800;letter-spacing:.14em;margin-bottom:2px}
+.lfc-deal__free{position:absolute;z-index:3;right:12px;bottom:12px;padding:.35rem .75rem;border-radius:999px;font-size:.64rem;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:#fff;background:linear-gradient(135deg,#10b981,#059669);border:1px solid rgba(255,255,255,.5);box-shadow:0 6px 14px rgba(0,0,0,.4)}
+.lfc-deal__body{display:flex;flex:1;flex-direction:column;padding:6px 20px 20px}
+.lfc-deal__type{font-size:.62rem;font-weight:900;letter-spacing:.2em;text-transform:uppercase;color:#fbbf24}
+.lfc-deal__title{margin:.35rem 0 0;font-weight:900;font-size:1.3rem;line-height:1.15;color:#fff;letter-spacing:-.01em}
+.lfc-deal__list{list-style:none;margin:.8rem 0 0;padding:0;display:grid;gap:.4rem}
+.lfc-deal__list li{display:flex;gap:.55rem;align-items:flex-start;font-size:.8rem;line-height:1.35;color:#cbd5e1}
+.lfc-deal__list li::before{content:"✓";flex:0 0 auto;width:18px;height:18px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.62rem;font-weight:900;color:#052e1b;background:linear-gradient(135deg,#6ee7b7,#10b981);margin-top:1px}
+.lfc-deal__text{margin:.8rem 0 0;font-size:.82rem;line-height:1.55;color:#cbd5e1;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
+.lfc-deal__foot{margin-top:auto;padding-top:18px}
+.lfc-deal__pricebox{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;padding-top:16px;border-top:1.5px dashed rgba(255,255,255,.18);min-height:62px}
+.lfc-deal__price{font-family:'Outfit',sans-serif;font-weight:900;font-size:1.9rem;line-height:1;letter-spacing:-.02em;background:linear-gradient(90deg,#fde047,#fb923c);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lfc-deal__old{display:block;margin-top:5px;font-size:.78rem;color:#94a3b8;text-decoration:line-through}
+.lfc-deal__saving{font-size:.68rem;font-weight:900;color:#052e1b;background:linear-gradient(135deg,#6ee7b7,#34d399);padding:.32rem .65rem;border-radius:999px;white-space:nowrap}
+.lfc-deal__choose{font-weight:900;font-size:1rem;color:#fde68a}
+.lfc-deal__fine{display:block;margin-top:4px;font-size:.7rem;font-weight:700;color:#6ee7b7}
+.lfc-deal__cta{width:100%;margin-top:16px;display:flex;align-items:center;justify-content:center;gap:.5rem;min-height:48px;padding:.75rem 1rem;border:0;cursor:pointer;border-radius:16px;font-weight:900;font-size:.8rem;letter-spacing:.09em;text-transform:uppercase;color:#fff;background:linear-gradient(135deg,#e11d2e,#f97316 60%,#facc15);box-shadow:0 4px 0 #7f1d1d,0 14px 24px -10px rgba(225,29,46,.8);text-shadow:0 1px 0 rgba(0,0,0,.25);transition:transform .15s,box-shadow .15s,filter .2s}
+.lfc-deal__cta:hover{filter:brightness(1.08);transform:translateY(-1px)}
+.lfc-deal__cta:active{transform:translateY(4px);box-shadow:0 0 0 #7f1d1d}
+.lfc-deal--bogo .lfc-deal__cta{color:#3b1304;background:linear-gradient(135deg,#fde047,#f59e0b);box-shadow:0 4px 0 #b45309,0 14px 24px -10px rgba(245,158,11,.8);text-shadow:none}
+.lfc-deals__empty{grid-column:1/-1;text-align:center;padding:40px 20px;border-radius:24px;color:#cbd5e1;background:rgba(255,255,255,.05);border:1px dashed rgba(255,255,255,.2)}
+
+/* ---- menu section header ---- */
+.lfc-menu-head{display:flex;flex-direction:column;gap:16px;margin-bottom:18px}
+@media(min-width:768px){.lfc-menu-head{flex-direction:row;align-items:flex-end;justify-content:space-between}}
+#menu-result-count{font-size:.72rem!important;font-weight:800!important;color:#92400e!important;margin-bottom:14px!important}
+
+/* ---- mobile bottom bar ---- */
+.lfc-bottom{background:rgba(11,13,22,.94)!important;border-top:1px solid rgba(250,204,21,.35)!important;box-shadow:0 -10px 30px rgba(0,0,0,.45)!important;padding-bottom:max(.5rem,env(safe-area-inset-bottom))!important}
+.lfc-bottom a,.lfc-bottom button{color:#cbd5e1!important}
+.lfc-bottom a:active,.lfc-bottom button:active{color:#fde047!important}
+.lfc-bottom .store-wa-link{color:#6ee7b7!important}
+.lfc-bottom button.relative{color:#fde047!important}
+
+#menu-grid .lfc-card__media img{background:transparent}
+@media(prefers-reduced-motion:reduce){.lfc-card,.lfc-deal,.lfc-card__media img,.lfc-deal__media img{transition:none!important}}
+#menu h2.lfc-title,#reviews h2.lfc-title{background:none!important;color:#111827!important;-webkit-text-fill-color:currentColor}
+</style>
+
 </head>
   <body class="bg-[#FAF8F5] text-gray-900 min-h-screen selection:bg-amber-400 selection:text-slate-950 pb-16 sm:pb-0" id="top">
 
@@ -608,7 +739,7 @@
     </section>
 
     <!-- Trust Stats Strip (Clean White & Yellow Mineral Bar) -->
-    <section class="reveal border-b border-amber-200/90 bg-white shadow-sm">
+    <section class="reveal lfc-stats border-b border-amber-200/90 bg-white shadow-sm">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 text-center">
         <div>
           <div class="text-2xl sm:text-3xl font-black text-amber-600 font-heading"><span class="stat-counter" data-target="4">0</span>+</div>
@@ -647,23 +778,23 @@
     <section id="menu" class="py-8 sm:py-16 max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8">
       
       <!-- Section Title & Desktop Search -->
-      <div class="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-6 sm:mb-8">
+      <div class="lfc-menu-head">
         <div>
-          <span class="text-amber-800 text-[10px] sm:text-xs font-black uppercase tracking-widest bg-amber-100 px-3 py-1.5 rounded-full border border-amber-300 inline-block shadow-sm">Made fresh at LFC</span>
-          <h2 class="text-2xl sm:text-4xl font-black text-gray-950 font-heading mt-2">Find your next favourite</h2>
-          <p class="text-xs sm:text-sm text-gray-600 mt-2 max-w-xl">Browse the menu by category, pick your favourites, and order in just a few taps.</p>
+          <span class="lfc-eyebrow"><span>🍗</span> Made fresh at LFC</span>
+          <h2 class="lfc-title font-heading">Find your next <em>favourite</em></h2>
+          <p class="lfc-sub" style="margin-top:.6rem">Browse by category, pick what you love, and order in a few taps.</p>
         </div>
 
         <!-- Desktop Search Bar -->
         <div class="hidden sm:block w-72 relative">
-          <input 
-            type="text" 
-            id="menu-search-input" 
-            placeholder="Search burgers, pizzas, rolls..." 
-            class="w-full px-4 py-2.5 pl-10 pr-9 rounded-xl bg-white border-2 border-amber-300 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:border-amber-500 shadow-sm transition"
+          <input
+            type="text"
+            id="menu-search-input"
+            placeholder="Search burgers, pizzas, rolls..."
+            class="w-full px-4 py-3 pl-10 pr-9 rounded-2xl bg-white border-2 border-amber-300 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:border-red-500 shadow-sm transition"
           />
-          <svg class="w-4 h-4 text-amber-600 absolute left-3.5 top-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-          <button type="button" id="search-clear-desktop" onclick="window.LFC.clearSearch()" class="hidden absolute right-2.5 top-3 text-gray-400 hover:text-amber-600 transition" aria-label="Clear search">✕</button>
+          <svg class="w-4 h-4 text-amber-600 absolute left-3.5 top-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+          <button type="button" id="search-clear-desktop" onclick="window.LFC.clearSearch()" class="hidden absolute right-2.5 top-3.5 text-gray-400 hover:text-amber-600 transition" aria-label="Clear search">✕</button>
         </div>
       </div>
 
@@ -686,82 +817,15 @@
     </section>
 
     <!-- Deals & Combos -->
-    <section id="deals" class="py-14 sm:py-20 bg-gradient-to-b from-[#fffaf0] via-white to-[#fff7e5] border-y border-amber-200 relative overflow-hidden">
-      <!-- Ambient Mineral Glow -->
-      <div class="absolute -top-20 -right-20 w-80 h-80 bg-yellow-300/30 rounded-full blur-3xl pointer-events-none"></div>
-      <div class="absolute -bottom-20 -left-20 w-80 h-80 bg-amber-400/25 rounded-full blur-3xl pointer-events-none"></div>
-
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div class="text-center max-w-3xl mx-auto mb-9 sm:mb-12">
-          <span class="text-amber-800 text-[10px] sm:text-xs font-black uppercase tracking-[0.2em] bg-amber-100 px-4 py-2 rounded-full border border-amber-300 inline-flex items-center gap-2 shadow-sm"><span>✦</span> Freshly made, better value</span>
-          <h2 class="text-3xl sm:text-5xl font-black text-gray-950 font-heading mt-4">Deals worth sharing</h2>
-          <p class="text-gray-600 text-sm sm:text-base mt-3 font-medium leading-relaxed">Choose a family combo or build your pizza Buy 1 Get 1 Free deal. For B1G1, select two Standard or Signature pizzas and sizes; the higher-priced pizza is charged.</p>
+    <section id="deals" class="lfc-deals">
+      <div class="lfc-deals__inner">
+        <div class="lfc-deals__head">
+          <span class="lfc-eyebrow"><span>🔥</span> Hot right now</span>
+          <h2 class="lfc-title font-heading">Deals worth <em>sharing</em></h2>
+          <p class="lfc-sub">Ready-to-share meals at a better price, or pick any two eligible pizzas for Buy 1 Get 1 Free. You pay for the higher-priced pizza.</p>
+          <div class="lfc-perks"><span>🍗 Fresh &amp; hot</span><span>💰 Bigger savings</span><span>💬 Order on WhatsApp</span></div>
         </div>
-
-        <div id="deals-grid" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-5 sm:gap-6 lg:gap-8"></div>
-        <div class="hidden reveal grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
-          
-          <!-- Deal 1 -->
-          <div class="p-5 sm:p-6 rounded-3xl bg-white border-2 border-amber-200/90 hover:border-amber-400 flex flex-col justify-between relative overflow-hidden group shadow-xl hover:shadow-[0_20px_45px_rgba(245,158,11,0.22)] transition-all duration-300">
-            <span class="absolute top-4 right-4 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-slate-950 font-black text-[10px] sm:text-xs px-3.5 py-1 rounded-full uppercase tracking-wider shadow-md z-10 border border-yellow-300">Save 25%</span>
-            <div>
-              <div class="relative overflow-hidden rounded-2xl mb-4 border border-amber-100 group-hover:border-amber-300 transition">
-                <img src="./images/hero-1.jpg" alt="Family Feast" loading="lazy" decoding="async" class="w-full h-40 sm:h-44 object-cover group-hover:scale-108 transition duration-500" onerror="this.onerror=null; this.src='./images/hero-1.jpg'"/>
-                <div class="absolute inset-0 bg-gradient-to-t from-white/60 via-transparent to-transparent opacity-60"></div>
-              </div>
-              <h3 class="text-lg sm:text-xl font-black text-gray-950 font-heading group-hover:text-amber-700 transition">Family Feast Mega Box</h3>
-              <p class="text-gray-600 text-xs mt-2 leading-relaxed">4 Crispy Zinger Burgers, 4 Pcs Golden Fried Chicken, 1 Jumbo Fries, 2 Paratha Rolls, and 1.5L Chilled Soft Drink.</p>
-            </div>
-            <div class="pt-4 mt-4 border-t border-amber-100 flex items-center justify-between">
-              <div>
-                <span class="text-[10px] sm:text-xs text-gray-500 line-through font-bold">Rs. 3,850</span>
-                <div class="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 font-black text-xl sm:text-2xl font-heading">Rs. 2,890</div>
-              </div>
-              <button onclick="window.LFC.addToCartById(9)" class="px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 hover:from-amber-300 hover:to-yellow-200 text-slate-950 font-black text-xs uppercase tracking-wider transition shadow-md shadow-amber-400/30 active:scale-95 cursor-pointer">Order Deal</button>
-            </div>
-          </div>
-
-          <!-- Deal 2 -->
-          <div class="p-5 sm:p-6 rounded-3xl bg-white border-2 border-amber-200/90 hover:border-amber-400 flex flex-col justify-between relative overflow-hidden group shadow-xl hover:shadow-[0_20px_45px_rgba(245,158,11,0.22)] transition-all duration-300">
-            <span class="absolute top-4 right-4 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-slate-950 font-black text-[10px] sm:text-xs px-3.5 py-1 rounded-full uppercase tracking-wider shadow-md z-10 border border-yellow-300">Duo Pack</span>
-            <div>
-              <div class="relative overflow-hidden rounded-2xl mb-4 border border-amber-100 group-hover:border-amber-300 transition">
-                <img src="./images/hero-4.jpg" alt="Couple Crunch" loading="lazy" decoding="async" class="w-full h-40 sm:h-44 object-cover group-hover:scale-108 transition duration-500" onerror="this.onerror=null; this.src='./images/hero-4.jpg'"/>
-                <div class="absolute inset-0 bg-gradient-to-t from-white/60 via-transparent to-transparent opacity-60"></div>
-              </div>
-              <h3 class="text-lg sm:text-xl font-black text-gray-950 font-heading group-hover:text-amber-700 transition">Couple Crunch Deal</h3>
-              <p class="text-gray-600 text-xs mt-2 leading-relaxed">2 Zinger Burgers, 2 Pcs Crunchy Fried Chicken, 1 Large Fries, and 2 Soft Drink cans (250ml).</p>
-            </div>
-            <div class="pt-4 mt-4 border-t border-amber-100 flex items-center justify-between">
-              <div>
-                <span class="text-[10px] sm:text-xs text-gray-500 line-through font-bold">Rs. 1,850</span>
-                <div class="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 font-black text-xl sm:text-2xl font-heading">Rs. 1,450</div>
-              </div>
-              <button onclick="window.LFC.addToCartById(10)" class="px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 hover:from-amber-300 hover:to-yellow-200 text-slate-950 font-black text-xs uppercase tracking-wider transition shadow-md shadow-amber-400/30 active:scale-95 cursor-pointer">Order Deal</button>
-            </div>
-          </div>
-
-          <!-- Deal 3 -->
-          <div class="p-5 sm:p-6 rounded-3xl bg-white border-2 border-amber-200/90 hover:border-amber-400 flex flex-col justify-between relative overflow-hidden group shadow-xl hover:shadow-[0_20px_45px_rgba(245,158,11,0.22)] transition-all duration-300">
-            <span class="absolute top-4 right-4 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-slate-950 font-black text-[10px] sm:text-xs px-3.5 py-1 rounded-full uppercase tracking-wider shadow-md z-10 border border-yellow-300">Hot Special</span>
-            <div>
-              <div class="relative overflow-hidden rounded-2xl mb-4 border border-amber-100 group-hover:border-amber-300 transition">
-                <img src="./images/hero-3.jpg" alt="Pizza & Bucket" loading="lazy" decoding="async" class="w-full h-40 sm:h-44 object-cover group-hover:scale-108 transition duration-500" onerror="this.onerror=null; this.src='./images/hero-3.jpg'"/>
-                <div class="absolute inset-0 bg-gradient-to-t from-white/60 via-transparent to-transparent opacity-60"></div>
-              </div>
-              <h3 class="text-lg sm:text-xl font-black text-gray-950 font-heading group-hover:text-amber-700 transition">Pizza & Chicken Platter</h3>
-              <p class="text-gray-600 text-xs mt-2 leading-relaxed">1 Medium Cheesy Loaded Pizza + 5 Pcs Hot Tender Strips + 2 Garlic Dips + 2 Chilled Soft Drinks.</p>
-            </div>
-            <div class="pt-4 mt-4 border-t border-amber-100 flex items-center justify-between">
-              <div>
-                <span class="text-[10px] sm:text-xs text-gray-500 line-through font-bold">Rs. 2,100</span>
-                <div class="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 font-black text-xl sm:text-2xl font-heading">Rs. 1,690</div>
-              </div>
-              <button onclick="window.LFC.addToCartById(3)" class="px-4 sm:px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 hover:from-amber-300 hover:to-yellow-200 text-slate-950 font-black text-xs uppercase tracking-wider transition shadow-md shadow-amber-400/30 active:scale-95 cursor-pointer">Order Deal</button>
-            </div>
-          </div>
-
-        </div>
+        <div id="deals-grid"></div>
       </div>
     </section>
 
@@ -873,7 +937,7 @@
     </footer>
 
     <!-- App-like Mobile Bottom Navigation Bar (No Admin Button - URL Only Access) -->
-    <div class="sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t-2 border-amber-200/90 px-2 py-2 flex items-center justify-around shadow-2xl">
+    <div class="lfc-bottom sm:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t-2 border-amber-200/90 px-2 py-2 flex items-center justify-around shadow-2xl">
       <a href="#top" class="flex flex-col items-center gap-0.5 text-gray-600 hover:text-amber-600 transition">
         <span class="text-base">🏠</span>
         <span class="text-[10px] font-black uppercase">Home</span>
@@ -1426,6 +1490,9 @@
                         </select>
                       </label>
                     </div>
+                    <p id="admin-bogo-help" class="hidden rounded-xl border border-amber-500/20 bg-amber-500/10 px-3 py-2 text-[10px] leading-relaxed text-amber-200">
+                      Edit which pizzas qualify in the Menu tab: open a pizza and turn on “Include in the Buy 1 Get 1 Free pizza menu.”
+                    </p>
                     <label class="block space-y-1.5">
                       <span class="block text-[10px] font-black uppercase tracking-wider text-gray-400">Customer description *</span>
                       <textarea id="deal-description" rows="3" maxlength="240" placeholder="List what is included. This text appears on your website." class="w-full px-3 py-2.5 rounded-xl bg-[#08090E] border border-gray-800 text-xs text-white focus:outline-none focus:border-amber-500"></textarea>
@@ -1730,7 +1797,7 @@
     </div>
 
     <!-- Floating Direct WhatsApp Quick Button (Desktop & Tablet) -->
-    <a href="https://wa.me/923224940181?text=Hi%20LFC!%20I%20would%20like%20to%20place%20an%20order." target="_blank" rel="noopener noreferrer" class="store-wa-link hidden sm:flex fixed bottom-6 left-6 z-40 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white p-3.5 rounded-full shadow-2xl items-center gap-2 group transition-all duration-300 hover:scale-105 active:scale-95 border-2 border-emerald-400/40">
+    <a id="floating-whatsapp" href="https://wa.me/923224940181?text=Hi%20LFC!%20I%20would%20like%20to%20place%20an%20order." target="_blank" rel="noopener noreferrer" class="store-wa-link hidden sm:flex fixed bottom-6 left-6 z-40 bg-gradient-to-r from-emerald-600 to-green-600 hover:from-emerald-500 hover:to-green-500 text-white p-3.5 rounded-full shadow-2xl items-center gap-2 group transition-all duration-300 hover:scale-105 active:scale-95 border-2 border-emerald-400/40">
       <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.275.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824zm-3.423-14.416c-6.627 0-12 5.373-12 12 0 2.158.572 4.183 1.564 5.932l-1.636 5.973 6.136-1.61c1.701.928 3.65 1.705 5.936 1.705 6.627 0 12-5.373 12-12s-5.373-12-12-12z"/></svg>
       <span class="text-xs font-black pr-1">WhatsApp Order</span>
     </a>
@@ -1832,17 +1899,25 @@
           <p class="text-xs text-emerald-300 bg-emerald-950/40 border border-emerald-700/40 rounded-xl p-3">Choose any two pizzas and sizes. The higher-priced pizza is charged; the other is free.</p>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div class="p-3 rounded-2xl bg-[#141824] border border-gray-800 space-y-2">
-              <label for="bogo-pizza-1" class="text-xs font-black uppercase tracking-wide text-amber-300">Pizza 1</label>
+              <label for="bogo-pizza-1" class="text-xs font-black uppercase tracking-wide text-amber-300">Pizza choice 1</label>
+              <div class="relative overflow-hidden rounded-xl aspect-[16/9] bg-gradient-to-br from-amber-100 to-orange-200">
+                <img id="bogo-pizza-preview-1" src="./images/hero-3.jpg" alt="Pizza choice 1 preview" class="w-full h-full object-cover"/>
+                <span id="bogo-pizza-status-1" class="absolute left-2 bottom-2 rounded-full bg-slate-950/85 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-white">Checking price…</span>
+              </div>
               <select id="bogo-pizza-1" onchange="window.LFC.setBogoPizza(1,this.value)" class="w-full px-3 py-2 rounded-xl bg-[#08090E] border border-gray-700 text-xs text-white focus:outline-none focus:border-amber-500"></select>
               <select id="bogo-size-1" onchange="window.LFC.setBogoSize(1,this.value)" aria-label="Pizza 1 size" class="w-full px-3 py-2 rounded-xl bg-[#08090E] border border-gray-700 text-xs text-white focus:outline-none focus:border-amber-500"></select>
             </div>
             <div class="p-3 rounded-2xl bg-[#141824] border border-gray-800 space-y-2">
-              <label for="bogo-pizza-2" class="text-xs font-black uppercase tracking-wide text-amber-300">Pizza 2 — Free</label>
+              <label for="bogo-pizza-2" class="text-xs font-black uppercase tracking-wide text-amber-300">Pizza choice 2</label>
+              <div class="relative overflow-hidden rounded-xl aspect-[16/9] bg-gradient-to-br from-amber-100 to-orange-200">
+                <img id="bogo-pizza-preview-2" src="./images/hero-3.jpg" alt="Pizza choice 2 preview" class="w-full h-full object-cover"/>
+                <span id="bogo-pizza-status-2" class="absolute left-2 bottom-2 rounded-full bg-slate-950/85 px-2.5 py-1 text-[10px] font-black uppercase tracking-wide text-white">Checking price…</span>
+              </div>
               <select id="bogo-pizza-2" onchange="window.LFC.setBogoPizza(2,this.value)" class="w-full px-3 py-2 rounded-xl bg-[#08090E] border border-gray-700 text-xs text-white focus:outline-none focus:border-amber-500"></select>
               <select id="bogo-size-2" onchange="window.LFC.setBogoSize(2,this.value)" aria-label="Pizza 2 size" class="w-full px-3 py-2 rounded-xl bg-[#08090E] border border-gray-700 text-xs text-white focus:outline-none focus:border-amber-500"></select>
             </div>
           </div>
-          <div id="bogo-deal-total" class="rounded-xl bg-[#0b1018] border border-amber-500/30 p-3 text-center text-sm font-black text-amber-300">Select two pizzas to see your total.</div>
+          <div id="bogo-deal-total" aria-live="polite" class="rounded-xl bg-[#0b1018] border border-amber-500/30 p-3 text-center text-sm font-black text-amber-300">Select two pizzas to see your total.</div>
         </div>
         <div class="p-4 sm:p-5 border-t border-gray-800 flex gap-2">
           <button onclick="window.LFC.closeBogoDealModal()" class="px-4 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-white font-bold text-xs">Keep Browsing</button>
@@ -1902,6 +1977,13 @@
               </select>
             </div>
           </div>
+          <label class="flex items-start gap-3 rounded-xl bg-amber-500/10 border border-amber-500/25 p-3 cursor-pointer">
+            <input type="checkbox" id="edit-item-bogo-eligible" class="mt-0.5 w-4 h-4 accent-amber-500"/>
+            <span>
+              <span class="block text-xs font-bold text-white">Include in the Buy 1 Get 1 Free pizza menu</span>
+              <span class="block text-[10px] text-gray-400 mt-0.5">Only pizza-category items can be selected for the offer.</span>
+            </span>
+          </label>
           <div>
             <label class="block text-[10px] text-gray-400 font-bold mb-1">Description</label>
             <textarea id="edit-item-desc" rows="2" class="w-full px-3 py-2 rounded-xl bg-[#08090E] border border-gray-800 text-xs text-white focus:outline-none focus:border-amber-500"></textarea>

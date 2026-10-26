@@ -1104,8 +1104,7 @@
   function orderMenuItemById(id) {
     const item = menuItems.find((entry) => entry.id === id);
     if (!item) return;
-    const hasBogoBadge = item.cat === 'pizzas' && String(item.badge || '').toLowerCase().includes('buy 1 get 1 free');
-    const bogoDeal = hasBogoBadge ? deals.find((deal) => deal.type === 'bogo' && isDealAvailable(deal)) : null;
+    const bogoDeal = isBogoEligible(item) ? deals.find((deal) => deal.type === 'bogo' && isDealAvailable(deal)) : null;
     if (bogoDeal) {
       openBogoDealModal(bogoDeal.id, item.id);
       return;
@@ -1148,10 +1147,14 @@
 
   function getBogoPizzas() {
     return menuItems.filter((item) =>
-      item.cat === 'pizzas' &&
-      item.inStock !== false &&
-      (item.bogoEligible === true || String(item.badge || '').toLowerCase().includes('buy 1 get 1 free'))
+      item.inStock !== false && isBogoEligible(item)
     );
+  }
+
+  function isBogoEligible(item) {
+    if (!item || item.cat !== 'pizzas') return false;
+    if (typeof item.bogoEligible === 'boolean') return item.bogoEligible;
+    return String(item.badge || '').toLowerCase().includes('buy 1 get 1 free');
   }
 
   function getBogoSizes(item) {
@@ -1197,6 +1200,15 @@
     const item = menuItems.find((pizza) => String(pizza.id) === bogoPizzaIds[slot - 1]);
     const select = document.getElementById(`bogo-size-${slot}`);
     if (!item || !select) return;
+    const preview = document.getElementById(`bogo-pizza-preview-${slot}`);
+    if (preview) {
+      preview.src = item.image || './images/hero-3.jpg';
+      preview.alt = `${item.name} pizza preview`;
+      preview.onerror = () => {
+        preview.onerror = null;
+        preview.src = './images/hero-3.jpg';
+      };
+    }
     const sizes = getBogoSizes(item);
     const selectedIndex = Math.min(bogoSizeIndexes[slot - 1] || 0, sizes.length - 1);
     bogoSizeIndexes[slot - 1] = selectedIndex;
@@ -1240,6 +1252,8 @@
     const second = getBogoChoice(2);
     const total = document.getElementById('bogo-deal-total');
     const button = document.getElementById('bogo-add-button');
+    const firstStatus = document.getElementById('bogo-pizza-status-1');
+    const secondStatus = document.getElementById('bogo-pizza-status-2');
     if (!first || !second) {
       if (total) total.textContent = 'Select two pizzas to see your total.';
       if (button) button.disabled = true;
@@ -1247,7 +1261,9 @@
     }
     const paid = first.price >= second.price ? first : second;
     const free = first.price >= second.price ? second : first;
-    if (total) total.textContent = `Pay Rs. ${paid.price.toLocaleString()} · ${free.item.name} is FREE (save Rs. ${free.price.toLocaleString()})`;
+    if (firstStatus) firstStatus.textContent = first === free ? 'FREE' : 'You pay for this';
+    if (secondStatus) secondStatus.textContent = second === free ? 'FREE' : 'You pay for this';
+    if (total) total.textContent = `Pay Rs. ${paid.price.toLocaleString()} for ${paid.item.name} · ${free.item.name} is FREE (save Rs. ${free.price.toLocaleString()})`;
     if (button) button.disabled = false;
   }
 
@@ -1680,6 +1696,17 @@
   }
 
   // --- Menu Categories & Grid Renderer ---
+  function categoryIcon(c) {
+    const n = String((c && (c.name || c.id)) || '').toLowerCase();
+    const map = [
+      ['all', '🍽️'], ['burger', '🍔'], ['wrap', '🌯'], ['roll', '🌯'], ['wing', '🍗'], ['nugget', '🍗'],
+      ['chicken', '🍗'], ['pasta', '🍝'], ['sandwich', '🥪'], ['pizza', '🍕'], ['midnight', '🌙'],
+      ['family', '👨‍👩‍👧‍👦'], ['deal', '🔥'], ['side', '🍟'], ['drink', '🥤']
+    ];
+    const hit = map.find(([k]) => n.includes(k));
+    return hit ? hit[1] : '🍴';
+  }
+
   function renderCategories() {
     const container = document.getElementById('categories-container');
     if (!container) return;
@@ -1687,16 +1714,22 @@
     container.innerHTML = categories
       .map(
         (c) => `
-        <button onclick="window.LFC.setCategory('${c.id}')" class="px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-black text-xs sm:text-sm whitespace-nowrap transition-all duration-200 flex-shrink-0 cursor-pointer ${
-          activeCategory === c.id
-            ? 'bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-slate-950 shadow-md shadow-amber-400/30 scale-105 border border-yellow-300'
-            : 'bg-white text-gray-800 hover:text-amber-800 hover:border-amber-400 border border-amber-200/90 shadow-sm font-bold'
-        }">
-          ${c.name}
+        <button type="button" onclick="window.LFC.setCategory('${c.id}')" aria-pressed="${activeCategory === c.id}" class="lfc-pill ${activeCategory === c.id ? 'is-active' : ''}">
+          <span class="ico" aria-hidden="true">${categoryIcon(c)}</span><span>${escapeHtml(c.name)}</span>
         </button>
       `
       )
       .join('');
+
+    const active = container.querySelector('.lfc-pill.is-active');
+    if (active && activeCategory !== 'all' && active.scrollIntoView) {
+      try { container.scrollTo({ left: Math.max(0, active.offsetLeft - 24), behavior: 'smooth' }); } catch (_) {}
+    }
+  }
+
+  function dealIncludes(text) {
+    const parts = String(text || '').split(/\s*(?:,|\+|;|\n|\s&\s)\s*/).map((p) => p.trim().replace(/^and\s+/i, '').replace(/\.$/, '')).filter(Boolean);
+    return parts.length >= 2 && parts.length <= 8 && parts.every((p) => p.length <= 64) ? parts : null;
   }
 
   function renderDeals() {
@@ -1704,7 +1737,7 @@
     if (!grid) return;
     const activeDeals = deals.filter(isDealAvailable);
     if (!activeDeals.length) {
-      grid.innerHTML = '<div class="md:col-span-2 xl:col-span-3 text-center p-8 rounded-3xl bg-white/90 border border-amber-200 text-gray-600">No active deals right now. Please check back soon!</div>';
+      grid.innerHTML = '<div class="lfc-deals__empty">No active deals right now. Please check back soon!</div>';
       return;
     }
 
@@ -1712,32 +1745,37 @@
       const isBogo = deal.type === 'bogo';
       const badge = escapeHtml(deal.badge || (isBogo ? 'Buy 1 Get 1 Free' : 'Special Deal'));
       const title = escapeHtml(deal.title);
-      const description = escapeHtml(deal.description);
       const image = escapeHtml(safeDealImage(deal.image));
-      const oldPrice = !isBogo && Number(deal.originalPrice) > Number(deal.price)
-        ? `<span class="text-[10px] sm:text-xs text-gray-500 line-through font-bold">Rs. ${Number(deal.originalPrice).toLocaleString()}</span>`
-        : '';
-      const price = isBogo
-        ? '<div class="text-amber-700 font-black text-sm sm:text-base">Choose any 2 pizzas</div><div class="text-[10px] text-gray-500">Pay for the higher-priced one</div>'
-        : `<div class="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 font-black text-xl sm:text-2xl font-heading">Rs. ${Number(deal.price).toLocaleString()}</div>`;
-      const buttonLabel = isBogo ? 'Choose Pizzas' : 'Order Deal';
+      const originalPrice = Number(deal.originalPrice);
+      const dealPrice = Number(deal.price);
+      const hasSavings = !isBogo && Number.isFinite(originalPrice) && originalPrice > dealPrice && dealPrice > 0;
+      const savingsPercent = hasSavings ? Math.round((originalPrice - dealPrice) / originalPrice * 100) : 0;
+      const includes = dealIncludes(deal.description);
+      const body = includes
+        ? `<ul class="lfc-deal__list">${includes.slice(0, 6).map((p) => `<li>${escapeHtml(p)}</li>`).join('')}</ul>`
+        : `<p class="lfc-deal__text">${escapeHtml(deal.description)}</p>`;
+      const priceBox = isBogo
+        ? `<div><div class="lfc-deal__choose">Choose any 2 pizzas</div><span class="lfc-deal__fine">✓ Pay for the higher-priced pizza only</span></div>`
+        : `<div><div class="lfc-deal__price">Rs. ${dealPrice.toLocaleString()}</div>${hasSavings ? `<span class="lfc-deal__old">Rs. ${originalPrice.toLocaleString()}</span>` : ''}</div>
+           ${hasSavings ? `<span class="lfc-deal__saving">Save Rs. ${(originalPrice - dealPrice).toLocaleString()}</span>` : ''}`;
+      const buttonLabel = isBogo ? 'Choose your pizzas' : 'Order this deal';
 
       return `
-        <article class="rounded-3xl bg-white border border-amber-200 hover:border-amber-400 flex flex-col justify-between relative overflow-hidden group shadow-lg hover:shadow-2xl hover:shadow-amber-900/10 transition-all duration-300 ${isBogo ? 'ring-2 ring-amber-400/60' : ''}">
-          <span class="absolute top-3 left-3 bg-slate-950/90 text-white font-black text-[10px] sm:text-xs px-3 py-1.5 rounded-full uppercase tracking-wider shadow-md z-10">${badge}</span>
-          <div>
-            <div class="relative overflow-hidden aspect-[16/9] bg-amber-50">
-              <img src="${image}" alt="${title}" loading="lazy" decoding="async" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" onerror="this.onerror=null; this.src='./images/hero-1.jpg'"/>
-              <div class="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-transparent"></div>
-            </div>
-            <div class="p-5 pb-0">
-              <h3 class="text-lg sm:text-xl font-black text-gray-950 font-heading group-hover:text-amber-700 transition">${title}</h3>
-              <p class="text-gray-600 text-xs mt-2 leading-relaxed min-h-10">${description}</p>
-            </div>
+        <article class="lfc-deal ${isBogo ? 'lfc-deal--bogo' : ''}">
+          <div class="lfc-deal__media">
+            <img src="${image}" alt="${title}" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='./images/hero-1.jpg'"/>
+            <span class="lfc-deal__badge">${badge}</span>
+            ${hasSavings ? `<span class="lfc-deal__save"><small>SAVE</small>${savingsPercent}%</span>` : ''}
+            ${isBogo ? '<span class="lfc-deal__free">1 pizza free</span>' : ''}
           </div>
-          <div class="p-5 pt-4 mt-4 border-t border-amber-100 flex items-center justify-between gap-3">
-            <div>${oldPrice}${price}</div>
-            <button onclick="window.LFC.orderDealById(${deal.id})" class="px-4 sm:px-5 py-2.5 rounded-xl ${isBogo ? 'bg-slate-950 hover:bg-amber-600 text-white' : 'bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 hover:from-amber-300 hover:to-yellow-200 text-slate-950'} font-black text-xs uppercase tracking-wider transition shadow-md active:scale-95 cursor-pointer">${buttonLabel}</button>
+          <div class="lfc-deal__body">
+            <div class="lfc-deal__type">${isBogo ? '🍕 Pizza offer' : '✨ Meal deal'}</div>
+            <h3 class="lfc-deal__title font-heading">${title}</h3>
+            ${body}
+            <div class="lfc-deal__foot">
+              <div class="lfc-deal__pricebox">${priceBox}</div>
+              <button type="button" class="lfc-deal__cta" aria-label="${buttonLabel}: ${title}" onclick="window.LFC.orderDealById(${deal.id})">${buttonLabel} <span aria-hidden="true">→</span></button>
+            </div>
           </div>
         </article>
       `;
@@ -1768,86 +1806,44 @@
 
     if (empty) empty.classList.add('hidden');
 
+    const hasActiveBogoDeal = deals.some((deal) => deal.type === 'bogo' && isDealAvailable(deal));
+
     grid.innerHTML = items
       .map((item) => {
-        const spicinessDots =
-          item.spiciness > 0
-            ? `<div class="hidden sm:flex items-center gap-1 text-[10px] text-amber-900 font-bold bg-amber-100/90 px-2 py-0.5 rounded-full border border-amber-300">
-                <span>🌶️</span><span>${'🔥'.repeat(item.spiciness)}</span>
-               </div>`
-            : '';
+        const spice = Math.min(5, Number(item.spiciness) || 0);
+        const spiceHtml = spice > 0 ? `<span class="lfc-spice" title="Spice level ${spice}" aria-label="Spice level ${spice}">${'🔥'.repeat(spice)}</span>` : '';
 
-        const hasActiveBogoDeal = deals.some((deal) => deal.type === 'bogo' && isDealAvailable(deal));
-        const badgeText = item.cat === 'pizzas' && String(item.badge || '').toLowerCase().includes('buy 1 get 1 free') && !hasActiveBogoDeal
-          ? ''
-          : item.badge;
-        const badgeHtml = badgeText
-          ? `<span class="absolute top-2.5 left-2.5 bg-gradient-to-r from-amber-500 via-yellow-400 to-amber-500 text-slate-950 font-black text-[9px] sm:text-[10px] uppercase px-2.5 py-0.5 rounded-lg shadow-md tracking-wider z-10 border border-yellow-300">
-              ${escapeHtml(badgeText)}
-             </span>`
-          : '';
-        const groupHtml = item.pizzaGroup
-          ? `<span class="inline-flex mb-2 px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-[9px] sm:text-[10px] font-black text-amber-900">${escapeHtml(item.pizzaGroup)}</span>`
-          : '';
+        const bogo = isBogoEligible(item);
+        const badgeText = bogo ? (hasActiveBogoDeal ? 'Buy 1 Get 1 Free' : '') : item.badge;
+        const badgeHtml = badgeText ? `<span class="lfc-tag ${bogo ? 'lfc-tag--gold' : ''}">${escapeHtml(badgeText)}</span>` : '';
 
-        const stockOverlay = !item.inStock
-          ? `<div class="absolute inset-0 bg-slate-950/80 backdrop-blur-[2px] flex items-center justify-center rounded-3xl z-20">
-              <span class="bg-red-600 text-white font-black text-[10px] sm:text-xs px-3 py-1 rounded-full uppercase tracking-wider">Sold Out</span>
-             </div>`
-          : '';
+        const hasSizes = item.sizes && item.sizes.length > 1;
+        const hasAddons = item.addons && item.addons.length > 0;
+        const chips = [
+          item.pizzaGroup ? `<span class="lfc-chip">🍕 ${escapeHtml(item.pizzaGroup)}</span>` : '',
+          hasSizes ? '<span class="lfc-chip">📏 Sizes</span>' : '',
+          hasAddons ? '<span class="lfc-chip">➕ Extras</span>' : ''
+        ].join('');
 
-        const hasMultiOptions =
-          (item.sizes && item.sizes.length > 1) || (item.addons && item.addons.length > 0);
+        const stockOverlay = !item.inStock ? '<div class="lfc-soldout"><span>Sold out</span></div>' : '';
 
         return `
-          <div class="group relative bg-white rounded-[26px] border-2 border-amber-200/90 hover:border-amber-400 shadow-[0_10px_30px_-5px_rgba(245,158,11,0.12)] hover:shadow-[0_20px_45px_-5px_rgba(245,158,11,0.25)] transition-all duration-300 flex flex-col overflow-hidden hover:-translate-y-1.5">
-            ${stockOverlay}
-            
-            <div class="relative aspect-[4/3] sm:h-52 overflow-hidden bg-amber-50 flex-shrink-0 cursor-pointer lfc-media" onclick="window.LFC.orderMenuItemById(${item.id})">
-              ${badgeHtml}
-              <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" loading="lazy" decoding="async" class="w-full h-full object-cover transform group-hover:scale-108 transition-all duration-500" onerror="this.onerror=null; this.src='./images/hero-1.jpg';"/>
-              <div class="absolute inset-0 bg-gradient-to-t from-white/90 via-transparent to-transparent opacity-60"></div>
+          <div class="lfc-card">
+            <div class="lfc-card__media lfc-media" onclick="window.LFC.orderMenuItemById(${item.id})">
+              ${badgeHtml}${spiceHtml}
+              <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.name)}" loading="lazy" decoding="async" onerror="this.onerror=null; this.src='./images/hero-1.jpg';"/>
+              <div class="lfc-card__shade"></div>
+              ${stockOverlay}
             </div>
-
-            <div class="p-4 sm:p-5 flex-1 flex flex-col justify-between">
-              <div>
-                <div class="flex items-start justify-between gap-1 mb-1.5">
-                  <h3 onclick="window.LFC.orderMenuItemById(${item.id})" class="font-extrabold text-sm sm:text-base text-gray-900 group-hover:text-amber-600 transition leading-snug line-clamp-1 font-heading cursor-pointer">${escapeHtml(item.name)}</h3>
-                  ${spicinessDots}
-                </div>
-                ${groupHtml}
-                <p class="text-gray-600 text-[11px] sm:text-xs line-clamp-2 leading-relaxed mb-3">${escapeHtml(item.desc)}</p>
-                
-                ${
-                  hasMultiOptions
-                    ? `<div class="inline-flex items-center gap-1.5 text-[9px] font-bold text-amber-900 bg-amber-50 border border-amber-300/80 px-2.5 py-0.5 rounded-full mb-2.5">
-                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-                        <span>Portions, Spiciness & Extras</span>
-                       </div>`
-                    : ''
-                }
-              </div>
-
-              <div class="pt-3 border-t border-amber-100 flex items-center justify-between gap-2 mt-auto">
-                <div>
-                  <span class="text-[9px] sm:text-[10px] text-gray-500 uppercase font-bold tracking-wider block">From</span>
-                  <div class="text-transparent bg-clip-text bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 font-black text-base sm:text-xl tracking-tight font-heading">Rs. ${item.price.toLocaleString()}</div>
-                </div>
-
-                <button 
-                  onclick="window.LFC.orderMenuItemById(${item.id})"
-                  ${!item.inStock ? 'disabled' : ''}
-                  class="flex items-center gap-1.5 px-4 sm:px-4.5 py-2 sm:py-2.5 rounded-xl font-black text-[11px] sm:text-xs uppercase tracking-wider transition-all duration-200 cursor-pointer ${
-                    item.inStock
-                      ? 'bg-gradient-to-r from-amber-400 via-yellow-300 to-amber-400 hover:from-amber-300 hover:to-yellow-200 text-slate-950 shadow-md shadow-amber-400/30 active:scale-95'
-                      : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  }">
-                  <span class="text-sm font-bold">+</span>
-                  <span>Order</span>
-                </button>
+            <div class="lfc-card__body">
+              <h3 class="lfc-card__name font-heading" onclick="window.LFC.orderMenuItemById(${item.id})">${escapeHtml(item.name)}</h3>
+              <p class="lfc-card__desc">${escapeHtml(item.desc)}</p>
+              ${chips ? `<div class="lfc-chips">${chips}</div>` : ''}
+              <div class="lfc-card__foot">
+                <div class="lfc-price">${hasSizes ? '<small>From</small>' : ''}<b>Rs. ${Number(item.price).toLocaleString()}</b></div>
+                <button type="button" class="lfc-add" aria-label="Order ${escapeHtml(item.name)}" onclick="window.LFC.orderMenuItemById(${item.id})" ${!item.inStock ? 'disabled' : ''}><span aria-hidden="true">+</span>${item.inStock ? 'Add' : 'Out'}</button>
               </div>
             </div>
-
           </div>
         `;
       })
@@ -2271,8 +2267,17 @@
   }
   async function apiPost(body) {
     const r = await fetch('/api/site', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey() }, body: JSON.stringify(body) });
-    let j = {}; try { j = await r.json(); } catch (e) {}
+    const isJson = (r.headers.get('content-type') || '').toLowerCase().includes('application/json');
+    let j = {};
+    if (isJson) {
+      try {
+        j = await r.json();
+      } catch (e) {
+        if (r.ok) throw new Error('Publishing backend returned invalid JSON');
+      }
+    }
     if (!r.ok) throw new Error(j.error || (r.status === 404 ? 'Backend not found — deploy with Netlify Functions (see DEPLOY-NETLIFY.md)' : r.status === 401 ? 'Wrong admin key' : 'Server error ' + r.status));
+    if (!isJson) throw new Error('Publishing backend returned a non-JSON response. Static Hostinger hosting does not provide the shared publishing API.');
     return j;
   }
   function syncSoon() {
@@ -2321,6 +2326,7 @@
         if (r.status !== 404) console.warn('Shared site data could not be loaded:', r.status);
         return;
       }
+      if (!(r.headers.get('content-type') || '').toLowerCase().includes('application/json')) return;
       const d = await r.json();
       if (!d || !d.updatedAt || localStorage.getItem('lfc_remote_stamp') === String(d.updatedAt)) return;
       applyingRemote = true;
@@ -2352,7 +2358,11 @@
     const c = document.getElementById('sync-backend');
     if (c) {
       c.textContent = 'Checking backend…';
-      try { const r = await fetch('/api/site?t=' + Date.now(), { cache: 'no-store' }); c.textContent = r.ok ? '✅ Backend connected' : '❌ Backend not found (deploy with Netlify Functions)'; }
+      try {
+        const r = await fetch('/api/site?t=' + Date.now(), { cache: 'no-store' });
+        const isJson = (r.headers.get('content-type') || '').toLowerCase().includes('application/json');
+        c.textContent = r.ok && isJson ? '✅ Backend connected' : '❌ Publishing backend not found (static Hostinger sites save changes in this browser only)';
+      }
       catch (e) { c.textContent = '❌ Backend not reachable'; }
     }
   }
@@ -3314,6 +3324,7 @@
     const priceEl = document.getElementById('edit-item-price');
     const badgeEl = document.getElementById('edit-item-badge');
     const stockEl = document.getElementById('edit-item-stock');
+    const bogoEligibleEl = document.getElementById('edit-item-bogo-eligible');
     const descEl = document.getElementById('edit-item-desc');
     const imgEl = document.getElementById('edit-item-image');
 
@@ -3323,6 +3334,7 @@
     if (priceEl) priceEl.value = item.price;
     if (badgeEl) badgeEl.value = item.badge || '';
     if (stockEl) stockEl.value = item.inStock ? 'true' : 'false';
+    if (bogoEligibleEl) bogoEligibleEl.checked = isBogoEligible(item);
     if (descEl) descEl.value = item.desc || '';
     if (imgEl) imgEl.value = item.image || '';
 
@@ -3445,6 +3457,7 @@
     const priceEl = document.getElementById('edit-item-price');
     const badgeEl = document.getElementById('edit-item-badge');
     const stockEl = document.getElementById('edit-item-stock');
+    const bogoEligibleEl = document.getElementById('edit-item-bogo-eligible');
     const descEl = document.getElementById('edit-item-desc');
     const imgEl = document.getElementById('edit-item-image');
 
@@ -3459,6 +3472,12 @@
     menuItems[itemIndex].inStock = stockEl ? stockEl.value === 'true' : true;
     menuItems[itemIndex].desc = descEl ? descEl.value.trim() : menuItems[itemIndex].desc;
     menuItems[itemIndex].image = imgEl && imgEl.value.trim() ? imgEl.value.trim() : menuItems[itemIndex].image;
+    menuItems[itemIndex].bogoEligible = menuItems[itemIndex].cat === 'pizzas' && !!(bogoEligibleEl && bogoEligibleEl.checked);
+    if (menuItems[itemIndex].bogoEligible && !menuItems[itemIndex].badge) {
+      menuItems[itemIndex].badge = 'Buy 1 Get 1 Free';
+    } else if (!menuItems[itemIndex].bogoEligible && String(menuItems[itemIndex].badge).toLowerCase().includes('buy 1 get 1 free')) {
+      menuItems[itemIndex].badge = menuItems[itemIndex].pizzaGroup || 'Pizza';
+    }
 
     if (currentEditingItem) {
       if (currentEditingItem.sizes) menuItems[itemIndex].sizes = currentEditingItem.sizes;
@@ -3617,8 +3636,10 @@
     const isBogo = (document.getElementById('deal-type') || {}).value === 'bogo';
     const priceFields = document.getElementById('admin-deal-price-fields');
     const priceInput = document.getElementById('deal-price');
+    const bogoHelp = document.getElementById('admin-bogo-help');
     if (priceFields) priceFields.classList.toggle('hidden', isBogo);
     if (priceInput) priceInput.required = !isBogo;
+    if (bogoHelp) bogoHelp.classList.toggle('hidden', !isBogo);
   }
 
   function editDeal(id) {
@@ -4571,6 +4592,7 @@
     updateOrderTypeUI();
     initScrollEffects();
     initStatsCounters();
+    initFloatingWhatsappVisibility();
     setInterval(() => {
       renderDeals();
       renderAdminDeals();
@@ -4622,6 +4644,19 @@
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') syncRemoteData();
     });
+  }
+
+  function initFloatingWhatsappVisibility() {
+    const floatingButton = document.getElementById('floating-whatsapp');
+    const dealsSection = document.getElementById('deals');
+    if (!floatingButton || !dealsSection || !('IntersectionObserver' in window)) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      const obscured = entry.isIntersecting;
+      floatingButton.classList.toggle('is-obscured', obscured);
+      floatingButton.setAttribute('aria-hidden', String(obscured));
+      floatingButton.toggleAttribute('inert', obscured);
+    }, { rootMargin: '-12% 0px -12% 0px' });
+    observer.observe(dealsSection);
   }
 
   // --- Window Controller Export ---

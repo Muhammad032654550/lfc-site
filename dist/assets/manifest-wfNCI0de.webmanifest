@@ -1,0 +1,33 @@
+{
+  "name": "Lahore Fried Chicken (LFC) - Taste the Legend",
+  "short_name": "LFC Lahore",
+  "description": "Lahore's premier crispy fried chicken, burgers, wraps and loaded pizzas with instant WhatsApp ordering.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#08090E",
+  "theme_color": "#08090E",
+  "lang": "en",
+  "categories": ["food", "shopping"],
+  "icons": [
+    {
+      "src": "./images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

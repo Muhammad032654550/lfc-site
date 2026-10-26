@@ -1,8 +1,8 @@
 # 🍗 Lahore Fried Chicken (LFC) — Website
 
-A fast, **zero-build** static website for a fast-food restaurant (fried chicken, burgers,
+A fast static website for a fast-food restaurant (fried chicken, burgers,
 paratha rolls, loaded pizzas & combo deals) with **instant WhatsApp ordering** and a built-in
-**Admin Control Suite**. Designed to run on **GitHub Pages** with no server, no database and no build step.
+**Admin Control Suite**. It can be uploaded to **Hostinger** or hosted on other static web hosts.
 
 > **Taste the Legend** — Developer credit: *Trivox Solutions*
 
@@ -12,12 +12,12 @@ paratha rolls, loaded pizzas & combo deals) with **instant WhatsApp ordering** a
 
 | Area | Details |
 |---|---|
-| Tech | Pure **HTML + CSS + Vanilla JavaScript** (single `index.html` + `app.js`) |
-| Styling | Tailwind CSS (CDN) + custom CSS — no compiler needed |
+| Tech | **HTML + CSS + Vanilla JavaScript** (`index.html` + `app.js`) |
+| Styling | Tailwind CSS + custom CSS |
 | Ordering | Cart → **WhatsApp checkout** with a pre-filled order message |
 | Admin | PIN-protected control suite to manage menu, categories, hero slides, branches, logo & settings |
 | Storage | Everything saved in the browser via `localStorage` (no backend) |
-| Hosting | **GitHub Pages** ready (static, relative paths, `.nojekyll` included) |
+| Hosting | Static-host ready; optional Vite production build |
 
 ---
 
@@ -40,6 +40,25 @@ paratha rolls, loaded pizzas & combo deals) with **instant WhatsApp ordering** a
 
 > All asset paths are **relative** (`./images/...`), so the site works whether it is hosted at the
 > repository root or any sub-path. No configuration required.
+
+## 🌐 Deploy to Hostinger
+
+1. On your computer, install Node.js, open a terminal in this project folder, and run:
+
+   ```bash
+   npm ci
+   npm run build
+   ```
+
+2. In Hostinger hPanel, open **Websites → Manage → Files → File Manager** and open `public_html`.
+3. Upload the **contents of the generated `dist` folder** into `public_html` (including `index.html`
+   and the `images` folder). Do not upload the `dist` folder itself as a nested folder.
+4. Visit your domain and hard-refresh once to load the new files.
+
+The storefront and WhatsApp ordering work as static files. Menu and deal edits in Admin are saved in
+the browser that made the edits; static Hostinger hosting does not share those changes with customers
+or other devices. The **Publish & Backup** cloud sync in this project currently requires its Netlify
+Function backend, so it will show as unavailable when the site is hosted only on Hostinger.
 
 ### First-time push (if you don't have a repo yet)
 
@@ -82,7 +101,7 @@ Open the admin panel in any of these ways:
 
 **Default PIN: `5640`** (change it in *Admin → Settings*).
 
-You can manage: menu items (with photo upload), customer deals (create, edit, enable/disable or delete fixed-price combos and Buy 1 Get 1 Free pizza offers), coupon codes, categories, hero slides, branch locations, logo/branding, WhatsApp & phone numbers, delivery fee, and free-delivery threshold. Changes are saved in the browser; configure the Netlify publishing key to share supported site content across devices.
+You can manage: menu items (with photo upload and a Buy 1 Get 1 Free eligibility switch), customer deals (create, edit, enable/disable or delete fixed-price combos and pizza offers), coupon codes, categories, hero slides, branch locations, logo/branding, WhatsApp & phone numbers, delivery fee, and free-delivery threshold. The B1G1 picker previews each selected pizza and clearly marks which one is free based on its size and price. Changes are saved in the browser; sharing them across devices requires the Netlify publishing backend described in [DEPLOY-NETLIFY.md](./DEPLOY-NETLIFY.md).
 
 ---
 
@@ -92,7 +111,6 @@ You can manage: menu items (with photo upload), customer deals (create, edit, en
 .
 ├── index.html                 # The whole page (markup + design)
 ├── app.js                     # All site logic (cart, WhatsApp, admin, animations)
-├── public/app.js              # Vite-served copy; keep it in sync with app.js
 ├── 404.html                   # Friendly "page not found" page
 ├── manifest.webmanifest       # PWA "Add to Home Screen" support
 ├── robots.txt / sitemap.xml   # SEO
