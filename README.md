@@ -2,7 +2,8 @@
 
 A fast static website for a fast-food restaurant (fried chicken, burgers,
 paratha rolls, loaded pizzas & combo deals) with **instant WhatsApp ordering** and a built-in
-**Admin Control Suite**. It can be uploaded to **Hostinger** or hosted on other static web hosts.
+**Admin Control Suite**. Deploy to **Netlify** for shared publishing across devices, or use it as a
+static site on hosts such as Hostinger.
 
 > **Taste the Legend** — Developer credit: *Trivox Solutions*
 
@@ -16,10 +17,24 @@ paratha rolls, loaded pizzas & combo deals) with **instant WhatsApp ordering** a
 | Styling | Tailwind CSS + custom CSS |
 | Ordering | Cart → **WhatsApp checkout** with a pre-filled order message |
 | Admin | PIN-protected control suite to manage menu, categories, hero slides, branches, logo & settings |
-| Storage | Everything saved in the browser via `localStorage` (no backend) |
-| Hosting | Static-host ready; optional Vite production build |
-
+| Storage | Browser `localStorage`, with optional shared publishing through Netlify Blobs |
+| Hosting | Zero-build static site; Netlify Function provides shared publishing |
 ---
+
+## 🌐 Deploy to Netlify (shared publishing)
+
+1. Import this repository in Netlify and deploy from your preferred branch. Netlify reads
+   [`netlify.toml`](./netlify.toml): it publishes the repository root and deploys the
+   `netlify/functions` function directory.
+2. In **Site configuration → Environment variables**, set `ADMIN_KEY` to a long, private key, then
+   redeploy. Keep this key secret.
+3. Open the deployed site, go to **Admin → Publish**, enter the same key, and choose **Save key &
+   sync**. Admin changes will then publish across devices.
+
+The site intentionally deploys from the repository root rather than `dist`: it uses relative
+`./images/...` paths at runtime, and the root deployment preserves those files along with all
+existing storefront and admin features. For detailed setup and troubleshooting, see
+[`DEPLOY-NETLIFY.md`](./DEPLOY-NETLIFY.md).
 
 ## 🚀 Deploy to GitHub Pages (2 easy ways)
 

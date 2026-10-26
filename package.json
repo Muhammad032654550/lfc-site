@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Lahore Fried Chicken (LFC) - zero-build static restaurant website (GitHub Pages ready).",
+  "description": "Lahore Fried Chicken (LFC) - zero-build restaurant website with Netlify shared publishing.",
   "scripts": {
     "dev": "vite --port=3000 --host=0.0.0.0",
     "build": "vite build",
