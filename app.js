@@ -11,7 +11,7 @@
   // --- Initial Preset Data ---
   const CATALOG_REVISION = '2026-10-21-v4';
   let syncing = false, syncPending = false, syncTimer = null, remoteSyncing = false, selfSaving = false, applyingRemote = false;
-  const SYNC_KEYS = ['hero_slides', 'hero_config', 'menu_items', 'categories', 'settings', 'branches', 'deals'];
+  const SYNC_KEYS = ['hero_slides', 'hero_config', 'menu_items', 'categories', 'settings', 'branches', 'zones', 'promos', 'deals'];
   const DEFAULT_SETTINGS = {
     storeName: 'LFC',
     fullName: 'Lahore Fried Chicken (LFC)',
@@ -2286,8 +2286,8 @@
     clearTimeout(syncTimer); syncTimer = setTimeout(() => syncUp(false), 2000);
   }
   async function syncUp(manual) {
-    if (!adminKey()) { if (manual) showToast('Enter your admin key first'); return; }
-    if (syncing) { syncPending = true; return; }
+    if (!adminKey()) { if (manual) showToast('Enter your admin key first'); return false; }
+    if (syncing) { syncPending = true; return false; }
     syncing = true; setSyncStatus('⏳ Syncing…');
     try {
       const up = async (o) => { if (o && IMG_RE.test(o.image || '')) o.image = (await apiPost({ action: 'upload', dataUri: o.image })).url; };
@@ -2300,17 +2300,22 @@
       selfSaving = false;
       const updatedAt = Date.now();
       const slim = menuItems.map((m) => ({ ...m, image: m.image && m.image.startsWith('data:image/svg') ? '' : m.image }));
-      await apiPost({ action: 'save', data: { updatedAt, heroSlides, heroConfig, categories, menuItems: slim, logoUrl: settings.logoUrl, branches, deals } });
+      const publicSettings = { ...settings };
+      delete publicSettings.adminPin;
+      await apiPost({ action: 'save', data: { updatedAt, heroSlides, heroConfig, categories, menuItems: slim, settings: publicSettings, logoUrl: settings.logoUrl, branches, zones, promos, deals } });
       localStorage.setItem('lfc_remote_stamp', String(updatedAt));
       setSyncStatus('✅ Synced to all devices · ' + new Date().toLocaleTimeString());
       if (manual) showToast('Synced to all devices!');
+      return true;
     } catch (e) {
       selfSaving = false;
       setSyncStatus('❌ ' + e.message);
       showToast('Publish failed: ' + e.message, 'error');
+      return false;
+    } finally {
+      syncing = false;
+      if (syncPending) { syncPending = false; syncSoon(); }
     }
-    syncing = false;
-    if (syncPending) { syncPending = false; syncSoon(); }
   }
   async function publishAll() {
     const k = (document.getElementById('sync-key') || {}).value;
@@ -2330,10 +2335,18 @@
       const d = await r.json();
       if (!d || !d.updatedAt || localStorage.getItem('lfc_remote_stamp') === String(d.updatedAt)) return;
       applyingRemote = true;
+      if (d.settings && typeof d.settings === 'object') {
+        const remoteSettings = { ...d.settings };
+        delete remoteSettings.adminPin;
+        settings = { ...DEFAULT_SETTINGS, ...settings, ...remoteSettings };
+        saveData('settings', settings);
+      }
       if (Array.isArray(d.heroSlides)) { heroSlides = d.heroSlides; saveData('hero_slides', heroSlides); }
       if (d.heroConfig) { heroConfig = d.heroConfig; saveData('hero_config', heroConfig); }
       if (Array.isArray(d.categories)) { categories = d.categories; saveData('categories', categories); }
       if (Array.isArray(d.branches)) { branches = d.branches; saveData('branches', branches); }
+      if (Array.isArray(d.zones)) { zones = d.zones; saveData('zones', zones); }
+      if (Array.isArray(d.promos)) { promos = d.promos; saveData('promos', promos); }
       if (Array.isArray(d.deals)) { deals = normalizeDeals(d.deals); saveData('deals', deals); }
       if (Array.isArray(d.menuItems)) {
         const remoteMenu = d.menuItems.map((m) => (!m.image || m.image.startsWith('data:image/svg') ? { ...m, image: menuArt(m.art || '🍽️') } : m));
@@ -2344,7 +2357,7 @@
       applyingRemote = false;
       try { localStorage.setItem('lfc_menu_version', MENU_VERSION); localStorage.setItem('lfc_remote_stamp', String(d.updatedAt)); } catch (e) {}
       activeCategory = 'all';
-      updateBrandLogos(); renderHeroSlide(0); startHeroTimer(); renderCategories(); renderMenu(); renderDeals(); renderAdminDeals(); renderBranches();
+      updateBrandLogos(); renderHeroSlide(0); startHeroTimer(); renderCategories(); renderMenu(); renderDeals(); renderAdminDeals(); renderBranches(); renderZoneSelect(); renderAdminZones(); renderAdminCoupons(); renderAdminSettings();
     } catch (e) {
       applyingRemote = false;
       console.warn('Shared site sync failed:', e);
@@ -3939,52 +3952,172 @@
     showToast('Store data downloaded as JSON backup!');
   }
 
+  const BACKUP_IMAGE_FIELDS = /^(image|imageUrl|photo|photoUrl|logoUrl)$/i;
+  const BACKUP_UPLOAD_IMAGE = /^data:image\/(jpeg|png|webp);base64,/i;
+
+  function visitBackupImages(value, visit) {
+    if (Array.isArray(value)) {
+      value.forEach((entry) => visitBackupImages(entry, visit));
+      return;
+    }
+    if (!value || typeof value !== 'object') return;
+    Object.entries(value).forEach(([key, entry]) => {
+      if (BACKUP_IMAGE_FIELDS.test(key) && typeof entry === 'string') visit(value, key, entry);
+      else visitBackupImages(entry, visit);
+    });
+  }
+
+  function blobToDataUrl(blob) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = () => reject(new Error('Could not read an image for the backup'));
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  async function exportCompleteBackup(button) {
+    if (button && button.disabled) return;
+    if (button) { button.disabled = true; button.dataset.originalLabel = button.textContent; button.textContent = 'Preparing complete backup…'; }
+    try {
+      const backup = JSON.parse(JSON.stringify({
+        format: 'lfc-complete-backup-v1',
+        settings,
+        menuItems,
+        categories,
+        heroSlides,
+        heroConfig,
+        branches,
+        zones,
+        promos,
+        deals,
+        orders,
+        reviews,
+        cart,
+        orderType,
+        theme: currentTheme,
+        exportedAt: new Date().toISOString()
+      }));
+      const imageUrls = new Set();
+      visitBackupImages(backup, (object, key, value) => {
+        if (value && !value.startsWith('data:image/') && /^(https?:\/\/|\/|\.\/|\.\.\/)/i.test(value)) imageUrls.add(value);
+      });
+      const embeddedImages = new Map();
+      const urls = [...imageUrls];
+      let nextImage = 0;
+      await Promise.all(Array.from({ length: Math.min(4, urls.length) }, async () => {
+        while (nextImage < urls.length) {
+          const source = urls[nextImage++];
+          const response = await fetch(new URL(source, window.location.href).href);
+          if (!response.ok) throw new Error(`Could not include image in complete backup (HTTP ${response.status})`);
+          const blob = await response.blob();
+          if (!blob.type.startsWith('image/')) throw new Error('An image URL did not return an image; complete backup was not created');
+          embeddedImages.set(source, await blobToDataUrl(blob));
+        }
+      }));
+      visitBackupImages(backup, (object, key, value) => {
+        if (embeddedImages.has(value)) object[key] = embeddedImages.get(value);
+      });
+      const blob = new Blob([JSON.stringify(backup)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `lfc-complete-backup-${new Date().toISOString().slice(0, 10)}.json`;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      showToast(`Complete backup downloaded with ${embeddedImages.size} image${embeddedImages.size === 1 ? '' : 's'}.`);
+    } catch (error) {
+      showToast(`Complete backup failed: ${error.message}`, 'error');
+    } finally {
+      if (button) { button.disabled = false; button.textContent = button.dataset.originalLabel || '📦 Download Complete Backup'; delete button.dataset.originalLabel; }
+    }
+  }
+
+  async function uploadBackupImages(data) {
+    const images = new Set();
+    visitBackupImages(data, (object, key, value) => {
+      if (BACKUP_UPLOAD_IMAGE.test(value)) images.add(value);
+    });
+    const uploaded = new Map();
+    const sources = [...images];
+    let nextImage = 0;
+    await Promise.all(Array.from({ length: Math.min(4, sources.length) }, async () => {
+      while (nextImage < sources.length) {
+        const source = sources[nextImage++];
+        const result = await apiPost({ action: 'upload', dataUri: source });
+        uploaded.set(source, result.url);
+      }
+    }));
+    visitBackupImages(data, (object, key, value) => {
+      if (uploaded.has(value)) object[key] = uploaded.get(value);
+    });
+  }
+
   function importDataJson(fileInput) {
     if (!fileInput.files || !fileInput.files[0]) return;
     const file = fileInput.files[0];
     const reader = new FileReader();
-    reader.onload = (e) => {
+    reader.onload = async (e) => {
       try {
         const data = JSON.parse(e.target.result);
+        if (!data || typeof data !== 'object' || Array.isArray(data)) throw new Error('Backup must contain a JSON object');
+        const supportedFields = ['settings', 'menuItems', 'categories', 'heroConfig', 'heroSlides', 'branches', 'zones', 'promos', 'deals', 'orders', 'reviews', 'cart'];
+        if (!supportedFields.some((key) => Object.prototype.hasOwnProperty.call(data, key))) throw new Error('No recognized store data found');
+        const arrayFields = ['menuItems', 'categories', 'heroSlides', 'branches', 'zones', 'promos', 'deals', 'orders', 'reviews', 'cart'];
+        if (arrayFields.some((key) => Object.prototype.hasOwnProperty.call(data, key) && !Array.isArray(data[key]))) throw new Error('Backup contains an invalid list');
+        if (Object.prototype.hasOwnProperty.call(data, 'settings') && (!data.settings || typeof data.settings !== 'object' || Array.isArray(data.settings))) throw new Error('Backup contains invalid settings');
+        let hasUploadableImages = false;
+        visitBackupImages(data, (object, key, value) => { if (BACKUP_UPLOAD_IMAGE.test(value)) hasUploadableImages = true; });
+        if (hasUploadableImages && !adminKey()) throw new Error('Enter your Netlify publishing key in Admin → Publish before restoring a complete backup with photos');
+        if (hasUploadableImages) await uploadBackupImages(data);
+
+        selfSaving = true;
         if (data.settings) {
           settings = { ...DEFAULT_SETTINGS, ...data.settings };
-          saveData('settings', settings);
+          if (!saveData('settings', settings)) throw new Error('Could not save restored settings');
         }
         if (data.menuItems && Array.isArray(data.menuItems)) {
           menuItems = migrateMenuCatalog(data.menuItems).items;
-          saveData('menu_items', menuItems);
+          if (!saveData('menu_items', menuItems)) throw new Error('Could not save restored menu items');
         }
         if (data.categories && Array.isArray(data.categories)) {
           categories = data.categories;
-          saveData('categories', categories);
+          if (!saveData('categories', categories)) throw new Error('Could not save restored categories');
         }
-        if (data.heroConfig) { heroConfig = Object.assign(heroConfig, data.heroConfig); saveData('hero_config', heroConfig); }
+        if (data.heroConfig) { heroConfig = Object.assign(heroConfig, data.heroConfig); if (!saveData('hero_config', heroConfig)) throw new Error('Could not save restored hero settings'); }
         if (data.heroSlides && Array.isArray(data.heroSlides)) {
           heroSlides = data.heroSlides;
-          saveData('hero_slides', heroSlides);
+          if (!saveData('hero_slides', heroSlides)) throw new Error('Could not save restored hero slides');
         }
         if (data.branches && Array.isArray(data.branches)) {
           branches = data.branches;
-          saveData('branches', branches);
+          if (!saveData('branches', branches)) throw new Error('Could not save restored branches');
         }
         if (data.zones && Array.isArray(data.zones)) {
           zones = data.zones;
-          saveData('zones', zones);
+          if (!saveData('zones', zones)) throw new Error('Could not save restored zones');
         }
         if (data.promos && Array.isArray(data.promos)) {
           promos = data.promos;
-          saveData('promos', promos);
+          if (!saveData('promos', promos)) throw new Error('Could not save restored promo codes');
         }
         if (data.deals && Array.isArray(data.deals)) {
           deals = normalizeDeals(data.deals);
-          saveData('deals', deals);
+          if (!saveData('deals', deals)) throw new Error('Could not save restored deals');
         }
         if (data.orders && Array.isArray(data.orders)) {
           orders = data.orders;
-          saveData('orders', orders);
+          if (!saveData('orders', orders)) throw new Error('Could not save restored orders');
         }
+        if (data.reviews && Array.isArray(data.reviews)) { reviews = data.reviews; if (!saveData('reviews', reviews)) throw new Error('Could not save restored reviews'); }
+        if (data.cart && Array.isArray(data.cart)) { cart = data.cart; if (!saveData('cart', cart)) throw new Error('Could not save restored cart'); }
+        if (['delivery', 'pickup', 'dinein'].includes(data.orderType)) { orderType = data.orderType; if (!saveData('order_type', orderType)) throw new Error('Could not save restored order type'); }
+        if (['flame', 'gold', 'sunset'].includes(data.theme)) setTheme(data.theme);
 
         updateBrandLogos();
+        renderReviews();
+        updateOrderTypeUI();
+        renderZoneSelect();
         renderCategories();
         renderMenu();
         renderDeals();
@@ -4001,10 +4134,15 @@
         renderAdminBranches();
         renderAdminSettings();
         updateCartUI();
-
-        showToast('Store data restored successfully!');
-      } catch (err) {
-        showToast('Invalid backup file', 'error');
+        selfSaving = false;
+        if (adminKey()) await syncUp(true);
+        else showToast('Backup restored on this device. Add your publishing key to sync it to other devices.');
+      } catch (error) {
+        selfSaving = false;
+        showToast(`Backup restore failed: ${error.message}`, 'error');
+      } finally {
+        selfSaving = false;
+        fileInput.value = '';
       }
     };
     reader.readAsText(file);
@@ -4747,6 +4885,7 @@
     deleteDeliveryZone,
     updateStoreStatus,
     exportDataJson,
+    exportCompleteBackup,
     importDataJson,
     addNewCategory,
     promptEditCategory,
