@@ -483,7 +483,7 @@
 .featured-bogo__inner{max-width:80rem;margin:0 auto}
 .featured-bogo__card{display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);overflow:hidden;border:1px solid rgba(180,83,9,.2);border-radius:30px;background:linear-gradient(125deg,#161525,#24101b 60%,#421717);box-shadow:0 24px 60px -24px rgba(80,35,10,.5)}
 .featured-bogo__image-wrap{position:relative;min-height:290px;overflow:hidden;background:#3b1b10}
-.featured-bogo__image{position:absolute;width:100%;height:100%;inset:0;object-fit:cover}
+.featured-bogo__image{position:absolute;width:100%;height:100%;inset:0;object-fit:contain;background:#080808}
 .featured-bogo__image-wrap::after{position:absolute;inset:0;content:"";background:linear-gradient(90deg,transparent 58%,rgba(22,21,37,.5))}
 .featured-bogo__image-badge{position:absolute;z-index:1;top:18px;left:18px;padding:.55rem .9rem;border:1px solid #fff3b0;border-radius:999px;background:linear-gradient(135deg,#fde047,#f59e0b);color:#3b1304;font-size:.7rem;font-weight:1000;letter-spacing:.08em;text-transform:uppercase;box-shadow:0 8px 20px #0005}
 .featured-bogo__copy{display:flex;flex-direction:column;justify-content:center;align-items:flex-start;padding:clamp(24px,5vw,56px);color:#fff}
@@ -520,6 +520,8 @@
 .lfc-deal--bogo{border-color:rgba(250,204,21,.7);box-shadow:0 0 0 1px rgba(250,204,21,.35),0 24px 48px -18px rgba(245,158,11,.5)}
 .lfc-deal__media{position:relative;aspect-ratio:16/10;overflow:hidden;background:radial-gradient(circle at 50% 42%,#fef08a,#facc15 38%,#ef4444 80%,#7f1d1d)}
 .lfc-deal__media img{width:100%;height:100%;object-fit:cover;transition:transform .7s cubic-bezier(.22,1,.36,1)}
+.lfc-deal--bogo .lfc-deal__media{background:#080808}
+.lfc-deal--bogo .lfc-deal__media img{object-fit:contain}
 .lfc-deal:hover .lfc-deal__media img{transform:scale(1.07)}
 .lfc-deal__media::after{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(0deg,#10131f 0%,rgba(16,19,31,.2) 45%,transparent 70%)}
 .lfc-deal__badge{position:absolute;z-index:3;left:12px;top:12px;max-width:68%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:.38rem .8rem;border-radius:999px;font-size:.62rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;color:#3b1304;background:linear-gradient(135deg,#fde047,#f59e0b);box-shadow:0 6px 14px rgba(0,0,0,.4);border:1px solid #fff3b0}
@@ -1563,7 +1565,7 @@
                       <button type="button" onclick="window.LFC.clearDealPhoto()" class="px-3 py-2 rounded-xl bg-gray-800 hover:bg-gray-700 text-gray-300 text-[11px] font-bold">Reset</button>
                     </div>
                     <input type="text" id="deal-image-url" oninput="window.LFC.updateDealImagePreview(this.value)" placeholder="Or paste image URL" class="w-full px-3 py-2 rounded-xl bg-[#08090E] border border-gray-800 text-[11px] text-white focus:outline-none focus:border-amber-500"/>
-                    <p class="text-[10px] text-gray-500 leading-relaxed">Photos are resized automatically. Upload works on this browser; add your Publish key to share photos across devices.</p>
+                    <p class="text-[10px] text-gray-500 leading-relaxed">Photos are resized automatically. After choosing a photo, save the deal, then select “Publish deal changes.” The site confirms when the new photo is saved on Netlify.</p>
                   </div>
                 </div>
 

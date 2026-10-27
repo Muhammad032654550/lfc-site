@@ -10,7 +10,7 @@
 
   // --- Initial Preset Data ---
   const CATALOG_REVISION = '2026-10-21-v4';
-  let syncing = false, syncPending = false, syncTimer = null, remoteSyncing = false, selfSaving = false, applyingRemote = false;
+  let syncing = false, syncPending = false, syncTimer = null, syncPromise = null, remoteSyncing = false, selfSaving = false, applyingRemote = false;
   let localSyncRevision = 0;
   const SYNC_KEYS = ['hero_slides', 'hero_config', 'menu_items', 'categories', 'settings', 'branches', 'zones', 'promos', 'deals'];
   const DEFAULT_SETTINGS = {
@@ -52,7 +52,7 @@
     { id: 1, title: 'Family Feast Mega Box', description: '4 Crispy Zinger Burgers, 4 Pcs Golden Fried Chicken, 1 Jumbo Fries, 2 Paratha Rolls, and 1.5L Chilled Soft Drink.', type: 'standard', price: 2890, originalPrice: 3850, badge: 'Save 25%', image: './images/hero-1.jpg', active: true, startsAt: '', endsAt: '' },
     { id: 2, title: 'Couple Crunch Deal', description: '2 Zinger Burgers, 2 Pcs Crunchy Fried Chicken, 1 Large Fries, and 2 Soft Drink cans (250ml).', type: 'standard', price: 1450, originalPrice: 1850, badge: 'Duo Pack', image: './images/hero-4.jpg', active: true, startsAt: '', endsAt: '' },
     { id: 3, title: 'Pizza & Chicken Platter', description: '1 Medium Cheesy Loaded Pizza + 5 Pcs Hot Tender Strips + 2 Garlic Dips + 2 Chilled Soft Drinks.', type: 'standard', price: 1690, originalPrice: 2100, badge: 'Hot Special', image: './images/hero-3.jpg', active: true, startsAt: '', endsAt: '' },
-    { id: 4, title: 'Pizza Buy 1 Get 1 Free', description: 'Choose any two Standard or Signature pizzas and sizes. Pay for the higher-priced pizza and get the other one free.', type: 'bogo', price: 0, originalPrice: 0, badge: 'Buy 1 Get 1 Free', image: './images/hero-3.jpg', active: true, startsAt: '', endsAt: '' },
+    { id: 4, title: 'Pizza Buy 1 Get 1 Free', description: 'Choose any two Standard or Signature pizzas and sizes. Pay for the higher-priced pizza and get the other one free.', type: 'bogo', price: 0, originalPrice: 0, badge: 'Buy 1 Get 1 Free', image: './images/bogo-pizza-offer.png', active: true, startsAt: '', endsAt: '', artworkVersion: 'bogo-pizza-offer-v1' },
     { id: 5, title: 'Big Deal 1', description: '2 Paratha Rolls, 4 Zinger Burgers, 10 Pc Nuggets, 2 Family Fries, 2 Small Pizzas, and 2 x 1.5 Ltr Drinks.', type: 'standard', price: 4000, originalPrice: 0, badge: 'Family Combo', image: './images/hero-1.jpg', active: true, startsAt: '', endsAt: '', catalogRevision: CATALOG_REVISION },
     { id: 6, title: 'Big Deal 2', description: '2 Paratha Rolls, 10 Pc Nuggets, 3 Zinger Burgers, 2 Chicken Pieces, 1 Single Large Pizza, 2 x 1.5 Ltr Drinks, and 2 Family Fries.', type: 'standard', price: 4500, originalPrice: 0, badge: 'Family Combo', image: './images/hero-4.jpg', active: true, startsAt: '', endsAt: '', catalogRevision: CATALOG_REVISION },
     { id: 7, title: 'Turkish Doner Combo', description: 'Turkish Doner + 1 Regular Drink.', type: 'standard', price: 500, originalPrice: 0, badge: 'Combo', image: './images/hero-2.jpg', active: true, startsAt: '', endsAt: '', catalogRevision: CATALOG_REVISION },
@@ -514,6 +514,10 @@
       let id = Number.isSafeInteger(Number(deal.id)) ? Number(deal.id) : Date.now() + idx;
       while (usedIds.has(id)) id += 1;
       usedIds.add(id);
+      const title = String(deal.title || 'Special Deal');
+      const isFeaturedBogo = deal.type === 'bogo' && title.trim().toLowerCase() === 'pizza buy 1 get 1 free';
+      const artworkVersion = 'bogo-pizza-offer-v1';
+      const shouldMigrateArtwork = isFeaturedBogo && deal.artworkVersion !== artworkVersion;
       const normalizeDate = (dateValue) => {
         if (typeof dateValue !== 'string' || !dateValue) return '';
         const date = new Date(dateValue);
@@ -521,16 +525,17 @@
       };
       return {
         id,
-        title: String(deal.title || 'Special Deal'),
+        title,
         description: String(deal.description || ''),
         type: deal.type === 'bogo' ? 'bogo' : 'standard',
         price: Number(deal.price) || 0,
         originalPrice: Number(deal.originalPrice) || 0,
         badge: String(deal.badge || ''),
-        image: safeDealImage(deal.image),
+        image: shouldMigrateArtwork ? './images/bogo-pizza-offer.png' : safeDealImage(deal.image),
         startsAt: normalizeDate(deal.startsAt),
         endsAt: normalizeDate(deal.endsAt),
         active: deal.active !== false,
+        ...(isFeaturedBogo ? { artworkVersion } : {}),
         ...(deal.catalogRevision ? { catalogRevision: String(deal.catalogRevision) } : {})
       };
     });
@@ -734,7 +739,13 @@
   let reviews = loadData('reviews', DEFAULT_REVIEWS);
   let zones = loadData('zones', DEFAULT_ZONES);
   let promos = loadData('promos', DEFAULT_PROMOS);
-  let deals = normalizeDeals(loadData('deals', DEFAULT_DEALS));
+  const savedDeals = loadData('deals', DEFAULT_DEALS);
+  let deals = normalizeDeals(savedDeals);
+  try {
+    if (localStorage.getItem('lfc_deals') && JSON.stringify(savedDeals) !== JSON.stringify(deals)) saveData('deals', deals);
+  } catch (e) {
+    console.warn('Could not migrate the saved BOGO artwork', e);
+  }
   let orders = loadData('orders', DEFAULT_ORDERS);
   let cart = loadData('cart', []);
   let orderType = loadData('order_type', 'delivery'); // 'delivery' | 'pickup' | 'dinein'
@@ -2349,11 +2360,19 @@
   }
   async function syncUp(manual) {
     if (!adminKey()) { if (manual) showToast('Enter your admin key first'); return false; }
-    if (syncing) { syncPending = true; return false; }
+    if (syncPromise) {
+      syncPending = true;
+      if (!manual) return false;
+      await syncPromise;
+      clearTimeout(syncTimer);
+      syncTimer = null;
+      return syncUp(true);
+    }
     clearTimeout(syncTimer);
     syncTimer = null;
     const syncRevision = localSyncRevision;
     syncing = true; setSyncStatus('⏳ Syncing…');
+    syncPromise = (async () => {
     try {
       const up = async (o) => { if (o && IMG_RE.test(o.image || '')) o.image = (await apiPost({ action: 'upload', dataUri: o.image })).url; };
       for (const s of heroSlides) await up(s);
@@ -2382,8 +2401,11 @@
       return false;
     } finally {
       syncing = false;
+      syncPromise = null;
       if (syncPending) { syncPending = false; syncSoon(); }
     }
+    })();
+    return syncPromise;
   }
   async function publishAll() {
     const k = (document.getElementById('sync-key') || {}).value;
@@ -2396,7 +2418,25 @@
       showToast('Enter your Netlify publishing key to share deal changes across devices');
       return;
     }
-    await syncUp(true);
+    if (!await syncUp(true)) return;
+    try {
+      const response = await fetch('/api/site?verify=' + Date.now(), { cache: 'no-store' });
+      if (!response.ok) throw new Error(`Netlify could not confirm the published changes (HTTP ${response.status})`);
+      const contentType = (response.headers.get('content-type') || '').toLowerCase();
+      if (!contentType.includes('application/json')) throw new Error('Netlify returned an unexpected response while verifying deals');
+      const published = await response.json();
+      const savedDeals = Array.isArray(published.deals) ? published.deals : [];
+      const allDealsPublished = deals.every((deal) => {
+        const saved = savedDeals.find((entry) => Number(entry.id) === Number(deal.id));
+        return saved && saved.image === deal.image && saved.title === deal.title && saved.active === deal.active;
+      }) && savedDeals.length === deals.length;
+      if (!allDealsPublished) throw new Error('The saved deals do not match Netlify yet. Please publish again.');
+      setSyncStatus('✅ Deals and photos confirmed on Netlify · ' + new Date().toLocaleTimeString());
+      showToast('Deals and photos are published to Netlify.');
+    } catch (error) {
+      setSyncStatus('❌ ' + error.message);
+      showToast('Deal publish verification failed: ' + error.message, 'error');
+    }
   }
   async function syncRemoteData() {
     if (remoteSyncing || document.visibilityState === 'hidden' || syncing || syncPending || syncTimer) return;
@@ -3811,7 +3851,7 @@
     if (hidden) hidden.value = '';
     if (url) url.value = '';
     const isBogo = (document.getElementById('deal-type') || {}).value === 'bogo';
-    if (preview) preview.src = isBogo ? './images/hero-3.jpg' : './images/hero-1.jpg';
+    if (preview) preview.src = isBogo ? './images/bogo-pizza-offer.png' : './images/hero-1.jpg';
   }
 
   function saveDeal() {
@@ -3870,7 +3910,8 @@
       price: type === 'bogo' ? 0 : price,
       originalPrice: type === 'bogo' ? 0 : originalPrice,
       badge: badge || (type === 'bogo' ? 'Buy 1 Get 1 Free' : 'Special Deal'),
-      image: safeDealImage(rawImage || (existing && existing.image) || (type === 'bogo' ? './images/hero-3.jpg' : './images/hero-1.jpg')),
+      image: safeDealImage(rawImage || (existing && existing.image) || (type === 'bogo' ? './images/bogo-pizza-offer.png' : './images/hero-1.jpg')),
+      ...(type === 'bogo' && title.toLowerCase() === 'pizza buy 1 get 1 free' ? { artworkVersion: 'bogo-pizza-offer-v1' } : {}),
       active: (document.getElementById('deal-active') || {}).checked !== false,
       startsAt: startsAt ? startsAt.toISOString() : '',
       endsAt: endsAt ? endsAt.toISOString() : ''
