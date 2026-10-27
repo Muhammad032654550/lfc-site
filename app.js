@@ -533,13 +533,6 @@
         ...(deal.catalogRevision ? { catalogRevision: String(deal.catalogRevision) } : {})
       };
     });
-    DEFAULT_DEALS.filter((deal) => deal.catalogRevision === CATALOG_REVISION).forEach((deal) => {
-      if (normalized.some((entry) => entry.title.toLowerCase() === deal.title.toLowerCase())) return;
-      const addedDeal = JSON.parse(JSON.stringify(deal));
-      if (usedIds.has(addedDeal.id)) addedDeal.id = Math.max(0, ...usedIds) + 1;
-      usedIds.add(addedDeal.id);
-      normalized.push(addedDeal);
-    });
     return normalized;
   }
 
@@ -1735,7 +1728,8 @@
   function renderDeals() {
     const grid = document.getElementById('deals-grid');
     if (!grid) return;
-    const activeDeals = deals.filter(isDealAvailable);
+    const activeDeals = deals.filter(isDealAvailable).sort((a, b) => Number(b.type === 'bogo') - Number(a.type === 'bogo'));
+    renderFeaturedBogo(activeDeals.find((deal) => deal.type === 'bogo'));
     if (!activeDeals.length) {
       grid.innerHTML = '<div class="lfc-deals__empty">No active deals right now. Please check back soon!</div>';
       return;
@@ -1780,6 +1774,37 @@
         </article>
       `;
     }).join('');
+  }
+
+  function renderFeaturedBogo(deal) {
+    const section = document.getElementById('featured-bogo');
+    const content = document.getElementById('featured-bogo-content');
+    if (!section || !content) return;
+    section.hidden = !deal;
+    if (!deal) {
+      content.innerHTML = '';
+      return;
+    }
+    const title = escapeHtml(deal.title);
+    const image = escapeHtml(safeDealImage(deal.image));
+    const badge = escapeHtml(deal.badge || 'Buy 1 Get 1 Free');
+    content.innerHTML = `
+      <article class="featured-bogo__card">
+        <div class="featured-bogo__image-wrap">
+          <img class="featured-bogo__image" src="${image}" alt="${title}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='./images/hero-3.jpg'"/>
+          <span class="featured-bogo__image-badge">🍕 ${badge}</span>
+        </div>
+        <div class="featured-bogo__copy">
+          <span class="featured-bogo__eyebrow"><span aria-hidden="true">★</span> LFC's best-selling pizza deal</span>
+          <h2 class="featured-bogo__title font-heading">${title}</h2>
+          <p class="featured-bogo__description">${escapeHtml(deal.description)}</p>
+          <div class="featured-bogo__promise"><span class="featured-bogo__free">1 FREE</span><span><strong>Choose any two pizzas</strong><br/>Pay only for the higher-priced pizza. The other one is free.</span></div>
+          <div class="featured-bogo__actions">
+            <button type="button" class="featured-bogo__cta" onclick="window.LFC.orderDealById(${deal.id})">Choose your pizzas <span aria-hidden="true">→</span></button>
+            <a class="featured-bogo__more" href="#deals">See all deals</a>
+          </div>
+        </div>
+      </article>`;
   }
 
   function renderMenu() {
