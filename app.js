@@ -11,6 +11,7 @@
   // --- Initial Preset Data ---
   const CATALOG_REVISION = '2026-10-21-v4';
   let syncing = false, syncPending = false, syncTimer = null, remoteSyncing = false, selfSaving = false, applyingRemote = false;
+  let localSyncRevision = 0;
   const SYNC_KEYS = ['hero_slides', 'hero_config', 'menu_items', 'categories', 'settings', 'branches', 'zones', 'promos', 'deals'];
   const DEFAULT_SETTINGS = {
     storeName: 'LFC',
@@ -585,7 +586,16 @@
   function saveData(key, val) {
     try {
       localStorage.setItem('lfc_' + key, JSON.stringify(val));
-      if (!applyingRemote && !selfSaving && SYNC_KEYS.includes(key)) syncSoon();
+      if (!applyingRemote && !selfSaving && SYNC_KEYS.includes(key)) {
+        localSyncRevision += 1;
+        try {
+          localStorage.setItem('lfc_publish_pending', 'true');
+        } catch (storageError) {
+          console.warn('Could not mark changes as pending for Netlify sync', storageError);
+        }
+        renderDealsSaveStatus();
+        syncSoon();
+      }
       return true;
     } catch (e) {
       console.warn('LocalStorage save error', e);
@@ -2289,6 +2299,33 @@
   function setSyncStatus(t) {
     window.__lfcSync = t;
     const e = document.getElementById('sync-state'); if (e) e.textContent = t;
+    renderDealsSaveStatus();
+  }
+  function renderDealsSaveStatus() {
+    const status = document.getElementById('admin-deal-save-status');
+    if (!status) return;
+    let text;
+    let style;
+    let pending = false;
+    try { pending = localStorage.getItem('lfc_publish_pending') === 'true'; } catch (e) {}
+    if (window.__lfcSync && window.__lfcSync.startsWith('❌')) {
+      text = 'Netlify sync failed · your local changes are saved; check the Publish tab';
+      style = 'border-red-400/30 bg-red-400/10 text-red-200';
+    } else if (pending && adminKey()) {
+      text = 'Changes saved here · syncing to all devices…';
+      style = 'border-amber-400/30 bg-amber-400/10 text-amber-200';
+    } else if (pending) {
+      text = 'Saved on this device · add your Netlify key to sync everywhere';
+      style = 'border-sky-400/30 bg-sky-400/10 text-sky-200';
+    } else if (window.__lfcSync && window.__lfcSync.startsWith('✅')) {
+      text = 'All deal changes are saved and synced to Netlify';
+      style = 'border-emerald-400/30 bg-emerald-400/10 text-emerald-200';
+    } else {
+      text = 'Deal changes save automatically on this device';
+      style = 'border-white/10 bg-white/5 text-gray-300';
+    }
+    status.className = `rounded-xl border px-3 py-2 text-[11px] font-bold ${style}`;
+    status.textContent = text;
   }
   async function apiPost(body) {
     const r = await fetch('/api/site', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey() }, body: JSON.stringify(body) });
@@ -2313,6 +2350,9 @@
   async function syncUp(manual) {
     if (!adminKey()) { if (manual) showToast('Enter your admin key first'); return false; }
     if (syncing) { syncPending = true; return false; }
+    clearTimeout(syncTimer);
+    syncTimer = null;
+    const syncRevision = localSyncRevision;
     syncing = true; setSyncStatus('⏳ Syncing…');
     try {
       const up = async (o) => { if (o && IMG_RE.test(o.image || '')) o.image = (await apiPost({ action: 'upload', dataUri: o.image })).url; };
@@ -2329,6 +2369,9 @@
       delete publicSettings.adminPin;
       await apiPost({ action: 'save', data: { updatedAt, heroSlides, heroConfig, categories, menuItems: slim, settings: publicSettings, logoUrl: settings.logoUrl, branches, zones, promos, deals } });
       localStorage.setItem('lfc_remote_stamp', String(updatedAt));
+      if (localSyncRevision === syncRevision) {
+        localStorage.removeItem('lfc_publish_pending');
+      }
       setSyncStatus('✅ Synced to all devices · ' + new Date().toLocaleTimeString());
       if (manual) showToast('Synced to all devices!');
       return true;
@@ -2347,8 +2390,17 @@
     if (k && k.trim()) localStorage.setItem('lfc_admin_key', k.trim());
     await syncUp(true);
   }
+  async function publishDealChanges() {
+    if (!adminKey()) {
+      switchAdminTab('publish');
+      showToast('Enter your Netlify publishing key to share deal changes across devices');
+      return;
+    }
+    await syncUp(true);
+  }
   async function syncRemoteData() {
-    if (remoteSyncing || document.visibilityState === 'hidden') return;
+    if (remoteSyncing || document.visibilityState === 'hidden' || syncing || syncPending || syncTimer) return;
+    try { if (localStorage.getItem('lfc_publish_pending') === 'true') return; } catch (e) {}
     remoteSyncing = true;
     try {
       const r = await fetch('/api/site?t=' + Date.now(), { cache: 'no-store' });
@@ -2358,6 +2410,7 @@
       }
       if (!(r.headers.get('content-type') || '').toLowerCase().includes('application/json')) return;
       const d = await r.json();
+      if (syncing || syncPending || syncTimer || localStorage.getItem('lfc_publish_pending') === 'true') return;
       if (!d || !d.updatedAt || localStorage.getItem('lfc_remote_stamp') === String(d.updatedAt)) return;
       applyingRemote = true;
       if (d.settings && typeof d.settings === 'object') {
@@ -3626,6 +3679,9 @@
   function renderAdminDeals() {
     const list = document.getElementById('admin-deals-list');
     if (!list) return;
+    renderDealsSaveStatus();
+    const count = document.getElementById('admin-deal-count');
+    if (count) count.textContent = `${deals.length} ${deals.length === 1 ? 'offer' : 'offers'}`;
     if (!deals.length) {
       list.innerHTML = '<div class="text-center p-6 rounded-2xl bg-[#141826] border border-gray-800 text-xs text-gray-400">No deals created yet. Add your first customer deal above.</div>';
       return;
@@ -3646,7 +3702,7 @@
         : '● Live';
       const details = isBogo ? 'Buy 1 Get 1 Free · Customer chooses two pizzas' : `Rs. ${Number(deal.price || 0).toLocaleString()}${Number(deal.originalPrice) > Number(deal.price) ? ` · Was Rs. ${Number(deal.originalPrice).toLocaleString()}` : ''}`;
       return `
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between p-3.5 rounded-2xl bg-[#141826] border border-gray-800 text-xs sm:text-sm gap-3">
+        <div class="group flex flex-col sm:flex-row sm:items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-gradient-to-br from-[#171b29] to-[#111521] border border-white/10 hover:border-amber-400/30 hover:shadow-lg hover:shadow-black/20 text-xs sm:text-sm gap-3 transition">
           <div class="flex items-center gap-3 min-w-0">
             <img src="${escapeHtml(safeDealImage(deal.image))}" alt="" class="w-16 h-14 object-cover rounded-xl border border-white/10 bg-black flex-shrink-0" onerror="this.onerror=null;this.src='./images/hero-1.jpg'"/>
             <div class="min-w-0">
@@ -3660,10 +3716,10 @@
             <div class="text-[10px] text-gray-500 mt-0.5">${escapeHtml(scheduleLabel)}</div>
             </div>
           </div>
-          <div class="flex items-center gap-2 flex-shrink-0">
-            <button onclick="window.LFC.editDeal(${deal.id})" class="px-2.5 py-1 rounded-xl bg-sky-500/15 text-sky-300 hover:bg-sky-500/25 font-bold">Edit</button>
-            <button onclick="window.LFC.toggleDeal(${deal.id})" class="px-2.5 py-1 rounded-xl font-bold ${deal.active === false ? 'bg-emerald-500/15 text-emerald-300' : 'bg-amber-500/15 text-amber-300'}">${deal.active === false ? 'Enable' : 'Disable'}</button>
-            <button onclick="window.LFC.deleteDeal(${deal.id})" class="px-2.5 py-1 rounded-xl bg-red-500/10 text-red-300 hover:bg-red-500/20 font-bold">Delete</button>
+          <div class="grid grid-cols-3 sm:flex items-center gap-2 flex-shrink-0">
+            <button onclick="window.LFC.editDeal(${deal.id})" class="min-h-10 px-3 rounded-xl bg-sky-500/10 border border-sky-400/20 text-sky-200 hover:bg-sky-500/20 font-bold transition">✏️ Edit</button>
+            <button onclick="window.LFC.toggleDeal(${deal.id})" class="min-h-10 px-3 rounded-xl border font-bold transition ${deal.active === false ? 'bg-emerald-500/10 border-emerald-400/20 text-emerald-200 hover:bg-emerald-500/20' : 'bg-amber-500/10 border-amber-400/20 text-amber-200 hover:bg-amber-500/20'}">${deal.active === false ? '▶ Enable' : '⏸ Hide'}</button>
+            <button onclick="window.LFC.deleteDeal(${deal.id})" class="min-h-10 px-3 rounded-xl bg-red-500/10 border border-red-400/20 text-red-200 hover:bg-red-500/20 font-bold transition">🗑 Delete</button>
           </div>
         </div>
       `;
@@ -3831,7 +3887,9 @@
     renderMenu();
     renderAdminDeals();
     cancelDealEdit();
-    showToast(existing ? 'Deal updated successfully' : 'Deal created and published');
+    showToast(adminKey()
+      ? `${existing ? 'Deal updated' : 'Deal created'} and saved. Syncing to Netlify…`
+      : `${existing ? 'Deal updated' : 'Deal created'} and saved on this device. Add your publishing key to sync everywhere.`);
   }
 
   function toggleDeal(id) {
@@ -3846,7 +3904,7 @@
     renderDeals();
     renderMenu();
     renderAdminDeals();
-    showToast(`${deal.title} ${deal.active === false ? 'enabled' : 'disabled'}`);
+    showToast(`${deal.title} ${deal.active === false ? 'enabled' : 'hidden'} and saved${adminKey() ? ' · syncing to Netlify…' : ' on this device'}`);
   }
 
   function deleteDeal(id) {
@@ -3862,7 +3920,7 @@
     renderMenu();
     renderAdminDeals();
     if (Number((document.getElementById('deal-edit-id') || {}).value) === deal.id) cancelDealEdit();
-    showToast('Deal deleted');
+    showToast(adminKey() ? 'Deal deleted and saved · syncing to Netlify…' : 'Deal deleted and saved on this device');
   }
 
   // --- Delivery Zones Manager ---
@@ -4912,6 +4970,7 @@
     exportDataJson,
     exportCompleteBackup,
     importDataJson,
+    publishDealChanges,
     addNewCategory,
     promptEditCategory,
     deleteCategory,

@@ -1490,12 +1490,22 @@
 
           <!-- Tab: Deals Manager -->
           <div id="tab-panel-deals" class="hidden space-y-5">
+            <div class="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-3 items-stretch">
+              <div id="admin-deal-save-status" class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-xs font-bold text-gray-300 flex items-center gap-2" role="status" aria-live="polite">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,.65)]"></span>
+                Deal changes save automatically on this device
+              </div>
+              <div class="rounded-2xl border border-amber-400/20 bg-amber-400/10 px-4 py-3 flex items-center justify-between gap-4 sm:min-w-36">
+                <span class="text-[10px] font-black uppercase tracking-wider text-amber-200">Your offers</span>
+                <strong id="admin-deal-count" class="text-lg font-black text-white">0 offers</strong>
+              </div>
+            </div>
             <div class="rounded-3xl border border-amber-500/30 bg-gradient-to-br from-[#171b29] via-[#121622] to-[#10131b] overflow-hidden">
               <div class="p-4 sm:p-5 border-b border-white/5 flex items-center justify-between gap-3">
                 <div>
                   <div class="text-[10px] font-black uppercase tracking-[.2em] text-amber-400">Offer Studio</div>
                   <h4 id="admin-deal-form-title" class="font-black text-white text-base sm:text-lg mt-1">Create a deal</h4>
-                  <p class="text-[11px] text-gray-400 mt-1">Set up the offer, add a photo, and choose when it appears.</p>
+                  <p class="text-[11px] text-gray-400 mt-1">Create or update an offer. Changes save on this device automatically and publish to Netlify when your key is connected.</p>
                 </div>
                 <div class="hidden sm:grid w-11 h-11 rounded-2xl bg-amber-500/10 border border-amber-400/20 place-items-center text-xl">🔥</div>
               </div>
@@ -1569,6 +1579,13 @@
                   <button id="cancel-deal-edit-button" onclick="window.LFC.cancelDealEdit()" class="hidden px-4 py-3 rounded-xl bg-gray-800 hover:bg-gray-700 text-white font-bold text-xs transition">Cancel</button>
                 </div>
               </div>
+            </div>
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
+              <div>
+                <h5 class="text-sm font-black text-white">Current offers</h5>
+                <p class="text-[11px] text-gray-500 mt-0.5">Edits are saved automatically. Publish to make them live on every device.</p>
+              </div>
+              <button type="button" onclick="window.LFC.publishDealChanges()" class="min-h-11 px-4 py-2 rounded-xl bg-gradient-to-r from-sky-500 to-emerald-500 hover:from-sky-400 hover:to-emerald-400 text-slate-950 text-xs font-black shadow-lg shadow-sky-950/20 transition">☁️ Publish deal changes</button>
             </div>
             <div id="admin-deals-list" class="space-y-2.5"></div>
           </div>
