@@ -1,0 +1,86 @@
+/* Cheesy theme layer for LFC — loads after the base styles. Remove the <link> to revert. */
+:root{--cz-red:#D71920;--cz-deep:#8E0E14;--cz-yel:#FFC20E;--cz-cream:#FFF8E7;--cz-ink:#2B0A0A}
+body{background:var(--cz-cream)!important}
+.font-heading,.lfc-title,#site-header .font-heading{font-family:'Baloo 2','Outfit',system-ui,sans-serif!important;letter-spacing:0!important}
+@keyframes czw{to{background-position-x:-1440px}}
+@keyframes czwr{to{background-position-x:1440px}}
+@keyframes czdrip{0%,100%{transform:scaleY(1)}50%{transform:scaleY(1.28)}}
+@keyframes czfloat{0%{transform:translateY(0) scale(1)}50%{transform:translateY(-34px) scale(1.12)}100%{transform:translateY(0) scale(1)}}
+@keyframes czpop{from{opacity:0;transform:translateY(22px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes czpulse{0%,100%{box-shadow:0 3px 0 var(--cz-deep),0 0 0 0 rgba(215,25,32,.45)}50%{box-shadow:0 3px 0 var(--cz-deep),0 0 0 9px rgba(215,25,32,0)}}
+@keyframes czmarq{to{transform:translateX(-50%)}}
+/* ---------- Header: red with dripping cheese ---------- */
+body #site-header{background:linear-gradient(180deg,#E8232A,#C5141B)!important;border-bottom:0!important;box-shadow:0 6px 18px -8px rgba(142,14,20,.7)!important;overflow:visible!important}
+body #site-header::before{display:none}
+body #site-header::after{content:"";position:absolute;left:0;right:0;top:100%;height:44px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 600 44'%3E%3Cg fill='%23FFC20E'%3E%3Crect width='600' height='9'/%3E%3Crect x='40' width='18' height='30' rx='9'/%3E%3Crect x='150' width='14' height='22' rx='7'/%3E%3Crect x='260' width='22' height='40' rx='11'/%3E%3Crect x='380' width='16' height='26' rx='8'/%3E%3Crect x='500' width='20' height='34' rx='10'/%3E%3C/g%3E%3C/svg%3E") repeat-x 0 0/600px 44px;transform-origin:top;animation:czdrip 5s ease-in-out infinite;pointer-events:none;z-index:0}
+body #site-header .text-transparent{background:none!important;-webkit-text-fill-color:var(--cz-yel);color:var(--cz-yel)!important;text-shadow:0 2px 0 var(--cz-deep)}
+body #site-header .text-gray-400{color:#fff!important;opacity:.9}
+body #site-header .brand-logo-img{ring-color:var(--cz-yel);box-shadow:0 0 0 3px var(--cz-yel),0 6px 12px rgba(0,0,0,.3)!important}
+body .nav-link{background:transparent!important;border:0!important;box-shadow:none!important;color:#fff!important;font-size:.82rem!important;font-weight:800;position:relative;transition:transform .2s,background .2s,color .2s!important}
+body .nav-link:hover{background:rgba(255,255,255,.16)!important;transform:translateY(-2px)}
+body .nav-link.is-active{background:var(--cz-yel)!important;color:var(--cz-ink)!important;box-shadow:0 3px 0 var(--cz-deep)!important}
+body .menu-btn{background:var(--cz-yel)!important;border:0!important}
+body .menu-btn span{background:var(--cz-ink)!important}
+body .cart-btn-trigger{background:var(--cz-yel)!important;color:var(--cz-ink)!important;box-shadow:0 3px 0 var(--cz-deep)}
+/* ---------- Mobile drawer: big tappable list ---------- */
+body .drawer-panel{background:linear-gradient(180deg,#E8232A,#A50F16)!important;border-left:0!important}
+body .drawer-link{background:#fff!important;color:var(--cz-ink)!important;border:0!important;border-radius:16px;box-shadow:0 3px 0 var(--cz-deep)!important;font-size:16px;font-weight:800}
+body .drawer-link:active{transform:translateY(2px);box-shadow:0 1px 0 var(--cz-deep)!important}
+body .drawer-link svg{color:var(--cz-red)!important}
+body .drawer-panel .text-amber-300{color:var(--cz-yel)!important}
+/* ---------- Hero ---------- */
+body #hero-section{background:radial-gradient(circle at 85% 15%,#FFD43B 0,transparent 45%),radial-gradient(circle at 10% 90%,#FF5A36 0,transparent 40%),linear-gradient(135deg,#E8232A,#A50F16)!important;border:0!important;padding-bottom:5.5rem!important}
+body #hero-section>.absolute{opacity:.35}
+body #hero-section::before,body #hero-section::after{content:"";position:absolute;left:0;right:0;bottom:-1px;pointer-events:none;z-index:2;background-repeat:repeat-x;background-size:1440px 100%}
+body #hero-section::before{height:86px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120' preserveAspectRatio='none'%3E%3Cpath fill='%23FFC20E' d='M0 50C180 0 360 100 540 50S900 0 1080 50 1260 100 1440 50V120H0Z'/%3E%3C/svg%3E");animation:czwr 18s linear infinite}
+body #hero-section::after{height:64px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120' preserveAspectRatio='none'%3E%3Cpath fill='%238E0E14' d='M0 50C180 0 360 100 540 50S900 0 1080 50 1260 100 1440 50V120H0Z'/%3E%3C/svg%3E");animation:czw 11s linear infinite}
+body #hero-title{color:#fff!important;text-shadow:0 3px 0 var(--cz-deep)}
+body #hero-highlight{background:none!important;-webkit-text-fill-color:var(--cz-yel);color:var(--cz-yel)!important;text-shadow:0 3px 0 var(--cz-deep)}
+body #hero-subtitle{color:#fff!important;opacity:.95}
+body #hero-cta-btn{background:var(--cz-yel)!important;color:var(--cz-ink)!important;box-shadow:0 5px 0 var(--cz-deep)!important;animation:czpulse 2.4s infinite}
+.cz-blob{position:absolute;border-radius:50%;background:radial-gradient(circle at 30% 30%,#fff3a0,#FFC20E 60%,#e59a00);opacity:.55;pointer-events:none;animation:czfloat var(--d,7s) ease-in-out infinite;z-index:0}
+/* ---------- Ticker + stats ---------- */
+.cz-ticker{background:var(--cz-yel);color:var(--cz-ink);overflow:hidden;white-space:nowrap;border-block:3px solid var(--cz-deep);font:800 15px 'Baloo 2',sans-serif}
+.cz-ticker div{display:inline-block;padding:8px 0;animation:czmarq 26s linear infinite}
+.cz-ticker span{padding:0 22px}
+body .lfc-stats{position:relative;background:var(--cz-deep)!important;border:0!important;padding-bottom:34px!important}
+body .lfc-stats::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:40px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120' preserveAspectRatio='none'%3E%3Cpath fill='%23FFF8E7' d='M0 50C180 0 360 100 540 50S900 0 1080 50 1260 100 1440 50V120H0Z'/%3E%3C/svg%3E") repeat-x 0 0/1440px 100%;animation:czw 14s linear infinite}
+/* ---------- Menu section ---------- */
+body .lfc-eyebrow{background:var(--cz-yel)!important;color:var(--cz-ink)!important;border:0!important;box-shadow:0 3px 0 var(--cz-deep)!important}
+body #menu h2.lfc-title,body #reviews h2.lfc-title,body #why-lfc h2{color:var(--cz-red)!important}
+body #menu h2.lfc-title em{color:var(--cz-ink);font-style:normal;background:linear-gradient(transparent 62%,var(--cz-yel) 62%)}
+body .lfc-pill{border:2px solid var(--cz-yel)!important;color:var(--cz-ink)!important;font-weight:800;transition:transform .2s}
+body .lfc-pill:hover{transform:translateY(-3px) rotate(-2deg)}
+body .lfc-pill.is-active{background:var(--cz-red)!important;color:#fff!important;border-color:var(--cz-red)!important;box-shadow:0 4px 0 var(--cz-deep)!important}
+body .lfc-card{border:2px solid #FFE08A!important;border-radius:22px!important;animation:czpop .55s cubic-bezier(.2,.9,.3,1.2) both;transition:transform .25s,box-shadow .25s}
+.lfc-card:nth-child(2){animation-delay:.05s}.lfc-card:nth-child(3){animation-delay:.1s}.lfc-card:nth-child(4){animation-delay:.15s}.lfc-card:nth-child(n+5){animation-delay:.2s}
+body .lfc-card:hover{transform:translateY(-8px) rotate(-.6deg);border-color:var(--cz-red)!important;box-shadow:0 18px 30px -14px rgba(215,25,32,.5)!important}
+body .lfc-price b{color:var(--cz-red)!important;font-family:'Baloo 2',sans-serif;font-size:1.15em}
+body .lfc-add{background:var(--cz-red)!important;color:#fff!important;box-shadow:0 3px 0 var(--cz-deep)!important;animation:czpulse 2.8s infinite}
+body .lfc-add:active{transform:translateY(2px);box-shadow:0 1px 0 var(--cz-deep)!important}
+body .lfc-tag{background:var(--cz-yel)!important;color:var(--cz-ink)!important}
+/* ---------- Mobile: menu as a list ---------- */
+@media(max-width:639px){
+ body #categories-container{position:sticky;top:64px;z-index:20;background:var(--cz-cream);padding:8px 0 10px;margin-inline:-14px;padding-inline:14px;box-shadow:0 8px 10px -10px rgba(142,14,20,.4)}
+ body #menu-grid{grid-template-columns:minmax(0,1fr)!important;gap:10px!important}
+ body #menu-grid>.lfc-card{flex-direction:row!important;align-items:stretch;min-height:116px;border-radius:18px!important}
+ body #menu-grid>.lfc-card .lfc-card__media{flex:0 0 116px;width:116px;aspect-ratio:auto!important;height:auto!important;max-height:none!important}
+ body #menu-grid>.lfc-card .lfc-card__media img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+ body #menu-grid>.lfc-card .lfc-card__body{padding:10px 12px!important;min-width:0;justify-content:space-between}
+ body #menu-grid>.lfc-card .lfc-card__name{font-size:16px!important;line-height:1.15;margin:0}
+ body #menu-grid>.lfc-card .lfc-card__desc{font-size:12px!important;margin:3px 0 0!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+ body #menu-grid>.lfc-card .lfc-chips{display:none!important}
+ body #menu-grid>.lfc-card .lfc-card__foot{margin-top:6px!important;align-items:center}
+ body #menu-grid>.lfc-card .lfc-add{padding:.45rem .8rem!important}
+ body #menu-grid>.lfc-card .lfc-tag{font-size:9px!important;padding:2px 6px!important}
+}
+/* ---------- Deals + footer waves ---------- */
+body .lfc-deals{position:relative;overflow:hidden;background:linear-gradient(180deg,#D71920,#A50F16)!important;padding-block:6rem!important}
+body .lfc-deals::before,body .lfc-deals::after{content:"";position:absolute;left:0;right:0;height:56px;background-repeat:repeat-x;background-size:1440px 100%;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120' preserveAspectRatio='none'%3E%3Cpath fill='%23FFF8E7' d='M0 50C180 0 360 100 540 50S900 0 1080 50 1260 100 1440 50V120H0Z'/%3E%3C/svg%3E");pointer-events:none}
+body .lfc-deals::before{top:-1px;transform:scaleY(-1);animation:czw 15s linear infinite}
+body .lfc-deals::after{bottom:-1px;animation:czwr 15s linear infinite}
+body footer{position:relative;background:linear-gradient(180deg,#A50F16,#5E0A0E)!important;border-top:0!important;padding-top:4.5rem!important}
+body footer::before{content:"";position:absolute;left:0;right:0;top:-1px;height:56px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 120' preserveAspectRatio='none'%3E%3Cpath fill='%23FFF8E7' d='M0 50C180 0 360 100 540 50S900 0 1080 50 1260 100 1440 50V120H0Z'/%3E%3C/svg%3E") repeat-x 0 0/1440px 100%;transform:scaleY(-1);animation:czw 16s linear infinite}
+/* ---------- Scroll reveal ---------- */
+.cz-in{opacity:0;transform:translateY(26px);transition:opacity .7s,transform .7s cubic-bezier(.2,.9,.3,1.1)}.cz-in.cz-show{opacity:1;transform:none}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
