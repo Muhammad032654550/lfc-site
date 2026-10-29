@@ -10,7 +10,7 @@
 
   // --- Initial Preset Data ---
   const CATALOG_REVISION = '2026-10-28-v8';
-  let syncing = false, syncPending = false, syncTimer = null, syncPromise = null, remoteSyncing = false, selfSaving = false, applyingRemote = false;
+  let syncing = false, syncPending = false, syncTimer = null, syncPromise = null, remoteSyncing = false, selfSaving = false, applyingRemote = false, initializing = true;
   let localSyncRevision = 0;
   const SYNC_KEYS = ['hero_slides', 'hero_config', 'menu_items', 'categories', 'settings', 'branches', 'zones', 'promos', 'deals'];
   const DEFAULT_SETTINGS = {
@@ -675,7 +675,7 @@
   function saveData(key, val) {
     try {
       localStorage.setItem('lfc_' + key, JSON.stringify(val));
-      if (!applyingRemote && !selfSaving && SYNC_KEYS.includes(key)) {
+      if (!initializing && !applyingRemote && !selfSaving && SYNC_KEYS.includes(key)) {
         localSyncRevision += 1;
         try {
           localStorage.setItem('lfc_publish_pending', 'true');
@@ -2471,19 +2471,28 @@
 
   /* ============ Shared save: PHP (Hostinger) or Netlify Function ============ */
   const IMG_RE = /^data:image\/(jpeg|png|webp);base64,/;
-  // Backend auto-detect: PHP (Hostinger / any PHP host) first, then Netlify Function.
-  const API_CANDIDATES = /netlify\.app$/i.test(location.hostname) ? ['/api/site', './api/site.php'] : ['./api/site.php', '/api/site'];
+  // Probe both shared backends. Custom domains can point to Netlify too, so
+  // hostname-based selection is unreliable; only select PHP when its ping
+  // response identifies itself, otherwise prefer Netlify.
+  const API_CANDIDATES = ['/api/site', './api/site.php'];
   let apiBase = null, apiProbe = null;
   function resolveApi(force) {
     if (apiBase && !force) return Promise.resolve(apiBase);
     if (apiProbe && !force) return apiProbe;
     apiProbe = (async () => {
+      let netlifyCandidate = null;
+      let phpCandidate = null;
       for (const u of API_CANDIDATES) {
         try {
           const r = await fetch(u + (u.includes('?') ? '&' : '?') + 'ping=1&t=' + Date.now(), { cache: 'no-store' });
-          if (r.ok && (r.headers.get('content-type') || '').toLowerCase().includes('application/json')) { apiBase = u; return u; }
+          if (!r.ok || !(r.headers.get('content-type') || '').toLowerCase().includes('application/json')) continue;
+          const info = await r.json();
+          if (info && info.backend === 'php') { phpCandidate = u; continue; }
+          if (u === '/api/site' && info && info.backend === 'netlify') netlifyCandidate = u;
         } catch (e) {}
       }
+      if (netlifyCandidate) { apiBase = netlifyCandidate; return netlifyCandidate; }
+      if (phpCandidate) { apiBase = phpCandidate; return phpCandidate; }
       return null;
     })();
     return apiProbe.finally(() => { if (!apiBase) apiProbe = null; });
@@ -2623,7 +2632,10 @@
   }
   async function syncRemoteData() {
     if (remoteSyncing || document.visibilityState === 'hidden' || syncing || syncPending || syncTimer) return;
-    try { if (localStorage.getItem('lfc_publish_pending') === 'true') return; } catch (e) {}
+    // Unsynced edits only need protection on a device authorized to publish.
+    // Other devices should always load the shared copy, even if an older app
+    // version left a local pending flag behind during startup migrations.
+    try { if (adminKey() && localStorage.getItem('lfc_publish_pending') === 'true') return; } catch (e) {}
     remoteSyncing = true;
     try {
       const r = await fetch(await apiUrl('t=' + Date.now()), { cache: 'no-store' });
@@ -2633,7 +2645,7 @@
       }
       if (!(r.headers.get('content-type') || '').toLowerCase().includes('application/json')) return;
       const d = await r.json();
-      if (syncing || syncPending || syncTimer || localStorage.getItem('lfc_publish_pending') === 'true') return;
+      if (syncing || syncPending || syncTimer || (adminKey() && localStorage.getItem('lfc_publish_pending') === 'true')) return;
       if (!d || !d.updatedAt || localStorage.getItem('lfc_remote_stamp') === String(d.updatedAt)) return;
       applyingRemote = true;
       if (d.settings && typeof d.settings === 'object') {
@@ -5033,6 +5045,9 @@
 
   // --- Initialization ---
   function init() {
+    // State migrations ran while the module loaded. They are defaults/local
+    // compatibility work, not intentional edits to publish to the shared site.
+    initializing = false;
     updateBrandLogos();
     renderHeroSlide(0);
     startHeroTimer();

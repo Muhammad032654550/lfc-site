@@ -12,6 +12,7 @@ export default async (req) => {
   const url = new URL(req.url);
 
   if (req.method === 'GET') {
+    if (url.searchParams.has('ping')) return json({ ok: true, backend: 'netlify' });
     const img = url.searchParams.get('img');
     if (img) {
       if (!/^[a-f0-9]{16,64}$/.test(img)) return new Response('Bad id', { status: 400 });
