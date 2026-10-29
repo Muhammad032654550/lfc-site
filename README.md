@@ -17,7 +17,7 @@ static site on hosts such as Hostinger.
 | Styling | Tailwind CSS + custom CSS |
 | Ordering | Cart → **WhatsApp checkout** with a pre-filled order message |
 | Admin | PIN-protected control suite to manage menu, categories, hero slides, branches, logo & settings |
-| Storage | Browser `localStorage`, with optional shared publishing through Netlify Blobs |
+| Storage | Browser `localStorage`, with optional shared publishing (PHP on Hostinger, or Netlify Blobs) |
 | Hosting | Zero-build static site; Netlify Function provides shared publishing |
 ---
 
@@ -56,24 +56,25 @@ existing storefront and admin features. For detailed setup and troubleshooting, 
 > All asset paths are **relative** (`./images/...`), so the site works whether it is hosted at the
 > repository root or any sub-path. No configuration required.
 
-## 🌐 Deploy to Hostinger
+## 🌐 Deploy to Hostinger (with working Publish)
 
-1. On your computer, install Node.js, open a terminal in this project folder, and run:
+No build step is needed.
 
-   ```bash
-   npm ci
-   npm run build
-   ```
+1. In hPanel open **Websites → Manage → Files → File Manager → `public_html`**.
+2. Upload **everything in this folder** (`index.html`, `app.js`, `cheesy.*`, `images/`, **`api/`**, `.htaccess`, …).
+   Skip `node_modules` and `netlify/`.
+3. Open **`public_html/api/config.php`**, replace `CHANGE-ME` with your own long secret key and save.
+4. Open `https://yourdomain/#AdminLFC1` → PIN → **🌐 Publish** tab. It should say
+   **✅ Backend connected (Hostinger / PHP)**. Enter the same key and press **Save key & publish**.
 
-2. In Hostinger hPanel, open **Websites → Manage → Files → File Manager** and open `public_html`.
-3. Upload the **contents of the generated `dist` folder** into `public_html` (including `index.html`
-   and the `images` folder). Do not upload the `dist` folder itself as a nested folder.
-4. Visit your domain and hard-refresh once to load the new files.
+Menu, deals, photos and prices then show on every device. Data is stored in `api/data/`
+(created automatically, blocked from direct access).
 
-The storefront and WhatsApp ordering work as static files. Menu and deal edits in Admin are saved in
-the browser that made the edits; static Hostinger hosting does not share those changes with customers
-or other devices. The **Publish & Backup** cloud sync in this project currently requires its Netlify
-Function backend, so it will show as unavailable when the site is hosted only on Hostinger.
+**Troubleshooting**
+- *"Publishing backend not found"* → the `api` folder is missing or not next to `index.html`.
+- *"no key is set yet"* → you haven't changed `CHANGE-ME` in `api/config.php`.
+- *"Wrong admin key"* → the key typed in Publish differs from `config.php`.
+- *"Cannot write to api/data"* → set the `api` folder permission to 755.
 
 ### First-time push (if you don't have a repo yet)
 
@@ -134,9 +135,7 @@ You can manage: menu items (with photo upload and a Buy 1 Get 1 Free eligibility
 └── .github/workflows/deploy.yml
 ```
 
-> The root `index.html` and `app.js` are the zero-build static site. Vite serves `public/app.js`
-> in its development/build output, so keep that copy synchronized when changing site logic.
-> `src/` is a legacy React version kept for reference.
+> The root `index.html` and `app.js` are the zero-build site — upload them as they are.
 
 ---
 

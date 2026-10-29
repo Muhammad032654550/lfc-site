@@ -596,7 +596,7 @@
         try {
           localStorage.setItem('lfc_publish_pending', 'true');
         } catch (storageError) {
-          console.warn('Could not mark changes as pending for Netlify sync', storageError);
+          console.warn('Could not mark changes as pending for sync', storageError);
         }
         renderDealsSaveStatus();
         syncSoon();
@@ -2304,8 +2304,26 @@
   }
 
 
-  /* ============ Shared save: Netlify Function + Blobs ============ */
+  /* ============ Shared save: PHP (Hostinger) or Netlify Function ============ */
   const IMG_RE = /^data:image\/(jpeg|png|webp);base64,/;
+  // Backend auto-detect: PHP (Hostinger / any PHP host) first, then Netlify Function.
+  const API_CANDIDATES = /netlify\.app$/i.test(location.hostname) ? ['/api/site', './api/site.php'] : ['./api/site.php', '/api/site'];
+  let apiBase = null, apiProbe = null;
+  function resolveApi(force) {
+    if (apiBase && !force) return Promise.resolve(apiBase);
+    if (apiProbe && !force) return apiProbe;
+    apiProbe = (async () => {
+      for (const u of API_CANDIDATES) {
+        try {
+          const r = await fetch(u + (u.includes('?') ? '&' : '?') + 'ping=1&t=' + Date.now(), { cache: 'no-store' });
+          if (r.ok && (r.headers.get('content-type') || '').toLowerCase().includes('application/json')) { apiBase = u; return u; }
+        } catch (e) {}
+      }
+      return null;
+    })();
+    return apiProbe.finally(() => { if (!apiBase) apiProbe = null; });
+  }
+  const apiUrl = (q) => resolveApi().then((b) => (b || API_CANDIDATES[0]) + (q ? '?' + q : ''));
   function adminKey() { try { return localStorage.getItem('lfc_admin_key') || ''; } catch (e) { return ''; } }
   function setSyncStatus(t) {
     window.__lfcSync = t;
@@ -2320,16 +2338,16 @@
     let pending = false;
     try { pending = localStorage.getItem('lfc_publish_pending') === 'true'; } catch (e) {}
     if (window.__lfcSync && window.__lfcSync.startsWith('❌')) {
-      text = 'Netlify sync failed · your local changes are saved; check the Publish tab';
+      text = 'Sync failed · your local changes are saved; check the Publish tab';
       style = 'border-red-400/30 bg-red-400/10 text-red-200';
     } else if (pending && adminKey()) {
       text = 'Changes saved here · syncing to all devices…';
       style = 'border-amber-400/30 bg-amber-400/10 text-amber-200';
     } else if (pending) {
-      text = 'Saved on this device · add your Netlify key to sync everywhere';
+      text = 'Saved on this device · add your publishing key to sync everywhere';
       style = 'border-sky-400/30 bg-sky-400/10 text-sky-200';
     } else if (window.__lfcSync && window.__lfcSync.startsWith('✅')) {
-      text = 'All deal changes are saved and synced to Netlify';
+      text = 'All deal changes are saved and synced to the server';
       style = 'border-emerald-400/30 bg-emerald-400/10 text-emerald-200';
     } else {
       text = 'Deal changes save automatically on this device';
@@ -2339,7 +2357,7 @@
     status.textContent = text;
   }
   async function apiPost(body) {
-    const r = await fetch('/api/site', { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey() }, body: JSON.stringify(body) });
+    const r = await fetch(await apiUrl(''), { method: 'POST', headers: { 'Content-Type': 'application/json', 'x-admin-key': adminKey() }, body: JSON.stringify(body) });
     const isJson = (r.headers.get('content-type') || '').toLowerCase().includes('application/json');
     let j = {};
     if (isJson) {
@@ -2349,8 +2367,8 @@
         if (r.ok) throw new Error('Publishing backend returned invalid JSON');
       }
     }
-    if (!r.ok) throw new Error(j.error || (r.status === 404 ? 'Backend not found — deploy with Netlify Functions (see DEPLOY-NETLIFY.md)' : r.status === 401 ? 'Wrong admin key' : 'Server error ' + r.status));
-    if (!isJson) throw new Error('Publishing backend returned a non-JSON response. Static Hostinger hosting does not provide the shared publishing API.');
+    if (!r.ok) throw new Error(j.error || (r.status === 404 ? 'Publishing backend not found — upload the api folder (api/site.php) to your hosting, see README' : r.status === 401 ? 'Wrong admin key' : 'Server error ' + r.status));
+    if (!isJson) throw new Error('Publishing backend returned a non-JSON response. Make sure the api folder (api/site.php) is uploaded and PHP is enabled.');
     return j;
   }
   function syncSoon() {
@@ -2415,24 +2433,24 @@
   async function publishDealChanges() {
     if (!adminKey()) {
       switchAdminTab('publish');
-      showToast('Enter your Netlify publishing key to share deal changes across devices');
+      showToast('Enter your publishing key to share deal changes across devices');
       return;
     }
     if (!await syncUp(true)) return;
     try {
-      const response = await fetch('/api/site?verify=' + Date.now(), { cache: 'no-store' });
-      if (!response.ok) throw new Error(`Netlify could not confirm the published changes (HTTP ${response.status})`);
+      const response = await fetch(await apiUrl('verify=' + Date.now()), { cache: 'no-store' });
+      if (!response.ok) throw new Error(`The server could not confirm the published changes (HTTP ${response.status})`);
       const contentType = (response.headers.get('content-type') || '').toLowerCase();
-      if (!contentType.includes('application/json')) throw new Error('Netlify returned an unexpected response while verifying deals');
+      if (!contentType.includes('application/json')) throw new Error('The server returned an unexpected response while verifying deals');
       const published = await response.json();
       const savedDeals = Array.isArray(published.deals) ? published.deals : [];
       const allDealsPublished = deals.every((deal) => {
         const saved = savedDeals.find((entry) => Number(entry.id) === Number(deal.id));
         return saved && saved.image === deal.image && saved.title === deal.title && saved.active === deal.active;
       }) && savedDeals.length === deals.length;
-      if (!allDealsPublished) throw new Error('The saved deals do not match Netlify yet. Please publish again.');
-      setSyncStatus('✅ Deals and photos confirmed on Netlify · ' + new Date().toLocaleTimeString());
-      showToast('Deals and photos are published to Netlify.');
+      if (!allDealsPublished) throw new Error('The saved deals do not match the server yet. Please publish again.');
+      setSyncStatus('✅ Deals and photos confirmed on the server · ' + new Date().toLocaleTimeString());
+      showToast('Deals and photos are published.');
     } catch (error) {
       setSyncStatus('❌ ' + error.message);
       showToast('Deal publish verification failed: ' + error.message, 'error');
@@ -2443,7 +2461,7 @@
     try { if (localStorage.getItem('lfc_publish_pending') === 'true') return; } catch (e) {}
     remoteSyncing = true;
     try {
-      const r = await fetch('/api/site?t=' + Date.now(), { cache: 'no-store' });
+      const r = await fetch(await apiUrl('t=' + Date.now()), { cache: 'no-store' });
       if (!r.ok) {
         if (r.status !== 404) console.warn('Shared site data could not be loaded:', r.status);
         return;
@@ -2490,9 +2508,18 @@
     if (c) {
       c.textContent = 'Checking backend…';
       try {
-        const r = await fetch('/api/site?t=' + Date.now(), { cache: 'no-store' });
-        const isJson = (r.headers.get('content-type') || '').toLowerCase().includes('application/json');
-        c.textContent = r.ok && isJson ? '✅ Backend connected' : '❌ Publishing backend not found (static Hostinger sites save changes in this browser only)';
+        const base = await resolveApi(true);
+        if (!base) {
+          c.textContent = '❌ Publishing backend not found. Upload the "api" folder (api/site.php) to your hosting next to index.html, then reopen this tab.';
+        } else if (base.includes('.php')) {
+          let info = {};
+          try { info = await (await fetch(base + '?ping=1&t=' + Date.now(), { cache: 'no-store' })).json(); } catch (e) {}
+          c.textContent = info.keyConfigured === false
+            ? '⚠️ Backend connected, but no key is set yet. Open api/config.php in Hostinger File Manager and replace CHANGE-ME with your secret key.'
+            : '✅ Backend connected (Hostinger / PHP)';
+        } else {
+          c.textContent = '✅ Backend connected (Netlify)';
+        }
       }
       catch (e) { c.textContent = '❌ Backend not reachable'; }
     }
@@ -3929,7 +3956,7 @@
     renderAdminDeals();
     cancelDealEdit();
     showToast(adminKey()
-      ? `${existing ? 'Deal updated' : 'Deal created'} and saved. Syncing to Netlify…`
+      ? `${existing ? 'Deal updated' : 'Deal created'} and saved. Syncing…`
       : `${existing ? 'Deal updated' : 'Deal created'} and saved on this device. Add your publishing key to sync everywhere.`);
   }
 
@@ -3945,7 +3972,7 @@
     renderDeals();
     renderMenu();
     renderAdminDeals();
-    showToast(`${deal.title} ${deal.active === false ? 'enabled' : 'hidden'} and saved${adminKey() ? ' · syncing to Netlify…' : ' on this device'}`);
+    showToast(`${deal.title} ${deal.active === false ? 'enabled' : 'hidden'} and saved${adminKey() ? ' · syncing…' : ' on this device'}`);
   }
 
   function deleteDeal(id) {
@@ -3961,7 +3988,7 @@
     renderMenu();
     renderAdminDeals();
     if (Number((document.getElementById('deal-edit-id') || {}).value) === deal.id) cancelDealEdit();
-    showToast(adminKey() ? 'Deal deleted and saved · syncing to Netlify…' : 'Deal deleted and saved on this device');
+    showToast(adminKey() ? 'Deal deleted and saved · syncing…' : 'Deal deleted and saved on this device');
   }
 
   // --- Delivery Zones Manager ---
@@ -4192,7 +4219,7 @@
         if (Object.prototype.hasOwnProperty.call(data, 'settings') && (!data.settings || typeof data.settings !== 'object' || Array.isArray(data.settings))) throw new Error('Backup contains invalid settings');
         let hasUploadableImages = false;
         visitBackupImages(data, (object, key, value) => { if (BACKUP_UPLOAD_IMAGE.test(value)) hasUploadableImages = true; });
-        if (hasUploadableImages && !adminKey()) throw new Error('Enter your Netlify publishing key in Admin → Publish before restoring a complete backup with photos');
+        if (hasUploadableImages && !adminKey()) throw new Error('Enter your publishing key in Admin → Publish before restoring a complete backup with photos');
         if (hasUploadableImages) await uploadBackupImages(data);
 
         selfSaving = true;

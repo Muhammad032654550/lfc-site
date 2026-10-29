@@ -1,0 +1,8 @@
+# Block direct reading of config and stored data (site.php stays reachable).
+<FilesMatch "^config\.php$">
+  Require all denied
+</FilesMatch>
+<IfModule mod_php.c>
+  php_value upload_max_filesize 12M
+  php_value post_max_size 14M
+</IfModule>

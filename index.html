@@ -1509,7 +1509,7 @@
                 <div>
                   <div class="text-[10px] font-black uppercase tracking-[.2em] text-amber-400">Offer Studio</div>
                   <h4 id="admin-deal-form-title" class="font-black text-white text-base sm:text-lg mt-1">Create a deal</h4>
-                  <p class="text-[11px] text-gray-400 mt-1">Create or update an offer. Changes save on this device automatically and publish to Netlify when your key is connected.</p>
+                  <p class="text-[11px] text-gray-400 mt-1">Create or update an offer. Changes save on this device automatically and publish to your server when your key is connected.</p>
                 </div>
                 <div class="hidden sm:grid w-11 h-11 rounded-2xl bg-amber-500/10 border border-amber-400/20 place-items-center text-xl">🔥</div>
               </div>
@@ -1690,26 +1690,26 @@
                 <span class="w-11 h-11 shrink-0 rounded-2xl bg-sky-400/10 border border-sky-300/20 flex items-center justify-center text-xl">🌐</span>
                 <div class="min-w-0">
                   <h4 class="font-black text-white text-base">Publish across your devices</h4>
-                  <p class="mt-1 text-xs text-slate-300 leading-relaxed">Your menu, hero photos and logo are stored on Netlify, not just in this browser. Other open devices check for updates about every 15 seconds; refreshing the page also loads the latest version.</p>
+                  <p class="mt-1 text-xs text-slate-300 leading-relaxed">Your menu, hero photos and logo are stored on your server, not just in this browser. Other open devices check for updates about every 15 seconds; refreshing the page also loads the latest version.</p>
                 </div>
               </div>
               <div class="relative mt-4 flex items-center gap-2 rounded-xl bg-black/25 border border-white/10 px-3 py-2.5">
                 <span class="w-2 h-2 rounded-full bg-sky-300 animate-pulse"></span>
-                <div class="text-xs font-bold text-gray-200" id="sync-backend" role="status" aria-live="polite">Checking Netlify connection…</div>
+                <div class="text-xs font-bold text-gray-200" id="sync-backend" role="status" aria-live="polite">Checking connection…</div>
               </div>
             </div>
             <div class="p-4 rounded-2xl bg-[#141826] border border-white/10 space-y-2">
               <label for="sync-key" class="block text-xs text-gray-200 font-extrabold">Publishing key</label>
-              <p class="text-[11px] text-gray-400 leading-relaxed">Enter the same <code class="px-1.5 py-0.5 rounded bg-black/40 text-sky-300">ADMIN_KEY</code> configured in Netlify. It is saved only in this browser and is needed only on devices you use to publish.</p>
-              <input id="sync-key" type="password" autocomplete="current-password" placeholder="Enter your Netlify ADMIN_KEY" class="w-full px-3.5 py-3 rounded-xl bg-[#08090E] border border-gray-700 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-400/15"/>
+              <p class="text-[11px] text-gray-400 leading-relaxed">Enter the same <code class="px-1.5 py-0.5 rounded bg-black/40 text-sky-300">ADMIN_KEY</code> you set on the server (Hostinger: <code class="px-1 rounded bg-black/40 text-sky-300">api/config.php</code>). It is saved only in this browser and is needed only on devices you use to publish.</p>
+              <input id="sync-key" type="password" autocomplete="current-password" placeholder="Enter your ADMIN_KEY" class="w-full px-3.5 py-3 rounded-xl bg-[#08090E] border border-gray-700 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-sky-400 focus:ring-2 focus:ring-sky-400/15"/>
             </div>
             <button onclick="window.LFC.publishAll()" class="w-full py-3.5 rounded-2xl bg-gradient-to-r from-sky-500 to-emerald-500 hover:from-sky-400 hover:to-emerald-400 text-slate-950 font-black text-sm shadow-lg shadow-sky-950/30 transition focus:outline-none focus:ring-2 focus:ring-sky-300 focus:ring-offset-2 focus:ring-offset-[#0b0d14]">☁️ Save key &amp; publish changes</button>
             <div class="p-3.5 rounded-2xl bg-black/30 border border-white/10 text-xs text-emerald-300 font-semibold" id="sync-state" role="status" aria-live="polite">—</div>
             <div class="p-4 rounded-2xl bg-[#10131d] border border-white/10">
               <h5 class="text-xs text-white font-extrabold mb-2">One-time setup</h5>
               <ol class="text-[11px] text-gray-400 list-decimal pl-4 space-y-1.5 leading-relaxed">
-                <li>In Netlify, add <b class="text-gray-200">ADMIN_KEY</b> under Site configuration → Environment variables.</li>
-                <li>Redeploy your site so the Netlify Function and environment variable are active.</li>
+                <li><b class="text-gray-200">Hostinger:</b> upload the <b class="text-gray-200">api</b> folder, open <b class="text-gray-200">api/config.php</b> in File Manager and replace <b class="text-gray-200">CHANGE-ME</b> with your own secret key.</li>
+                <li><b class="text-gray-200">Netlify:</b> add <b class="text-gray-200">ADMIN_KEY</b> in Environment variables and redeploy.</li>
                 <li>Enter that key here once, then publish. Visitors on other devices do not need the key.</li>
               </ol>
             </div>
