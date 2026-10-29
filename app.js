@@ -2532,8 +2532,8 @@
         if (r.ok) throw new Error('Publishing backend returned invalid JSON');
       }
     }
-    if (!r.ok) throw new Error(j.error || (r.status === 404 ? 'Publishing backend not found — upload the api folder (api/site.php) to your hosting, see README' : r.status === 401 ? 'Wrong admin key' : 'Server error ' + r.status));
-    if (!isJson) throw new Error('Publishing backend returned a non-JSON response. Make sure the api folder (api/site.php) is uploaded and PHP is enabled.');
+    if (!r.ok) throw new Error(j.error || (r.status === 404 ? 'Shared publishing is not available on this host. Deploy the full site through Netlify to publish changes for everyone.' : r.status === 401 ? 'Wrong admin key' : 'Server error ' + r.status));
+    if (!isJson) throw new Error('The publishing service returned an unexpected response. Confirm this site is deployed through Netlify.');
     return j;
   }
   function syncSoon() {
@@ -2675,7 +2675,7 @@
       try {
         const base = await resolveApi(true);
         if (!base) {
-          c.textContent = '❌ Publishing backend not found. Upload the "api" folder (api/site.php) to your hosting next to index.html, then reopen this tab.';
+          c.textContent = '⚠️ Shared publishing is unavailable on this host. Deploy the full site through Netlify to enable admin publishing for every visitor. GitHub Pages and other static-only hosting can display the site, but cannot save shared admin changes.';
         } else if (base.includes('.php')) {
           let info = {};
           try { info = await (await fetch(base + '?ping=1&t=' + Date.now(), { cache: 'no-store' })).json(); } catch (e) {}
@@ -2683,7 +2683,7 @@
             ? '⚠️ Backend connected, but no key is set yet. Open api/config.php in Hostinger File Manager and replace CHANGE-ME with your secret key.'
             : '✅ Backend connected (Hostinger / PHP)';
         } else {
-          c.textContent = '✅ Backend connected (Netlify)';
+          c.textContent = '✅ Netlify publishing and shared storage connected';
         }
       }
       catch (e) { c.textContent = '❌ Backend not reachable'; }

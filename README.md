@@ -1,9 +1,8 @@
 # 🍗 Lahore Fried Chicken (LFC) — Website
 
-A fast static website for a fast-food restaurant (fried chicken, burgers,
+A fast website for a fast-food restaurant (fried chicken, burgers,
 paratha rolls, loaded pizzas & combo deals) with **instant WhatsApp ordering** and a built-in
-**Admin Control Suite**. Deploy to **Netlify** for shared publishing across devices, or use it as a
-static site on hosts such as Hostinger.
+**Admin Control Suite**. Deploy the complete site to **Netlify** for shared publishing across devices.
 
 > **Taste the Legend** — Developer credit: *Trivox Solutions*
 
@@ -17,8 +16,8 @@ static site on hosts such as Hostinger.
 | Styling | Tailwind CSS + custom CSS |
 | Ordering | Cart → **WhatsApp checkout** with a pre-filled order message |
 | Admin | PIN-protected control suite to manage menu, categories, hero slides, branches, logo & settings |
-| Storage | Browser `localStorage`, with optional shared publishing (PHP on Hostinger, or Netlify Blobs) |
-| Hosting | Zero-build static site; Netlify Function provides shared publishing |
+| Storage | Browser `localStorage` plus Netlify Blobs for shared publishing |
+| Hosting | Netlify serves the site, publishing function and shared data on one platform |
 ---
 
 ## 🌐 Deploy to Netlify (shared publishing)
@@ -56,7 +55,15 @@ existing storefront and admin features. For detailed setup and troubleshooting, 
 > All asset paths are **relative** (`./images/...`), so the site works whether it is hosted at the
 > repository root or any sub-path. No configuration required.
 
-## 🌐 Deploy to Hostinger (with working Publish)
+## 🌐 Other hosts
+
+GitHub Pages and other static-only hosts can display the storefront, but admin changes stay in the
+current browser because static hosting cannot receive and store shared updates. To let one admin
+publish updates that every visitor sees, deploy the full site to Netlify as described above. Netlify
+hosts the storefront, private publishing function and shared storage together; visitors do not need
+the publishing key.
+
+## 🌐 Deploy to Hostinger (PHP option)
 
 No build step is needed.
 

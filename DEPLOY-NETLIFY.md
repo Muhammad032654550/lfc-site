@@ -12,7 +12,7 @@
 3. Open your site → Admin → **🌐 Publish** tab → type the same key → **Save key & sync**.
 4. From then on every change (photos, hero, menu, prices, categories, deals and B1G1 offers) syncs automatically. Other open, visible devices check for updates about every 15 seconds; refreshing the page loads the latest version immediately.
 
-Photos and data live in Netlify Blobs (included with your site, no extra account). The publishing key is stored only in the browser where you enter it; visitors and other devices can read published content without the key.
+Photos and data live in Netlify Blobs on the same platform as the website (no separate server or storage account). The private publishing key protects admin writes and is stored only in the browser where you enter it; visitors can read published content without the key. A static-only host such as GitHub Pages cannot provide shared admin publishing by itself.
 
 ## Restore or download a backup
 
