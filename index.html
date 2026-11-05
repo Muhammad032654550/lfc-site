@@ -21,7 +21,7 @@
     <link rel="icon" href="./favicon.ico?v=2" sizes="any" />
     <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon-32.png?v=2" />
     <link rel="icon" type="image/png" sizes="16x16" href="./images/favicon-16.png?v=2" />
-    <link rel="alternate icon" type="image/png" href="./images/logo.png" />
+    <link rel="alternate icon" type="image/png" href="./images/lfc-logo.png" />
     <link rel="apple-touch-icon" href="./images/apple-touch-icon.png?v=2" />
     <link rel="manifest" href="./manifest.webmanifest" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -56,7 +56,7 @@
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS CDN (Pure Zero-Build, 100% GitHub Pages native) -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -329,8 +329,12 @@
       .drawer-panel{position:absolute;top:0;right:0;bottom:0;width:min(88%,360px);display:flex;flex-direction:column;padding:20px;background:linear-gradient(180deg,#121729,#0A0D18);border-left:1px solid rgba(251,191,36,.25);transform:translateX(100%);transition:transform .35s cubic-bezier(.22,1,.36,1);overflow-y:auto}
       #mobile-drawer.open .drawer-backdrop{opacity:1}
       #mobile-drawer.open .drawer-panel{transform:none}
-      .drawer-link{display:flex;align-items:center;gap:12px;padding:14px;border-radius:16px;color:#f3f4f6;font-weight:800;font-size:15px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);transition:background .2s,border-color .2s}
+      .drawer-link{display:flex;align-items:center;gap:12px;padding:12px 14px;min-height:58px;border-radius:16px;color:#f3f4f6;font-weight:800;font-size:15px;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.06);transition:background .2s,border-color .2s}
       .drawer-link:hover,.drawer-link.is-active{background:rgba(251,191,36,.12);border-color:rgba(251,191,36,.4);color:#fbbf24}
+      /* drawer icon tiles — real line icons on a gold-tinted tile */
+      .drawer-ico{width:38px;height:38px;flex:0 0 auto;border-radius:12px;display:inline-flex;align-items:center;justify-content:center;color:#fbbf24;background:linear-gradient(135deg,rgba(251,191,36,.16),rgba(249,115,22,.08));border:1px solid rgba(251,191,36,.28);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 3px 8px -3px rgba(0,0,0,.5)}
+      .drawer-ico svg{width:19px;height:19px}
+      .drawer-link:hover .drawer-ico,.drawer-link.is-active .drawer-ico{color:#fde68a;border-color:rgba(251,191,36,.55);background:linear-gradient(135deg,rgba(251,191,36,.26),rgba(249,115,22,.14))}
       #hero-image{transition:opacity .45s ease,transform .7s ease}
       body.menu-open{overflow:hidden}
     </style>
@@ -342,7 +346,14 @@
       #site-header::after{content:"";position:absolute;left:0;right:0;bottom:-3px;height:3px;background:linear-gradient(90deg,#F43F5E,#F59E0B,#10B981,#0EA5E9,#8B5CF6,#F43F5E);background-size:200% 100%;animation:lfcflow 7s linear infinite}
       #site-header>div{position:relative;z-index:1}
       #site-header nav{gap:.6rem!important}
-      .nav-link{padding:.55rem 1rem!important;border-radius:12px;font-size:.72rem!important;background:linear-gradient(180deg,#323b5f,#1a2140);border:1px solid rgba(255,255,255,.1);box-shadow:0 4px 0 #070a16,0 10px 14px -6px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.18);transition:transform .15s,box-shadow .15s,color .2s,background .2s}
+      /* nav pill icons — crisp line icons, not emoji */
+      .nav-link{display:inline-flex;align-items:center;gap:.45rem}
+      .nav-link .nl-ico{width:15px;height:15px;flex:0 0 auto;stroke-width:2;opacity:.8}
+      .nav-link:hover .nl-ico,.nav-link.is-active .nl-ico{opacity:1}
+      .nav-link{padding:.55rem .9rem!important;border-radius:12px;font-size:.72rem!important;background:linear-gradient(180deg,#323b5f,#1a2140);border:1px solid rgba(255,255,255,.1);box-shadow:0 4px 0 #070a16,0 10px 14px -6px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.18);transition:transform .15s,box-shadow .15s,color .2s,background .2s}
+      .nav-link .nl-ico{color:#fbbf24;opacity:.9}
+      .nav-link:hover .nl-ico{color:#fff}
+      .nav-link.is-active .nl-ico{color:#92400e}
       .nav-link::after{display:none!important}
       .nav-link:hover{transform:translateY(-2px);color:#fff;box-shadow:0 6px 0 #070a16,0 14px 18px -6px rgba(0,0,0,.75),inset 0 1px 0 rgba(255,255,255,.25)}
       .nav-link:active{transform:translateY(3px);box-shadow:0 1px 0 #070a16,inset 0 1px 0 rgba(255,255,255,.1)}
@@ -566,9 +577,180 @@
 </style>
 
 <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./cheesy.css?v=1">
+<!-- Cheesy theme unlinked: warm-gold dark design (lfc-cinema.css) is the single theme now. To restore, re-add this link and the cheesy.js script. -->
+<style id="lfc-3d-hero">
+/* ══════════ LFC CINEMATIC 3D HERO ══════════ */
+.fx-hero{--mx:0;--my:0;--tx:0deg;--ty:0deg;isolation:isolate}
+.fx-hero::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:
+  radial-gradient(1100px 540px at 72% 36%,rgba(255,188,44,.21),transparent 62%),
+  radial-gradient(900px 500px at 14% 88%,rgba(255,176,32,.16),transparent 62%),
+  radial-gradient(860px 460px at 88% 2%,rgba(255,218,96,.17),transparent 60%),
+  radial-gradient(1500px 800px at 50% 118%,rgba(0,0,0,.5),transparent 72%)}
+.fx-hero::after{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background:radial-gradient(circle at 66% 44%,transparent 26%,rgba(16,9,2,.5) 105%)}
+.fx-hero-inner{padding-block:2.75rem}
+@media(min-width:640px){.fx-hero-inner{padding-block:4rem}}
+@media(min-width:1024px){
+  .fx-hero,.fx-hero-inner{min-height:calc(100vh - 72px);min-height:calc(100svh - 72px)}
+  .fx-hero-inner{display:flex;align-items:center}
+  .fx-hero-inner>div{width:100%}
+}
+
+/* ── drifting ambience ── */
+.fx-orb{position:absolute;z-index:0;border-radius:50%;filter:blur(70px);pointer-events:none;animation:fxOrb 12s ease-in-out infinite alternate}
+.fx-orb--a{top:-120px;left:-120px;width:24rem;height:24rem;background:rgba(251,191,36,.13)}
+.fx-orb--b{top:20%;right:-140px;width:26rem;height:26rem;background:rgba(225,29,46,.15);animation-duration:15s;animation-delay:-4s}
+.fx-orb--c{bottom:-100px;left:32%;width:20rem;height:20rem;background:rgba(234,88,12,.13);animation-duration:18s;animation-delay:-8s}
+@keyframes fxOrb{0%{transform:translate(0,0) scale(1)}50%{transform:translate(42px,-34px) scale(1.15)}100%{transform:translate(-30px,30px) scale(.94)}}
+
+/* ── copy column ── */
+.fx-eyebrow{display:block;font-size:.62rem;font-weight:900;letter-spacing:.4em;text-transform:uppercase;color:#fbbf24;text-shadow:0 0 18px rgba(251,191,36,.45)}
+.fx-enter{opacity:0;transform:translateY(20px);animation:fxRise .85s cubic-bezier(.16,1,.3,1) forwards;animation-delay:var(--d,0s)}
+@keyframes fxRise{to{opacity:1;transform:none}}
+.fx-badge{animation:fxBadgeFloat 5s ease-in-out infinite}
+.fx-badge-ico{display:inline-block;animation:fxBadgeIco 2.4s cubic-bezier(.36,.07,.19,.97) infinite}
+@keyframes fxBadgeFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes fxBadgeIco{0%,72%,100%{transform:translateY(0)}80%{transform:translateY(-4px) rotate(-14deg)}88%{transform:translateY(0)}94%{transform:translateY(-2px) rotate(9deg)}}
+.fx-shine{background-size:180% 100%!important;animation:fxShine 4.5s ease-in-out infinite}
+@keyframes fxShine{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+
+/* ── 3D word pop (spans injected by engine) ── */
+#hero-title .fx-word{display:inline-block;color:inherit}
+#hero-highlight .fx-word{-webkit-text-fill-color:transparent}
+.fx-word{display:inline-block;animation:fxWordIn .4s ease-out both;animation-delay:calc(var(--i,0)*.05s);will-change:opacity}
+@keyframes fxWordIn{0%{opacity:0}100%{opacity:1}}
+
+.fx-price{transition:box-shadow .3s}
+.fx-price.is-pop{animation:fxPricePop .55s cubic-bezier(.34,1.56,.64,1)}
+@keyframes fxPricePop{0%{transform:scale(1)}35%{transform:scale(1.07) rotate(-1.5deg);box-shadow:0 0 0 6px rgba(251,191,36,.25)}100%{transform:scale(1)}}
+
+.fx-cta::after{content:"";position:absolute;inset:-3px;border-radius:inherit;background:linear-gradient(90deg,rgba(251,191,36,.5),transparent,rgba(234,88,12,.5));filter:blur(9px);z-index:-1;animation:fxCtaPulse 2.6s ease-in-out infinite}
+@keyframes fxCtaPulse{0%,100%{opacity:.3;transform:scale(.98)}50%{opacity:.8;transform:scale(1.03)}}
+
+/* ════ cinematic dish scene ════ */
+.fx-scene{position:relative;width:100%;display:flex;justify-content:center;transform-style:preserve-3d;will-change:transform,opacity}
+@media(min-width:1024px){.fx-scene{align-self:stretch;min-height:600px;align-items:center}}
+.fx-stage{position:relative;width:min(88vw,520px);aspect-ratio:1;perspective:1250px;perspective-origin:50% 42%}
+@media(min-width:1024px){.fx-stage{width:min(42vw,600px)}}
+.fx-tilt{position:absolute;inset:0;transform-style:preserve-3d;transform:rotateX(var(--tx)) rotateY(var(--ty));transition:transform .12s linear;will-change:transform}
+.fx-dish-group{position:absolute;inset:0;transform-style:preserve-3d}
+
+/* warm studio backlight */
+.fx-glow{position:absolute;left:50%;top:50%;width:104%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;pointer-events:none;background:radial-gradient(circle,rgba(251,191,36,.4) 0%,rgba(225,29,46,.18) 45%,transparent 70%);filter:blur(34px);animation:fxHalo 5.5s ease-in-out infinite}
+@keyframes fxHalo{0%,100%{opacity:.55;transform:translate(-50%,-50%) scale(.96)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.08)}}
+
+/* neon rings */
+.fx-ring{position:absolute;left:50%;top:50%;border-radius:50%;pointer-events:none;transform:translate(-50%,-50%)}
+.fx-ring--1{width:82%;aspect-ratio:1;background:conic-gradient(from 0deg,#f59e0b,#e11d48,#f59e0b 24%,transparent 30%,transparent 56%,#fbbf24 78%,transparent 86%,#f59e0b);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 3.5px),#000 calc(100% - 2.5px));mask:radial-gradient(farthest-side,transparent calc(100% - 3.5px),#000 calc(100% - 2.5px));animation:fxSpin 18s linear infinite;opacity:.9;filter:drop-shadow(0 0 7px rgba(245,158,11,.6))}
+.fx-ring--2{width:96%;aspect-ratio:1;background:conic-gradient(from 120deg,transparent 8%,#fbbf24 18%,transparent 27%,transparent 60%,#fb7185 82%,transparent 92%);-webkit-mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 1px));mask:radial-gradient(farthest-side,transparent calc(100% - 2px),#000 calc(100% - 1px));animation:fxSpin 12s linear infinite reverse;opacity:.6;filter:drop-shadow(0 0 6px rgba(251,191,36,.55))}
+@keyframes fxSpin{to{transform:translate(-50%,-50%) rotate(360deg)}}
+
+/* orbital dashed track + glowing satellites */
+.fx-orbit{position:absolute;left:50%;top:50%;width:110%;aspect-ratio:1;transform:translate(-50%,-50%);border-radius:50%;border:1px dashed rgba(251,191,36,.2);pointer-events:none}
+.fx-orbit-dot{position:absolute;inset:0;border-radius:50%;animation:fxOrbitSpin 34s linear infinite}
+.fx-orbit-dot:nth-child(2){animation-delay:-11.33s}
+.fx-orbit-dot:nth-child(3){animation-delay:-22.66s}
+.fx-orbit-dot::after{content:"";position:absolute;top:-4px;left:calc(50% - 4px);width:9px;height:9px;border-radius:50%;background:#fbbf24;box-shadow:0 0 12px rgba(251,191,36,.85)}
+@keyframes fxOrbitSpin{to{transform:rotate(360deg)}}
+
+/* the dish itself: organic floating circle, edges melt into the dark */
+.fx-blob{position:absolute;left:50%;top:50%;width:74%;aspect-ratio:1;border-radius:50%;overflow:hidden;transform:translate(-50%,-50%) translateZ(48px);background:#1b140f;box-shadow:0 50px 110px -22px rgba(0,0,0,.85),0 0 90px -16px rgba(245,158,11,.42),0 0 0 1px rgba(251,191,36,.28);animation:fxBlobFloat 6.5s ease-in-out infinite}
+@keyframes fxBlobFloat{0%,100%{translate:0 -9px}50%{translate:0 10px}}
+.fx-dish{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.07)}
+.fx-blob::before{content:"";position:absolute;inset:0;z-index:3;border-radius:50%;pointer-events:none;background:radial-gradient(circle at 50% 40%,transparent 44%,rgba(10,12,20,.28) 70%,rgba(7,9,16,.94) 99%)}
+.fx-blob.is-pop .fx-dish{animation:fxDishPop .9s cubic-bezier(.34,1.4,.64,1)}
+.fx-blob.is-pop::after{content:"";position:absolute;inset:0;z-index:4;border-radius:50%;pointer-events:none;background:linear-gradient(115deg,transparent 22%,rgba(255,255,255,.3) 46%,transparent 62%);transform:translateX(-130%);animation:fxSweep .85s ease .05s forwards}
+@keyframes fxDishPop{0%{transform:scale(1.2) rotateX(9deg);filter:saturate(1.4)}55%{transform:scale(.99) rotateX(-2deg)}100%{transform:scale(1.07);filter:saturate(1.06)}}
+@keyframes fxSweep{to{transform:translateX(130%)}}
+
+/* floating ingredients at parallax depths */
+.fx-chip{position:absolute;z-index:6;display:block;font-size:clamp(1.4rem,3.4vw,2.4rem);pointer-events:none;transform:translate3d(calc(var(--mx,0)*var(--d,30)*1px),calc(var(--my,0)*var(--d,30)*1px),0);transition:transform .15s linear;will-change:transform;filter:drop-shadow(0 14px 18px rgba(0,0,0,.55)) drop-shadow(0 0 16px rgba(251,191,36,.38))}
+.fx-chip i{display:block;font-style:normal;animation:fxChipFloat var(--t,5s) ease-in-out infinite;animation-delay:var(--dl,0s)}
+.fx-chip--1{top:5%;left:2%;--t:5.4s}
+.fx-chip--2{bottom:10%;left:-2%;--t:6.2s;font-size:clamp(1.7rem,4vw,2.9rem)}
+.fx-chip--3{top:20%;right:-1%;--t:4.8s}
+.fx-chip--4{bottom:0;right:7%;--t:5.8s}
+.fx-chip--5{top:56%;left:-6%;--t:6.6s}
+@keyframes fxChipFloat{0%,100%{translate:0 -6px;rotate:-4deg}50%{translate:0 -18px;rotate:5deg}}
+
+/* sparkles */
+.fx-spark{position:absolute;z-index:7;color:#fde68a;pointer-events:none;font-size:.9rem;text-shadow:0 0 10px rgba(253,224,71,.9);animation:fxTwinkle 2.4s ease-in-out infinite;animation-delay:var(--dl,0s)}
+.fx-spark--1{top:8%;right:10%}
+.fx-spark--2{top:32%;left:-2%;animation-delay:.5s}
+.fx-spark--3{top:2%;left:34%;animation-delay:1.1s;font-size:.7rem}
+.fx-spark--4{bottom:24%;right:-3%;animation-delay:.8s}
+.fx-spark--5{bottom:5%;left:24%;animation-delay:1.5s;font-size:.7rem}
+.fx-spark--6{top:58%;right:2%;animation-delay:.3s;font-size:.65rem}
+@keyframes fxTwinkle{0%,100%{opacity:.12;transform:scale(.6) rotate(0)}50%{opacity:1;transform:scale(1.25) rotate(28deg)}}
+
+/* steam wisps */
+.fx-steam{position:absolute;z-index:8;width:24%;height:32%;top:12%;pointer-events:none;border-radius:50%;background:radial-gradient(ellipse at bottom,rgba(255,255,255,.32),rgba(255,255,255,0) 68%);filter:blur(12px);opacity:0;transform:translateZ(90px);animation:fxSteam 4.6s ease-in-out infinite;animation-delay:var(--dl,0s)}
+.fx-steam--1{left:36%}
+.fx-steam--2{left:50%;--dl:1.5s}
+.fx-steam--3{left:64%;--dl:2.8s}
+@keyframes fxSteam{0%{opacity:0;translate:0 16px}25%{opacity:.7}70%{opacity:.15}100%{opacity:0;translate:0 -58px}}
+
+/* ingredient callouts */
+.fx-callout{position:absolute;z-index:9;display:flex;align-items:center;gap:8px;padding:.5rem .85rem;border-radius:999px;background:rgba(18,22,36,.78);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px);border:1px solid rgba(251,191,36,.3);color:#fde68a;font-size:.68rem;font-weight:800;letter-spacing:.07em;white-space:nowrap;box-shadow:0 12px 30px rgba(0,0,0,.5);animation:fxCalloutBob 5.5s ease-in-out infinite}
+.fx-callout i{flex:none;width:8px;height:8px;border-radius:50%;background:#f59e0b;box-shadow:0 0 10px rgba(245,158,11,.9),0 0 0 4px rgba(245,158,11,.18)}
+.fx-callout--1{top:15%;right:-2%}
+.fx-callout--2{bottom:21%;left:-4%;animation-delay:-2.6s}
+@keyframes fxCalloutBob{0%,100%{translate:0 0}50%{translate:0 -9px}}
+@media(max-width:1023px){.fx-callout{display:none}}
+
+/* falling flavour particles */
+.fx-particles span{position:absolute;top:-6vh;display:inline-block;opacity:0;animation:fxFall var(--t) linear infinite;animation-delay:var(--dl);font-size:var(--s)}
+@keyframes fxFall{0%{opacity:0;transform:translateY(0) rotate(0)}8%{opacity:var(--o,.5)}88%{opacity:var(--o,.5)}100%{opacity:0;transform:translateY(112vh) rotate(300deg)}}
+
+/* responsive tuning */
+@media(max-width:1023px){
+  .fx-tilt{transition:transform .5s ease}
+  .fx-chip{font-size:1.4rem}
+  .fx-chip--2{left:0}.fx-chip--5{left:0}.fx-chip--3{right:0}.fx-chip--4{right:3%}
+  .fx-stage{width:min(80vw,420px)}
+  .fx-ring--2{width:100%}
+  .fx-orbit{width:116%}
+}
+
+/* pause everything when hero is offscreen / tab hidden (perf) */
+.fx-hero.is-idle :is(.fx-orb,.fx-ring,.fx-glow,.fx-orbit-dot,.fx-chip i,.fx-spark,.fx-steam,.fx-callout,.fx-particles span,.fx-badge,.fx-badge-ico,.fx-blob){animation-play-state:paused!important}
+
+/* reduced motion */
+@media(prefers-reduced-motion:reduce){
+  .fx-orb,.fx-glow,.fx-ring,.fx-orbit-dot,.fx-chip i,.fx-spark,.fx-steam,.fx-callout,.fx-particles span,.fx-badge,.fx-badge-ico,.fx-shine,.fx-blob,.fx-cta::after,.fx-word,.fx-price.is-pop,.fx-blob.is-pop .fx-dish,.fx-drip{animation:none!important}
+  .fx-word{opacity:1;transform:none}
+  .fx-enter{opacity:1;transform:none;animation:none}
+  .fx-tilt{transform:none!important}
+}
+</style>
+<link rel="stylesheet" href="./lfc-cinema.css?v=19">
+</head>
 </head>
   <body class="bg-[#FAF8F5] text-gray-900 min-h-screen selection:bg-amber-400 selection:text-slate-950 pb-16 sm:pb-0" id="top">
+    <!-- ══ LFC preloader — saffron session, studio plate ══ -->
+    <div id="lfc-pre" class="lfc-pre" role="status" aria-label="Loading">
+      <div class="lfc-pre-plate" aria-hidden="true"></div>
+      <div class="lfc-pre-embers" aria-hidden="true"></div>
+      <div class="lfc-pre-head lfc-pre-head--l" aria-hidden="true">LFC &bull; LAHORE</div>
+      <div class="lfc-pre-head lfc-pre-head--r" aria-hidden="true">CRISPY &bull; FRESH &bull; FAST</div>
+      <div class="lfc-pre-inner">
+        <div class="lfc-pre-logo-wrap">
+          <div class="lfc-pre-arc" aria-hidden="true"></div>
+          <div class="lfc-pre-arc lfc-pre-arc--2" aria-hidden="true"></div>
+          <img src="./images/lfc-logo.png" alt="LFC logo" class="lfc-pre-logo">
+        </div>
+        <div class="lfc-pre-brand">
+          <span class="lfc-pre-brand__name"><i>L</i><i>F</i><i>C</i></span>
+          <span class="lfc-pre-brand__sub"><i>L</i><i>A</i><i>H</i><i>O</i><i>R</i><i>E</i><i>&nbsp;</i><i>F</i><i>R</i><i>I</i><i>E</i><i>D</i><i>&nbsp;</i><i>C</i><i>H</i><i>I</i><i>C</i><i>K</i><i>E</i><i>N</i></span>
+        </div>
+        <div class="lfc-pre-line">
+          <span class="lfc-pre-min" aria-hidden="true">LOADING</span>
+          <span class="lfc-pre-track" aria-hidden="true"><i></i></span>
+          <span class="lfc-pre-pct" id="lfc-pre-pct">0%</span>
+        </div>
+        <div class="lfc-pre-text">Preparing something delicious&hellip;</div>
+      </div>
+    </div>
+
 
     <!-- Scroll Progress Bar -->
     <div id="scroll-progress"></div>
@@ -605,7 +787,7 @@
     <header id="site-header" class="sticky top-0 z-40 bg-[#0A0D18]/85 backdrop-blur-xl border-b border-white/10 transition-all duration-300">
       <div class="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 h-16 sm:h-[72px] flex items-center justify-between gap-3">
         <a href="#top" class="flex items-center gap-2.5 sm:gap-3 group min-w-0" aria-label="LFC home">
-          <img src="./images/logo.png" alt="LFC logo" class="brand-logo-img h-10 w-10 sm:h-12 sm:w-12 object-cover rounded-full ring-2 ring-amber-400/80 shadow-lg shadow-amber-500/20 group-hover:scale-105 transition" referrerpolicy="no-referrer" />
+          <img src="./images/lfc-logo.png" alt="LFC logo" class="brand-logo-img h-10 w-10 sm:h-12 sm:w-12 object-cover rounded-full ring-2 ring-amber-400/80 shadow-lg shadow-amber-500/20 group-hover:scale-105 transition" referrerpolicy="no-referrer" />
           <div class="leading-tight min-w-0">
             <div class="text-xl sm:text-2xl font-black tracking-wide text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-400 to-red-500 font-heading">LFC</div>
             <div class="text-[9px] sm:text-[10px] text-gray-400 font-bold tracking-[.18em] uppercase truncate">Lahore Fried Chicken</div>
@@ -613,11 +795,11 @@
         </a>
 
         <nav class="hidden lg:flex items-center gap-8" aria-label="Main navigation">
-          <a href="#menu" class="nav-link" data-spy="menu">Menu</a>
-          <a href="#deals" class="nav-link" data-spy="deals">Deals & Combos</a>
-          <a href="#why-lfc" class="nav-link" data-spy="why-lfc">Why LFC</a>
-          <a href="#reviews" class="nav-link" data-spy="reviews">Reviews</a>
-          <a href="#branches" class="nav-link" data-spy="branches">Branches</a>
+          <a href="#menu" class="nav-link" data-spy="menu"><svg class="nl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8c0-2.4 3.6-4.2 8-4.2s8 1.8 8 4.2"/><path d="M3.2 11.4h17.6"/><path d="M4 15h16v.8a2.2 2.2 0 01-2.2 2.2H6.2A2.2 2.2 0 014 15.8z"/></svg>Menu</a>
+          <a href="#deals" class="nav-link" data-spy="deals"><svg class="nl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4l-7.2 7.2a2 2 0 01-2.8 0L2 12V2h10l8.6 8.6a2 2 0 010 2.8z"/><path d="M7 7h.01"/></svg>Deals &amp; Combos</a>
+          <a href="#why-lfc" class="nav-link" data-spy="why-lfc"><svg class="nl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.6l2.86 5.98 6.54.86-4.8 4.53 1.24 6.43L12 17.2l-5.84 3.2 1.24-6.43-4.8-4.53 6.54-.86z"/></svg>Why LFC</a>
+          <a href="#reviews" class="nav-link" data-spy="reviews"><svg class="nl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8z"/></svg>Reviews</a>
+          <a href="#branches" class="nav-link" data-spy="branches"><svg class="nl-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0116 0z"/><circle cx="12" cy="10" r="3"/></svg>Branches</a>
         </nav>
 
         <div class="flex items-center gap-2 sm:gap-2.5">
@@ -636,56 +818,58 @@
       <div class="drawer-backdrop" data-close></div>
       <aside class="drawer-panel" role="dialog" aria-label="Site menu">
         <div class="flex items-center justify-between mb-5">
-          <div class="flex items-center gap-3"><img src="./images/logo.png" alt="" class="brand-logo-img h-11 w-11 rounded-full ring-2 ring-amber-400/80 object-cover"/><div><div class="text-xl font-black text-amber-300 font-heading leading-none">LFC</div><div class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Taste the Legend</div></div></div>
+          <div class="flex items-center gap-3"><img src="./images/lfc-logo.png" alt="" class="brand-logo-img h-11 w-11 rounded-full ring-2 ring-amber-400/80 object-cover"/><div><div class="text-xl font-black text-amber-300 font-heading leading-none">LFC</div><div class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Taste the Legend</div></div></div>
           <button class="h-10 w-10 rounded-xl bg-white/5 border border-white/10 text-gray-300 text-xl" data-close aria-label="Close menu">✕</button>
         </div>
         <nav class="flex flex-col gap-1.5" aria-label="Mobile navigation">
-        <a href="#menu" class="drawer-link" data-close><span class="text-xl">🍔</span><span>Menu</span><svg class="w-4 h-4 ml-auto text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg></a>
-        <a href="#deals" class="drawer-link" data-close><span class="text-xl">🔥</span><span>Deals & Combos</span><svg class="w-4 h-4 ml-auto text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg></a>
-        <a href="#why-lfc" class="drawer-link" data-close><span class="text-xl">⭐</span><span>Why LFC</span><svg class="w-4 h-4 ml-auto text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg></a>
-        <a href="#reviews" class="drawer-link" data-close><span class="text-xl">💬</span><span>Reviews</span><svg class="w-4 h-4 ml-auto text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg></a>
-        <a href="#branches" class="drawer-link" data-close><span class="text-xl">📍</span><span>Branches</span><svg class="w-4 h-4 ml-auto text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg></a>
+          <a href="#menu" class="drawer-link" data-close><span class="drawer-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8c0-2.4 3.6-4.2 8-4.2s8 1.8 8 4.2"/><path d="M3.2 11.4h17.6"/><path d="M4 15h16v.8a2.2 2.2 0 01-2.2 2.2H6.2A2.2 2.2 0 014 15.8z"/></svg></span><span>Menu</span><svg class="w-4 h-4 ml-auto text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg></a>
+          <a href="#deals" class="drawer-link" data-close><span class="drawer-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.6 13.4l-7.2 7.2a2 2 0 01-2.8 0L2 12V2h10l8.6 8.6a2 2 0 010 2.8z"/><path d="M7 7h.01"/></svg></span><span>Deals &amp; Combos</span><svg class="w-4 h-4 ml-auto text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg></a>
+          <a href="#why-lfc" class="drawer-link" data-close><span class="drawer-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.6l2.86 5.98 6.54.86-4.8 4.53 1.24 6.43L12 17.2l-5.84 3.2 1.24-6.43-4.8-4.53 6.54-.86z"/></svg></span><span>Why LFC</span><svg class="w-4 h-4 ml-auto text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg></a>
+          <a href="#reviews" class="drawer-link" data-close><span class="drawer-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.48 8.48 0 018 8z"/></svg></span><span>Reviews</span><svg class="w-4 h-4 ml-auto text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg></a>
+          <a href="#branches" class="drawer-link" data-close><span class="drawer-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0116 0z"/><circle cx="12" cy="10" r="3"/></svg></span><span>Branches</span><svg class="w-4 h-4 ml-auto text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg></a>
         </nav>
         <div class="mt-auto pt-6 space-y-2.5">
-          <a href="#menu" data-close class="flex items-center justify-center h-12 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black text-sm shadow-lg shadow-orange-500/25">Order Now 🍗</a>
+          <a href="#menu" data-close class="flex items-center justify-center gap-2 h-12 rounded-2xl bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 font-black text-sm shadow-lg shadow-orange-500/25"><svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8c0-2.4 3.6-4.2 8-4.2s8 1.8 8 4.2"/><path d="M3.2 11.4h17.6"/><path d="M4 15h16v.8a2.2 2.2 0 01-2.2 2.2H6.2A2.2 2.2 0 014 15.8z"/></svg>Order Now</a>
           <a href="https://wa.me/923224940181?text=Hi%20LFC!%20I%20would%20like%20to%20place%20an%20order." target="_blank" rel="noopener noreferrer" class="store-wa-link flex items-center justify-center gap-2 h-12 rounded-2xl bg-emerald-500 text-white font-black text-sm"><svg class="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M12.031 6.172c-3.181 0-5.767 2.586-5.768 5.766-.001 1.298.38 2.27 1.019 3.287l-.582 2.128 2.182-.573c.978.58 1.911.928 3.145.929 3.178 0 5.767-2.587 5.768-5.766.001-3.187-2.575-5.77-5.764-5.771zm3.392 8.244c-.144.405-.837.774-1.17.824-.299.045-.677.063-1.092-.069-.252-.08-.575-.187-.988-.365-1.739-.751-2.874-2.502-2.961-2.617-.087-.116-.708-.94-.708-1.793s.448-1.273.607-1.446c.159-.173.346-.217.462-.217l.332.006c.106.005.249-.04.39.298.144.347.491 1.2.534 1.287.043.087.072.188.014.304-.058.116-.087.188-.173.289l-.26.304c-.087.086-.177.18-.076.354.101.174.449.741.964 1.201.662.591 1.221.774 1.394.86s.275.072.376-.043c.101-.116.433-.506.549-.68.116-.173.231-.145.39-.087s1.011.477 1.184.564.289.13.332.202c.045.072.045.419-.099.824zm-3.423-14.416c-6.627 0-12 5.373-12 12 0 2.158.572 4.183 1.564 5.932l-1.636 5.973 6.136-1.61c1.701.928 3.65 1.705 5.936 1.705 6.627 0 12-5.373 12-12s-5.373-12-12-12z"/></svg> Order on WhatsApp</a>
-          <a href="tel:+923224940181" class="flex items-center justify-center h-12 rounded-2xl bg-white/5 border border-white/10 text-gray-200 font-bold text-sm">📞 Call us</a>
+          <a href="tel:+923224940181" class="flex items-center justify-center gap-2 h-12 rounded-2xl bg-white/5 border border-white/10 text-gray-200 font-bold text-sm"><svg class="w-4 h-4 text-amber-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6A19.79 19.79 0 012.12 4.18 2 2 0 014.11 2h3a2 2 0 012 1.72c.13.96.36 1.9.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0122 16.92z"/></svg>Call us</a>
           <p class="text-center text-[11px] text-emerald-400 font-bold pt-1">● Open till 2:30 AM · Fast Lahore delivery</p>
         </div>
       </aside>
     </div>
 
-    <!-- Hero Section (Optimized for Mobile Glory with Radiant Food Halo & Fast CTAs) -->
-    <section id="hero-section" class="relative overflow-hidden bg-[#10131d] py-5 sm:py-12 md:py-16 border-b border-amber-500/30">
-      
-      <!-- Ambient Mineral Glow Orbs in Background -->
-      <div class="absolute -top-24 -left-24 w-96 h-96 bg-amber-400/20 rounded-full blur-3xl pointer-events-none"></div>
-      <div class="absolute top-1/2 -right-24 w-96 h-96 bg-red-600/20 rounded-full blur-3xl pointer-events-none"></div>
+        <!-- ══ Cinematic 3D Hero — dark studio, floating dish, orchestrated entrance ══ -->
+    <section id="hero-section" class="relative overflow-hidden border-b border-amber-500/30 fx-hero">
+      <div class="fx-orb fx-orb--a" aria-hidden="true"></div>
+      <div class="fx-orb fx-orb--b" aria-hidden="true"></div>
+      <div class="fx-orb fx-orb--c" aria-hidden="true"></div>
+      <div class="fx-wm" aria-hidden="true">LFC</div>
+      <div class="fx-particles pointer-events-none absolute inset-0 overflow-hidden z-0" aria-hidden="true"></div>
 
-      <div class="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 relative z-10">
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-10 lg:gap-12 items-center">
-          
-          <!-- Left Presentation Content -->
-          <div class="order-2 lg:order-1 lg:col-span-6 space-y-3 sm:space-y-5">
-            
-            <!-- Rating Pill Badge -->
-            <div class="inline-flex items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-white/10 border border-amber-400/40 text-amber-200 text-[10px] sm:text-xs font-black uppercase tracking-wider shadow-sm backdrop-blur">
-              <span>🍗</span>
+      <div class="fx-billboard" aria-hidden="true"><span class="fx-billboard__word is-pop" id="fx-billboard-word">LEGENDARY INSIDE.</span></div>
+
+      <div class="fx-hero-inner max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 relative z-10">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-8 lg:gap-6 items-center">
+
+          <!-- ── Copy column ── -->
+          <div class="fx-hero-copy order-2 lg:order-1 lg:col-span-6 flex flex-col justify-center gap-3 sm:gap-5 py-2 sm:py-4 lg:py-0">
+            <span class="fx-eyebrow fx-enter" style="--d:.05s">Lahore Fried Chicken</span>
+
+            <div class="fx-badge inline-flex self-start items-center gap-1.5 sm:gap-2 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full bg-white/10 border border-amber-400/40 text-amber-200 text-[10px] sm:text-xs font-black uppercase tracking-wider shadow-sm backdrop-blur">
+              <span class="fx-badge-ico">🍗</span>
               <span id="hero-badge">Lahore’s crispy chicken favourite</span>
             </div>
 
-            <!-- Main Headline -->
-            <h1 class="text-[2rem] sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.02] sm:leading-none font-heading">
-              <span id="hero-title" class="block">CRISPY OUTSIDE.</span>
-              <span id="hero-highlight" class="block text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-400 to-red-400 filter drop-shadow-sm">LEGENDARY INSIDE.</span>
+            <h1 class="fx-headline text-[2rem] sm:text-5xl lg:text-[3.7rem] font-black text-white tracking-tight leading-[1.03] sm:leading-[0.98] font-heading">
+              <span id="hero-title" class="block" data-words="CRISPY OUTSIDE.">CRISPY OUTSIDE.</span>
+              <span id="hero-highlight" class="block text-transparent bg-clip-text bg-gradient-to-r from-amber-300 via-orange-400 to-red-400 filter drop-shadow-sm fx-shine" data-words="LEGENDARY INSIDE.">LEGENDARY INSIDE.</span>
+              <span class="fx-underline" aria-hidden="true"></span>
             </h1>
 
-            <p id="hero-subtitle" class="text-gray-300 text-xs sm:text-base lg:text-lg leading-relaxed max-w-xl font-medium">
+            <p id="hero-subtitle" class="text-gray-300 text-xs sm:text-base lg:text-lg leading-relaxed max-w-xl font-medium fx-enter" style="--d:.35s">
               Freshly made burgers, golden fried chicken and loaded pizzas — your next LFC favourite is just a tap away.
             </p>
 
-            <!-- Quick Delivery & Value Highlights (Mobile Friendly) -->
-            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-bold pt-0.5">
+            <div class="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs font-bold fx-enter" style="--d:.5s">
               <span class="inline-flex items-center gap-1 bg-amber-300/10 border border-amber-300/30 px-2.5 py-1 rounded-full text-amber-100 font-black">
                 <span>⚡</span> Fast Delivery
               </span>
@@ -697,14 +881,13 @@
               </span>
             </div>
 
-            <!-- Price and Call to Action (Optimized for Mobile Taps) -->
-            <div class="flex items-center gap-2 sm:gap-4 pt-1">
-              <div id="hero-price-box" class="bg-white px-3 sm:px-5 py-2.5 sm:py-3 rounded-2xl border-2 border-amber-300 shadow-md flex-shrink-0">
+            <div class="flex items-center gap-2 sm:gap-4 fx-enter" style="--d:.62s">
+              <div id="hero-price-box" class="bg-white px-3 sm:px-5 py-2.5 sm:py-3 rounded-2xl border-2 border-amber-300 shadow-md flex-shrink-0 fx-price">
                 <div class="text-[9px] sm:text-[10px] text-gray-500 font-bold uppercase tracking-wider" id="hero-price-label">Starting at</div>
                 <div class="flex items-baseline gap-2"><div id="hero-price" class="text-lg sm:text-2xl font-black text-amber-700 font-heading">Zinger · Rs. 350</div><span id="hero-old-price" class="hidden text-xs sm:text-sm font-bold text-gray-400 line-through"></span></div>
               </div>
 
-              <button id="hero-cta-btn" class="flex-1 sm:flex-none group relative px-3.5 sm:px-8 min-h-12 sm:min-h-14 sm:py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-red-600 hover:from-amber-400 hover:to-orange-500 text-white font-black text-xs sm:text-base shadow-xl shadow-orange-500/25 active:scale-95 transition overflow-hidden flex items-center justify-center gap-1.5 sm:gap-2.5 cursor-pointer">
+              <button id="hero-cta-btn" class="fx-cta flex-1 sm:flex-none group relative px-3.5 sm:px-8 min-h-12 sm:min-h-14 sm:py-4 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-red-600 hover:from-amber-400 hover:to-orange-500 text-white font-black text-xs sm:text-base shadow-xl shadow-orange-500/25 active:scale-95 transition overflow-hidden flex items-center justify-center gap-1.5 sm:gap-2.5 cursor-pointer">
                 <span class="relative z-10 flex items-center gap-1.5 sm:gap-2">
                   <span id="hero-cta-text">Order a Zinger</span>
                   <svg class="w-4 h-4 sm:w-5 sm:h-5 transform group-hover:translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
@@ -713,61 +896,93 @@
               </button>
 
               <a href="#menu" class="hidden sm:inline-flex px-4 py-3.5 rounded-2xl bg-white/10 hover:bg-white/15 text-white border border-white/20 text-xs font-black transition items-center gap-1">
-                <span>Menu</span>
+                <span>Explore Menu</span>
                 <span>↓</span>
               </a>
             </div>
 
-            <!-- Slide Thumbnails Switcher -->
-            <div id="hero-thumbs-wrap" class="pt-2">
+            <div id="hero-thumbs-wrap" class="fx-enter" style="--d:.75s">
               <div class="text-[10px] sm:text-[11px] text-gray-400 font-bold uppercase tracking-wider mb-2 flex items-center justify-between">
                 <span>Explore Featured Highlights</span>
                 <span class="text-amber-300 text-[10px] font-extrabold">Tap to switch</span>
               </div>
               <div id="hero-thumbnails" class="flex items-center gap-2 overflow-x-auto pb-2 no-scrollbar"></div>
             </div>
-
           </div>
 
-          <!-- Right Showcase Graphical Presentation -->
-          <div class="order-1 lg:order-2 lg:col-span-6 relative flex items-center justify-center mt-0 sm:mt-0">
-            
-            <!-- Radiant Food Halo Backdrop -->
-            <div class="absolute inset-0 sm:inset-2 rounded-full bg-gradient-to-tr from-yellow-300/60 via-amber-400/40 to-orange-400/25 blur-3xl transform scale-110 pointer-events-none"></div>
+          <!-- ── Cinematic 3D dish scene ── -->
+          <div class="fx-scene-col order-1 lg:order-2 lg:col-span-6 relative flex items-center justify-center">
+            <div class="fx-scene" id="fx-scene">
 
-            <div class="relative w-full max-w-xl lg:max-w-lg aspect-[16/10] sm:aspect-square rounded-[26px] sm:rounded-3xl overflow-hidden border border-amber-300/70 bg-[#201a18] shadow-2xl shadow-amber-950/40 group mx-auto">
-              
-              <!-- Floating Top Badges -->
-              <div class="absolute top-3 left-3 sm:top-4 sm:left-4 z-20 bg-white/95 backdrop-blur-md px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-full border border-amber-300 text-amber-900 text-[10px] sm:text-xs font-black flex items-center gap-1.5 shadow-md">
-                <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-                <span>Fresh Cooked • 100% Halal</span>
+              <!-- depth carousel: side products + chrome -->
+              <div class="fx-side fx-side--prev" id="fx-side-prev" aria-label="Previous product"><img src="" alt="Previous item"></div>
+              <div class="fx-side fx-side--next" id="fx-side-next" aria-label="Next product"><img src="" alt="Next item"></div>
+              <div class="fx-rays" aria-hidden="true"></div>
+              <div class="fx-stage" id="fx-stage">
+
+                <!-- carousel controls + film replay -->
+                <button class="fx-car-btn fx-car-btn--prev" id="fx-car-prev" aria-label="Previous product">&#8249;</button>
+                <button class="fx-car-btn fx-car-btn--next" id="fx-car-next" aria-label="Next product">&#8250;</button>
+                <button class="fx-replay" id="fx-replay"><i>&#10227;</i><span>Replay the film</span></button>
+                <div class="fx-tilt" id="fx-tilt">
+                  <div class="fx-dish-group" id="fx-dish-group">
+                    <div class="fx-glow" aria-hidden="true"></div>
+                    <div class="fx-ring fx-ring--1" aria-hidden="true"></div>
+                    <div class="fx-ring fx-ring--2" aria-hidden="true"></div>
+
+                    <div class="fx-orbit" aria-hidden="true">
+                      <span class="fx-orbit-dot"></span>
+                      <span class="fx-orbit-dot"></span>
+                      <span class="fx-orbit-dot"></span>
+                    </div>
+
+                    <div class="fx-blob">
+                      <img id="hero-image" src="./images/hero-1.jpg" alt="Crispy LFC fried chicken and meal" class="fx-dish" decoding="async" fetchpriority="high" />
+                    </div>
+
+                    <span class="fx-chip fx-chip--1 fx-og" style="--d:26" aria-hidden="true"><i><b class="fx-olive"></b><b class="fx-olive fx-olive--2"></b></i></span>
+                    <span class="fx-chip fx-chip--2 fx-og" style="--d:52" aria-hidden="true"><i><b class="fx-cheese"></b></i></span>
+                    <span class="fx-chip fx-chip--3 fx-og" style="--d:34" aria-hidden="true"><i><b class="fx-drip"></b></i></span>
+                    <span class="fx-chip fx-chip--4 fx-og" style="--d:64" aria-hidden="true"><i><b class="fx-cheese fx-cheese--2"></b></i></span>
+                    <span class="fx-chip fx-chip--5 fx-og" style="--d:44" aria-hidden="true"><i><b class="fx-drip fx-drip--alt"></b></i></span>
+
+                    <span class="fx-spark fx-spark--1" aria-hidden="true">✦</span>
+                    <span class="fx-spark fx-spark--2" aria-hidden="true">✦</span>
+                    <span class="fx-spark fx-spark--3" aria-hidden="true">✦</span>
+                    <span class="fx-spark fx-spark--4" aria-hidden="true">✧</span>
+                    <span class="fx-spark fx-spark--5" aria-hidden="true">✦</span>
+                    <span class="fx-spark fx-spark--6" aria-hidden="true">✧</span>
+
+                    <span class="fx-steam fx-steam--1" aria-hidden="true"></span>
+                    <span class="fx-steam fx-steam--2" aria-hidden="true"></span>
+                    <span class="fx-steam fx-steam--3" aria-hidden="true"></span>
+
+                    <div class="fx-callout fx-callout--1"><i></i><b>12-Spice Crust</b></div>
+                    <div class="fx-callout fx-callout--2"><i></i><b>100% Fresh Halal</b></div>
+                    <div class="fx-burger-wrap" id="fx-burger-wrap" aria-hidden="true"></div>
+
+                  </div>
+                </div>
               </div>
-
-              <div class="absolute top-3 right-3 sm:top-4 sm:right-4 z-20 bg-gradient-to-r from-amber-500 to-yellow-400 text-slate-950 px-2.5 py-1 rounded-full text-[10px] sm:text-xs font-black shadow-md flex items-center gap-1 border border-yellow-200">
-                <span>🔥 Trending</span>
-              </div>
-
-              <!-- Main Hero Dish Image with Float Animation -->
-              <img id="hero-image" src="./images/hero-1.jpg" alt="Crispy LFC fried chicken and meal" class="w-full h-full object-cover transform transition-all duration-700 group-hover:scale-105 animate-float" decoding="async" fetchpriority="high" />
-
-              <!-- Bottom Glass Feature Pill -->
-              <div class="absolute bottom-2 left-2 right-2 sm:bottom-4 sm:left-4 sm:right-4 bg-[#10131d]/90 backdrop-blur-md p-2 sm:p-3.5 rounded-2xl border border-white/15 flex items-center justify-around text-[8px] sm:text-xs font-black text-white shadow-lg">
-                <span class="flex items-center gap-1 text-amber-800">✨ Lahori Spice</span>
-                <span class="flex items-center gap-1 text-orange-700">🌶️ Crispy Crunch</span>
-                <span class="flex items-center gap-1 text-emerald-700">⚡ Fast Delivery</span>
-              </div>
-
             </div>
-
           </div>
 
         </div>
       </div>
+      <div class="fx-scroll-cue" aria-hidden="true"><i></i></div>
     </section>
 
     <section id="featured-bogo" aria-label="Featured Buy 1 Get 1 Free pizza offer" hidden>
       <div class="featured-bogo__inner" id="featured-bogo-content"></div>
     </section>
+
+    <!-- Rotated gold marquee band (design signature) -->
+    <div class="lfc-marquee" aria-hidden="true">
+      <div class="lfc-marquee__track">
+        <span>CRISPY FRIED CHICKEN <b>✦</b> ZINGER BURGERS <b>✦</b> CHEESY PIZZA <b>✦</b> PARATHA ROLLS <b>✦</b> LOADED FRIES <b>✦</b> HOT WINGS <b>✦</b> FAMILY DEALS <b>✦</b> TASTE THE LEGEND <b>✦</b>&nbsp;</span>
+        <span>CRISPY FRIED CHICKEN <b>✦</b> ZINGER BURGERS <b>✦</b> CHEESY PIZZA <b>✦</b> PARATHA ROLLS <b>✦</b> LOADED FRIES <b>✦</b> HOT WINGS <b>✦</b> FAMILY DEALS <b>✦</b> TASTE THE LEGEND <b>✦</b>&nbsp;</span>
+      </div>
+    </div>
 
     <!-- Trust Stats Strip (Clean White & Yellow Mineral Bar) -->
     <section class="reveal lfc-stats border-b border-amber-200/90 bg-white shadow-sm">
@@ -789,6 +1004,22 @@
           <div class="text-[10px] sm:text-xs text-gray-600 font-bold uppercase tracking-wider mt-1">Express Delivery</div>
         </div>
       </div>
+    </section>
+
+    <!-- Signature Picks — 3D coverflow of real menu favourites (design-file port) -->
+    <section id="signature-picks" class="sg-sec" aria-label="Signature picks">
+      <div class="sg-head">
+        <span class="lfc-eyebrow">Fan favourites</span>
+        <h2 class="lfc-title font-heading">Signature <em>picks</em></h2>
+        <p class="sg-sub">Spin through the dishes Lahore orders on repeat — tap the centre card to order.</p>
+      </div>
+      <div class="sg-stage" id="sg-stage"></div>
+      <div class="sg-nav">
+        <button type="button" id="sg-prev" aria-label="Previous pick">‹</button>
+        <span class="sg-count font-heading" id="sg-count">0 / 0</span>
+        <button type="button" id="sg-next" aria-label="Next pick">›</button>
+      </div>
+      <div class="sg-progress" aria-hidden="true"><i id="sg-progress-fill"></i></div>
     </section>
 
     <!-- Mobile Search Bar (App-like top experience) -->
@@ -925,6 +1156,30 @@
     </section>
 
     <!-- Footer with LFC Branding & Trivox Solutions Credits (Admin buttons completely removed) -->
+
+    <section id="final-cta" class="reveal py-10 sm:py-14 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="fx-final">
+        <div class="fx-final-orb fx-final-orb--a" aria-hidden="true"></div>
+        <div class="fx-final-orb fx-final-orb--b" aria-hidden="true"></div>
+        <div class="fx-final-cols">
+          <div>
+            <span class="fx-eyebrow">Taste the Legend</span>
+            <h2>YOUR NEXT CRAVING <em>STARTS HERE.</em></h2>
+            <p>Freshly cooked crispy chicken, loaded burgers and cheesy pizzas — hot out of the fryer and on the way to your door.</p>
+            <div class="fx-final-actions">
+              <a id="final-wa-btn" class="wa" href="#menu">&#128666; Order on WhatsApp</a>
+              <a class="ghost" href="#menu">See Full Menu</a>
+            </div>
+          </div>
+          <div class="relative flex justify-center">
+            <div class="fx-final-dish">
+              <img src="./images/zinger-burger.jpg" alt="LFC signature Zinger burger" loading="lazy" decoding="async">
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <footer class="bg-gradient-to-b from-[#181D2D] to-[#0A0D16] border-t-2 border-amber-400/80 py-10 sm:py-12 text-xs text-gray-300">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
@@ -932,7 +1187,7 @@
           <div class="flex items-center gap-3">
             <div class="relative flex-shrink-0">
               <div class="absolute -inset-1 rounded-full bg-gradient-to-r from-amber-500 to-yellow-400 opacity-70 blur-sm"></div>
-              <img src="./images/logo.png" alt="LFC Logo" class="brand-logo-img relative h-12 w-12 rounded-full object-cover ring-2 ring-amber-400/80 shadow-md shadow-amber-500/30" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='./images/logo.png'"/>
+              <img src="./images/lfc-logo.png" alt="LFC Logo" class="brand-logo-img relative h-12 w-12 rounded-full object-cover ring-2 ring-amber-400/80 shadow-md shadow-amber-500/30" referrerpolicy="no-referrer" onerror="this.onerror=null; this.src='./images/logo.png'"/>
             </div>
             <div>
               <div class="text-white font-black text-xl sm:text-2xl font-heading tracking-wider flex items-center gap-2">
@@ -1494,6 +1749,34 @@
 
           <!-- Tab: Deals Manager -->
           <div id="tab-panel-deals" class="hidden space-y-5">
+            <!-- Homepage Buy 1 Get 1 banner controls -->
+            <div class="rounded-3xl border border-rose-500/30 bg-gradient-to-br from-[#1e1424] via-[#151223] to-[#10131b] overflow-hidden">
+              <div class="p-4 sm:p-5 border-b border-white/5 flex items-center justify-between gap-3">
+                <div>
+                  <div class="text-[10px] font-black uppercase tracking-[.2em] text-rose-400">Homepage section</div>
+                  <h4 class="font-black text-white text-base sm:text-lg mt-1">Buy 1 Get 1 Free pizza banner</h4>
+                  <p class="text-[11px] text-gray-400 mt-1">Shown right after the hero. Pick which live B1G1 deal it features, or hide it entirely.</p>
+                </div>
+                <div class="hidden sm:grid w-11 h-11 rounded-2xl bg-rose-500/10 border border-rose-400/20 place-items-center text-xl">🍕</div>
+              </div>
+              <div class="p-4 sm:p-5 grid grid-cols-1 sm:grid-cols-[1fr_1.4fr_auto] gap-3 items-end">
+                <label class="space-y-1.5">
+                  <span class="block text-[10px] font-black uppercase tracking-wider text-gray-400">Section visibility</span>
+                  <select id="featured-bogo-enabled" class="w-full px-3 py-2.5 rounded-xl bg-[#08090E] border border-gray-800 text-xs text-white focus:outline-none focus:border-amber-500">
+                    <option value="1">Show after hero</option>
+                    <option value="0">Hide section</option>
+                  </select>
+                </label>
+                <label class="space-y-1.5">
+                  <span class="block text-[10px] font-black uppercase tracking-wider text-gray-400">Featured deal</span>
+                  <select id="featured-bogo-deal" class="w-full px-3 py-2.5 rounded-xl bg-[#08090E] border border-gray-800 text-xs text-white focus:outline-none focus:border-amber-500">
+                    <option value="0">Auto — first active B1G1 deal</option>
+                  </select>
+                </label>
+                <button type="button" onclick="window.LFC.saveFeaturedBogoSettings()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-black text-xs shadow-lg shadow-rose-600/25 active:scale-95 transition whitespace-nowrap">Save banner</button>
+              </div>
+            </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-[1fr_auto] gap-3 items-stretch">
               <div id="admin-deal-save-status" class="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-xs font-bold text-gray-300 flex items-center gap-2" role="status" aria-live="polite">
                 <span class="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_12px_rgba(52,211,153,.65)]"></span>
@@ -1659,7 +1942,7 @@
               <p class="text-gray-400 text-xs">Upload your restaurant logo directly or specify a custom URL.</p>
 
               <div class="flex flex-col sm:flex-row sm:items-center gap-4 p-4 rounded-xl bg-[#08090E] border border-gray-800">
-                <img id="admin-logo-preview" src="./images/logo.png" alt="Current Logo" class="h-16 w-16 rounded-full object-cover ring-2 ring-amber-400/80 shadow-md" onerror="this.onerror=null; this.src='./images/logo.png';"/>
+                <img id="admin-logo-preview" src="./images/lfc-logo.png" alt="Current Logo" class="h-16 w-16 rounded-full object-cover ring-2 ring-amber-400/80 shadow-md" onerror="this.onerror=null; this.src='./images/lfc-logo.png';"/>
                 <div class="space-y-2">
                   <div class="flex flex-wrap gap-2">
                     <label class="px-3 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 hover:from-amber-400 hover:to-yellow-400 text-black font-black text-xs uppercase tracking-wider cursor-pointer inline-flex items-center gap-1.5 transition">
@@ -2134,7 +2417,332 @@
   window.addEventListener('scroll',spy,{passive:true}); spy();
 })();
 </script>
-    <script type="module" src="./app.js"></script>
-  <script src="./cheesy.js?v=1" defer></script>
+    <script type="module" src="./app.js?v=19"></script>
+  <!-- <script src="./cheesy.js?v=1" defer></script> (see comment above cheesy.css link) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script>
+/* ══════════════ LFC CINEMATIC HERO ENGINE ══════════════ */
+(function () {
+  'use strict';
+  var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var hero = document.getElementById('hero-section');
+  var scene = document.getElementById('fx-scene');
+  var stage = document.getElementById('fx-stage');
+  var tilt = document.getElementById('fx-tilt');
+  var group = document.getElementById('fx-dish-group');
+  var blob = document.querySelector('.fx-blob');
+  var priceBox = document.getElementById('hero-price-box');
+
+  /* ---------- pointer parallax (desktop only) ---------- */
+  if (!reduceMotion && stage && tilt && hero && window.matchMedia('(pointer: fine)').matches) {
+    var target = { x: 0, y: 0 };
+    var cur = { x: 0, y: 0 };
+    var rafId = null;
+    var tick = function () {
+      cur.x += (target.x - cur.x) * 0.10;
+      cur.y += (target.y - cur.y) * 0.10;
+      tilt.style.setProperty('--tx', cur.y.toFixed(3) + 'deg');
+      tilt.style.setProperty('--ty', cur.x.toFixed(3) + 'deg');
+      hero.style.setProperty('--mx', cur.x.toFixed(3));
+      hero.style.setProperty('--my', cur.y.toFixed(3));
+      if (Math.abs(target.x - cur.x) > 0.002 || Math.abs(target.y - cur.y) > 0.002) {
+        rafId = requestAnimationFrame(tick);
+      } else { rafId = null; }
+    };
+    var kick = function () { if (rafId === null) rafId = requestAnimationFrame(tick); };
+    hero.addEventListener('pointermove', function (e) {
+      var r = stage.getBoundingClientRect();
+      target.x = Math.max(-1, Math.min(1, (e.clientX - (r.left + r.width / 2)) / (r.width * 0.9)));
+      target.y = Math.max(-1, Math.min(1, (e.clientY - (r.top + r.height / 2)) / (r.height * 0.9)));
+      kick();
+    });
+    hero.addEventListener('pointerleave', function () { target.x = 0; target.y = 0; kick(); });
+  }
+
+  /* ---------- word-pop whenever copy changes ---------- */
+  function popWords(el) {
+    if (!el || reduceMotion) return;
+    var text = (el.textContent || '').trim();
+    if (!text) return;
+    /* spans fade in (opacity only — no translate, so nothing can ever
+       overlap the neighbouring line mid-entrance) */
+    var html = text.split(/\s+/).map(function (w, i) {
+      return '<span class="fx-word" style="--i:' + i + '">' + w + '</span>';
+    }).join(' ');
+    if (el._popHtml === html && el.querySelector('.fx-word')) return; /* guard: skip only while spans are actually in place */
+    el._popHtml = html;
+    el.innerHTML = html;
+  }
+
+  function guardPop(el) {
+    if (!el) return;
+    var busy = false;
+    var obs = new MutationObserver(function () {
+      if (busy) return;
+      busy = true;
+      /* microtask, not rAF: rAF can stay suspended in throttled/occluded
+         tabs, which would swallow every later rebuild forever */
+      Promise.resolve().then(function () { popWords(el); busy = false; });
+    });
+    obs.observe(el, { childList: true, characterData: false, subtree: true });
+  }
+  guardPop(document.getElementById('hero-title'));
+  guardPop(document.getElementById('hero-highlight'));
+
+  if (!reduceMotion) {
+    popWords(document.getElementById('hero-title'));
+    setTimeout(function () { popWords(document.getElementById('hero-highlight')); }, 220);
+  }
+
+  /* ---------- dish pop when image swaps ---------- */
+  if (blob && !reduceMotion) {
+    var img = document.getElementById('hero-image');
+    if (img) {
+      var imgObs = new MutationObserver(function () {
+        blob.classList.remove('is-pop');
+        void blob.offsetWidth;
+        blob.classList.add('is-pop');
+      });
+      imgObs.observe(img, { attributes: true, attributeFilter: ['src'] });
+    }
+  }
+
+  /* ---------- price pop when active deal changes ---------- */
+  if (priceBox && !reduceMotion) {
+    var price = document.getElementById('hero-price');
+    if (price) {
+      var pop = function () {
+        priceBox.classList.remove('is-pop');
+        void priceBox.offsetWidth;
+        priceBox.classList.add('is-pop');
+      };
+      new MutationObserver(pop).observe(price, { childList: true, characterData: false, subtree: true });
+    }
+  }
+
+  /* ---------- magnetic CTA: gold button leans toward the cursor ---------- */
+  var magnetBtn = document.getElementById('hero-cta-btn');
+  if (!reduceMotion && magnetBtn && window.matchMedia('(pointer: fine)').matches) {
+    var mxT = null;
+    magnetBtn.addEventListener('pointermove', function (e) {
+      var r = magnetBtn.getBoundingClientRect();
+      var dx = (e.clientX - (r.left + r.width / 2)) / r.width;
+      var dy = (e.clientY - (r.top + r.height / 2)) / r.height;
+      if (mxT === null) mxT = requestAnimationFrame(function () {
+        mxT = null;
+        magnetBtn.style.transform = 'translate(' + (dx * 9).toFixed(1) + 'px,' + (dy * 6).toFixed(1) + 'px)';
+      });
+    });
+    magnetBtn.addEventListener('pointerleave', function () {
+      if (mxT !== null) { cancelAnimationFrame(mxT); mxT = null; }
+      magnetBtn.style.transform = '';
+    });
+  }
+
+  /* ---------- rising gold embers (design-file hero) ---------- */
+  if (!reduceMotion && hero) {
+    var wrap = document.querySelector('.fx-particles');
+    if (wrap) {
+      var count = window.innerWidth < 768 ? 9 : 16;
+      var frag = document.createDocumentFragment();
+      for (var i = 0; i < count; i++) {
+        var s = document.createElement('span');
+        s.className = 'ember';
+        s.style.left = Math.round(Math.random() * 98) + '%';
+        s.style.setProperty('--ew', (3 + Math.random() * 6).toFixed(1) + 'px');
+        s.style.setProperty('--t', (7 + Math.random() * 9).toFixed(1) + 's');
+        s.style.setProperty('--dl', (-Math.random() * 12).toFixed(1) + 's');
+        s.style.setProperty('--o', (0.3 + Math.random() * 0.5).toFixed(2));
+        frag.appendChild(s);
+      }
+      wrap.appendChild(frag);
+    }
+  }
+
+  /* ---------- pause ambient loops when offscreen / tab hidden ---------- */
+  if (hero && 'IntersectionObserver' in window) {
+    hero._fxOut = false;
+    var applyIdle = function () {
+      hero.classList.toggle('is-idle', hero._fxOut || document.hidden);
+    };
+    new IntersectionObserver(function (entries) {
+      hero._fxOut = !entries[entries.length - 1].isIntersecting;
+      applyIdle();
+    }, { threshold: 0.03 }).observe(hero);
+    document.addEventListener('visibilitychange', applyIdle);
+  }
+
+  /* ---------- GSAP cinematic entrance + scroll parallax ---------- */
+  function playIntro() {
+    if (!window.gsap || reduceMotion || !hero || hero._fxIntro) return;
+    hero._fxIntro = true;
+    if (window.ScrollTrigger) gsap.registerPlugin(ScrollTrigger);
+
+    var enters = [].slice.call(hero.querySelectorAll('.fx-enter'));
+    var headline = hero.querySelector('.fx-headline');
+    var badge = hero.querySelector('.fx-badge');
+    var cue = hero.querySelector('.fx-scroll-cue');
+
+    try {
+      /* take ownership of the CSS rise so every beat lands with the curtain */
+      gsap.set(enters, { animation: 'none' });
+
+      var tl = gsap.timeline({ delay: 0.05, defaults: { ease: 'expo.out' } });
+      hero._fxTl = tl; /* debug/seek handle */
+
+      /* ══ act 1 — the dish rises out of the dark ══ */
+      tl.from(scene, { y: 110, opacity: 0, scale: 0.72, duration: 1.7 }, 0)
+        .from(group, { rotationY: -30, rotationX: 12, duration: 1.9, ease: 'power4.out' }, 0.06)
+        .from('.fx-glow', { opacity: 0, scale: 0.5, duration: 1.4, ease: 'power2.out' }, 0.28)
+        .from('.fx-rays', { opacity: 0, duration: 1.7, ease: 'power2.out' }, 0.36)
+        .from('.fx-ring', { opacity: 0, duration: 1.2, stagger: 0.16, ease: 'power2.out' }, 0.45)
+        .from('.fx-orbit', { opacity: 0, duration: 1, ease: 'power2.out' }, 0.6)
+        .from('.fx-chip', { opacity: 0, scale: 0.35, duration: 0.8, stagger: 0.1, ease: 'back.out(2.2)', onComplete: function () { gsap.set('.fx-chip', { clearProps: 'transform' }); } }, 0.55)
+        .from('.fx-callout', { opacity: 0, y: 18, duration: 0.9, stagger: 0.18, ease: 'power3.out' }, 1.0)
+        .from('.fx-spark', { opacity: 0, duration: 0.8, stagger: 0.07 }, 1.1);
+
+      /* ══ act 2 — copy arrives in choreographed waves ══ */
+      if (headline) {
+        /* opacity-only reveal — a rotateX/translate fold on the h1 is what
+           made the two headline lines visually collapse into each other */
+        tl.fromTo(headline,
+          { opacity: 0 },
+          { opacity: 1, duration: 0.9, ease: 'power2.out' }, 0.24);
+      }
+      if (badge) {
+        tl.fromTo(badge, { opacity: 0 }, { opacity: 1, duration: 0.8, ease: 'power2.out' }, 0.34);
+      }
+      enters.forEach(function (el) {
+        var pos = 0.16 + (parseFloat(getComputedStyle(el).getPropertyValue('--d')) || 0);
+        if (el.classList.contains('fx-eyebrow')) {
+          tl.fromTo(el,
+            { opacity: 0, x: -26, y: 0, filter: 'blur(7px)' },
+            { opacity: 1, x: 0, y: 0, filter: 'blur(0px)', duration: 1.1 }, pos);
+        } else {
+          tl.fromTo(el,
+            { opacity: 0, y: 28, filter: 'blur(7px)' },
+            { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.05 }, pos);
+        }
+      });
+      /* price + CTA get their own accent beats on top of the wave */
+      var priceBox = document.getElementById('hero-price-box');
+      var ctaBtn = document.getElementById('hero-cta-btn');
+      if (priceBox) tl.fromTo(priceBox, { scale: 0.82, rotate: -4 }, { scale: 1, rotate: 0, duration: 0.85, ease: 'back.out(2.4)' }, 0.94);
+      if (ctaBtn) tl.fromTo(ctaBtn, { x: -34, scale: 0.94 }, { x: 0, scale: 1, duration: 0.9, ease: 'back.out(1.8)' }, 1.06);
+      if (cue) tl.fromTo(cue, { opacity: 0 }, { opacity: 1, duration: 0.9, ease: 'power2.out' }, 1.75);
+
+      /* scroll parallax: food drifts slower, copy glides away faster */
+      if (window.ScrollTrigger) {
+        gsap.to(scene, {
+          y: 110, ease: 'none',
+          scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.5 }
+        });
+        var copy = document.querySelector('.fx-hero-copy');
+        if (copy) {
+          gsap.to(copy, {
+            y: -46, opacity: 0.3, ease: 'none',
+            scrollTrigger: { trigger: hero, start: 'top top', end: 'bottom top', scrub: 0.5 }
+          });
+        }
+      }
+    } catch (err) {
+      /* fail-open: hand motion back to CSS so nothing stays hidden */
+      try {
+        gsap.set(enters, { clearProps: 'all' });
+        enters.forEach(function (el) { el.style.animation = ''; });
+      } catch (e2) { /* no-op */ }
+      if (window.console && console.warn) console.warn('LFC hero intro fallback', err);
+    }
+  }
+
+  /* ---------- reveal gate: intro starts when the preloader curtain opens ---------- */
+  var introStarted = false;
+  function startIntro() {
+    if (introStarted) return;
+    introStarted = true;
+    playIntro();
+    /* GSAP runs on rAF — when the tab loads unfocused/occluded the ticker can
+       be throttled and the intro never advances, leaving copy at its from
+       state (opacity 0 / offset = the "ghosted overlapping text" bug).
+       Watchdog: if the timeline hasn't moved within 4s, hand everything back
+       to CSS (the fxRise animation is compositor-driven and always plays). */
+    var wd = 0;
+    var gsapHandled = false;
+    var watchdog = function () {
+      if (!hero) return;
+      var tl = hero._fxTl;
+      /* hand a stalled GSAP intro back to CSS — once, then keep inline fixes.
+         clears EVERY intro target, not just .fx-enter: a frozen timeline
+         leaves rotateX/y starts on the headline too, which visually folds
+         the h1 over the subtitle ("text wrapping on each other").
+         "Stalled" = never started OR frozen at the same progress twice. */
+      if (window.gsap) {
+        var stalled = !tl || tl.progress() < 0.04 ||
+          (tl.progress() < 0.98 && hero._fxLastP === tl.progress());
+        if (tl) hero._fxLastP = tl.progress();
+        if (stalled && !gsapHandled) {
+          gsapHandled = true;
+          try {
+            hero.querySelectorAll('.fx-enter').forEach(function (el) { el.style.animation = ''; });
+            gsap.set(hero.querySelectorAll('.fx-enter, .fx-headline, .fx-stage, .fx-blob, .fx-glow, .fx-rays, .fx-ring, .fx-orbit, .fx-chip, .fx-callout, .fx-spark, #hero-price-box, #hero-cta-btn'), { clearProps: 'all' });
+          } catch (e) { /* no-op */ }
+          if (tl) { try { tl.pause(); } catch (e2) {} }
+        }
+      }
+      /* snap stuck copy open (also covers fxRise that can't play while
+         the tab is throttled — inline state survives everything) */
+      var picky = hero.querySelectorAll('.fx-word, .fx-enter, .fx-underline, .fx-price');
+      for (var i = 0; i < picky.length; i++) {
+        var el = picky[i];
+        var cs = getComputedStyle(el);
+        var cls = ' ' + el.className.toString() + ' ';
+        var stuckHidden = (cls.indexOf(' fx-word ') > -1 || cls.indexOf(' fx-enter ') > -1) && parseFloat(cs.opacity) < 0.6;
+        var stuckScale = (cls.indexOf(' fx-underline ') > -1 || cls.indexOf(' fx-price ') > -1) && cs.transform && cs.transform !== 'none' && cs.transform !== 'matrix(1, 0, 0, 1, 0, 0)';
+        if (stuckHidden || stuckScale) {
+          el.style.animation = 'none';
+          if (stuckHidden) { el.style.opacity = '1'; el.style.filter = 'none'; }
+          el.style.transform = 'none';
+        }
+      }
+      /* fold guard: the h1 must never carry a rotate/translate — any leftover
+         intro transform literally folds the two headline lines over
+         each other. Reset it on sight. */
+      try {
+        var hl1 = hero.querySelector('.fx-headline');
+        if (hl1 && window.gsap) {
+          var htr = getComputedStyle(hl1).transform;
+          if (htr && htr !== 'none' && htr !== 'matrix(1, 0, 0, 1, 0, 0)') {
+            gsap.set(hl1, { clearProps: 'all' });
+          }
+        }
+      } catch (e) { /* no-op */ }
+      /* headline missing its word spans (observer stalled)? rebuild them */
+      try {
+        var ht2 = document.getElementById('hero-title');
+        if (ht2 && ht2.textContent.trim() && !ht2.querySelector('.fx-word')) popWords(ht2);
+        var hh2 = document.getElementById('hero-highlight');
+        if (hh2 && hh2.textContent.trim() && !hh2.querySelector('.fx-word')) popWords(hh2);
+      } catch (e) { /* no-op */ }
+      if (++wd < 8) setTimeout(watchdog, 4000);
+    };
+    setTimeout(watchdog, 4000);
+  }
+  if (reduceMotion) {
+    startIntro(); /* playIntro no-ops under reduced motion */
+  } else {
+    window.addEventListener('lfc:reveal', startIntro, false);
+    setTimeout(function () {
+      /* mirrors the preloader's ultimate fail-safe (6.4s) */
+      document.body.classList.remove('lfc-hold');
+      document.body.classList.add('lfc-revealed');
+      startIntro();
+    }, 6400);
+  }
+})();
+</script>
+
+<script src="./lfc-cinema.js?v=19"></script>
+</body>
 </body>
 </html>

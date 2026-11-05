@@ -17,7 +17,7 @@
     storeName: 'LFC',
     fullName: 'Lahore Fried Chicken (LFC)',
     tagline: 'Taste the Legend',
-    logoUrl: './images/logo.png',
+    logoUrl: './images/lfc-logo.png',
     phoneCallNumber: '0322-4940181',
     whatsappNumber: '0322-4940181',
     adminPin: '5640', // Protected Master Admin PIN
@@ -813,7 +813,7 @@
   if (originalFirstHeroCopy !== JSON.stringify(Array.isArray(heroSlides) && heroSlides.find((slide) => Number(slide.id) === 1))) {
     saveData('hero_slides', heroSlides);
   }
-  let heroConfig = loadData('hero_config', { autoplay: true, interval: 6, showThumbs: true, showPrice: true });
+  let heroConfig = loadData('hero_config', { autoplay: true, interval: 6, showThumbs: true, showPrice: true, billboardOn: true, bbTheme: 'saffron', bbWedge: '#f4e9d0', bbWordColor: '#8e1616', bbBg1: '#ffb020', bbBg2: '#ff8a00', bbScale: 1 });
   if (menuWasReset) { heroSlides.forEach((s, i) => { const d = DEFAULT_HERO_SLIDES[i]; if (d) { s.targetDealId = d.targetDealId; s.priceTag = d.priceTag; } }); saveData('hero_slides', heroSlides); }
   function activeSlides() { const a = heroSlides.filter((s) => s.enabled !== false); return a.length ? a : heroSlides; }
   const catalogMigration = migrateMenuCatalog(loadData('menu_items', DEFAULT_MENU_ITEMS));
@@ -1237,6 +1237,45 @@
     updateCartUI();
     showToast(`${deal.title} added to your order!`);
     animateCartButton();
+  }
+
+  /* Featured B1G1 banner → straight to checkout: adds the deal using the same
+     defaults the chooser pre-selects (popular package + first two eligible pizzas,
+     all real catalog data), then opens the cart at the address form. */
+  function bogoCheckoutNow(id) {
+    const deal = deals.find((entry) => entry.id === Number(id) && isDealAvailable(entry)) ||
+                 deals.find((entry) => entry.type === 'bogo' && isDealAvailable(entry));
+    if (!deal) {
+      showToast('This deal is no longer available', 'error');
+      return;
+    }
+    const alreadyInCart = cart.some((entry) => entry.dealId === deal.id);
+    if (!alreadyInCart) {
+      activeBogoDeal = deal;
+      const pizzas = getBogoPizzas();
+      if (!pizzas.length) {
+        showToast('Pizza catalog is currently updating', 'error');
+        return;
+      }
+      if (!selectedBogoPizza1Id || !pizzas.some((p) => String(p.id) === String(selectedBogoPizza1Id))) {
+        selectedBogoPizza1Id = String(pizzas[0].id);
+      }
+      if (!selectedBogoPizza2Id || !pizzas.some((p) => String(p.id) === String(selectedBogoPizza2Id))) {
+        const second = pizzas.find((p) => String(p.id) !== String(selectedBogoPizza1Id));
+        selectedBogoPizza2Id = String((second || pizzas[0]).id);
+      }
+      addBogoDealToCart();
+    } else {
+      showToast('This deal is already in your order');
+    }
+    openCartDrawer();
+    setTimeout(() => {
+      const address = document.getElementById('checkout-address');
+      if (address) {
+        try { address.scrollIntoView({ block: 'center', behavior: 'smooth' }); } catch (_) {}
+        setTimeout(() => { try { address.focus({ preventScroll: true }); } catch (_) { address.focus(); } }, 350);
+      }
+    }, 380);
   }
 
   const BOGO_PACKAGES = [
@@ -1693,7 +1732,9 @@
   // --- Dynamic Logo, Contact & Store Status Sync ---
   function updateBrandLogos() {
     const logoImgs = document.querySelectorAll('.brand-logo-img');
-    const safeLogo = settings && settings.logoUrl ? settings.logoUrl : './images/logo.png';
+    let safeLogo = settings && settings.logoUrl ? settings.logoUrl : './images/lfc-logo.png';
+    /* migrate legacy hand-drawn logo to the real gold LFC mark */
+    if (/lfc-logo-gold\.svg|\/images\/logo\.png$/i.test(safeLogo)) safeLogo = './images/lfc-logo.png';
     if (safeLogo !== './images/logo.png') document.querySelectorAll('link[rel="icon"]').forEach((l) => { l.removeAttribute('sizes'); l.href = safeLogo; });
     logoImgs.forEach((img) => {
       img.src = safeLogo;
@@ -1726,11 +1767,40 @@
   }
 
   // --- Hero Section Renderer & Animations ---
+  // Billboard hero: big angled panel + giant rotating dish word (admin-tunable)
+  function applyBillboard() {
+    const hero = document.getElementById('hero-section');
+    if (!hero) return;
+    const on = heroConfig.billboardOn !== false;
+    const theme = heroConfig.bbTheme === 'onyx' ? 'onyx' : 'saffron';
+    document.body.classList.toggle('lfc-bb', on);
+    document.body.classList.toggle('lfc-bb-saffron', on && theme === 'saffron');
+    document.body.classList.toggle('lfc-bb-onyx', on && theme === 'onyx');
+    hero.style.setProperty('--bb-wedge', heroConfig.bbWedge || '#f4e9d0');
+    hero.style.setProperty('--bb-word', heroConfig.bbWordColor || '#8e1616');
+    hero.style.setProperty('--bb-bg1', heroConfig.bbBg1 || '#ffb020');
+    hero.style.setProperty('--bb-bg2', heroConfig.bbBg2 || '#ff8a00');
+    hero.style.setProperty('--bb-scale', String(Number(heroConfig.bbScale) || 1));
+  }
+
   function renderHeroSlide(index) {
     const slidesList = activeSlides();
     if (!slidesList.length) return;
     activeSlideIndex = (index + slidesList.length) % slidesList.length;
     const slide = slidesList[activeSlideIndex];
+    applyBillboard();
+
+    // the giant billboard word — swaps with a pop as items rotate one by one
+    const bWord = document.getElementById('fx-billboard-word');
+    if (bWord) {
+      const txt = slide.bbWord || slide.highlight || '';
+      if (bWord.textContent !== txt) {
+        bWord.textContent = txt;
+        bWord.classList.remove('is-pop');
+        void bWord.offsetWidth;
+        bWord.classList.add('is-pop');
+      }
+    }
 
     const titleEl = document.getElementById('hero-title');
     const highlightEl = document.getElementById('hero-highlight');
@@ -1884,7 +1954,11 @@
     const grid = document.getElementById('deals-grid');
     if (!grid) return;
     const activeDeals = deals.filter(isDealAvailable).sort((a, b) => Number(b.type === 'bogo') - Number(a.type === 'bogo'));
-    renderFeaturedBogo(activeDeals.find((deal) => deal.type === 'bogo'));
+    /* homepage Buy 1 Get 1 banner: admin controls visibility + which deal is featured */
+    const featuredBogoList = activeDeals.filter((deal) => deal.type === 'bogo');
+    const featuredBogoId = Number(settings.featuredBogoDealId) || 0;
+    const featuredBogo = (featuredBogoId && featuredBogoList.find((deal) => deal.id === featuredBogoId)) || featuredBogoList[0] || null;
+    renderFeaturedBogo(settings.featuredBogoEnabled === false ? null : featuredBogo);
     if (!activeDeals.length) {
       grid.innerHTML = '<div class="lfc-deals__empty">No active deals right now. Please check back soon!</div>';
       return;
@@ -1944,10 +2018,17 @@
     const image = escapeHtml(safeDealImage(deal.image));
     const badge = escapeHtml(deal.badge || 'Buy 1 Get 1 Free');
     content.innerHTML = `
-      <article class="featured-bogo__card">
+      <article class="featured-bogo__card" id="bogo-card">
+        <div class="featured-bogo__fx" aria-hidden="true">
+          <i class="fb-spark s1"></i><i class="fb-spark s2"></i><i class="fb-spark s3"></i><i class="fb-spark s4"></i><i class="fb-spark s5"></i>
+          <i class="fb-conf c1"></i><i class="fb-conf c2"></i><i class="fb-conf c3"></i><i class="fb-conf c4"></i><i class="fb-conf c5"></i><i class="fb-conf c6"></i><i class="fb-conf c7"></i><i class="fb-conf c8"></i><i class="fb-conf c9"></i><i class="fb-conf c10"></i><i class="fb-conf c11"></i><i class="fb-conf c12"></i>
+          <span class="fb-orbit-w"><span class="fb-orbit">🍕</span></span>
+        </div>
         <div class="featured-bogo__image-wrap">
           <img class="featured-bogo__image" src="${image}" alt="${title}" loading="lazy" decoding="async" onerror="this.onerror=null;this.src='./images/hero-3.jpg'"/>
-          <span class="featured-bogo__image-badge">🍕 ${badge}</span>
+          <span class="featured-bogo__image-badge">${badge}</span>
+          <span class="featured-bogo__stamp" aria-hidden="true">1 FREE</span>
+          <div class="featured-bogo__ribbon" aria-hidden="true"><span>PIZZA &nbsp;·&nbsp; BUY 1 GET 1 FREE &nbsp;·&nbsp; PICK ANY 2 &nbsp;·&nbsp; HOT &amp; FRESH &nbsp;·&nbsp; </span><span>PIZZA &nbsp;·&nbsp; BUY 1 GET 1 FREE &nbsp;·&nbsp; PICK ANY 2 &nbsp;·&nbsp; HOT &amp; FRESH &nbsp;·&nbsp; </span></div>
         </div>
         <div class="featured-bogo__copy">
           <span class="featured-bogo__eyebrow"><span aria-hidden="true">★</span> LFC's best-selling pizza deal</span>
@@ -1955,11 +2036,90 @@
           <p class="featured-bogo__description">${escapeHtml(deal.description)}</p>
           <div class="featured-bogo__promise"><span class="featured-bogo__free">1 FREE</span><span><strong>Choose any two pizzas</strong><br/>Pay only for the higher-priced pizza. The other one is free.</span></div>
           <div class="featured-bogo__actions">
-            <button type="button" class="featured-bogo__cta" onclick="window.LFC.orderDealById(${deal.id})">Choose your pizzas <span aria-hidden="true">→</span></button>
+            <button type="button" class="featured-bogo__cta" aria-label="Add ${title} to cart" onclick="window.LFC.orderDealById(${deal.id})">Add to Cart <span class="fb-arrow" aria-hidden="true">→</span></button>
+            <button type="button" class="featured-bogo__wa" aria-label="Order ${title} on WhatsApp" onclick="window.LFC.bogoCheckoutNow(${deal.id})">
+              <svg aria-hidden="true" width="17" height="17" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91c0 1.75.46 3.45 1.32 4.95L2 22l5.25-1.38a9.9 9.9 0 0 0 4.79 1.22h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2Zm0 18.15h-.01a8.2 8.2 0 0 1-4.19-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.19 8.19 0 0 1-1.26-4.38c0-4.54 3.7-8.23 8.25-8.23 2.2 0 4.27.86 5.83 2.42a8.18 8.18 0 0 1 2.41 5.82c0 4.54-3.7 8.23-8.24 8.23Zm4.52-6.16c-.25-.12-1.47-.72-1.69-.81-.23-.08-.39-.12-.56.13-.16.24-.64.8-.78.97-.14.16-.29.18-.54.06-.25-.13-1.05-.39-2-1.23-.74-.66-1.24-1.47-1.38-1.72-.15-.25-.02-.38.11-.5.11-.11.25-.29.37-.43.13-.15.17-.25.25-.41.08-.17.04-.31-.02-.43-.06-.13-.56-1.35-.77-1.84-.2-.49-.4-.42-.56-.43h-.47c-.16 0-.43.06-.65.31-.22.25-.86.84-.86 2.05s.88 2.38 1 2.54c.12.17 1.73 2.64 4.19 3.7.59.26 1.04.41 1.4.52.59.19 1.12.16 1.55.1.47-.07 1.47-.6 1.67-1.18.21-.58.21-1.07.15-1.18-.06-.11-.22-.17-.47-.29Z"/></svg>
+              <span>Order on WhatsApp</span>
+            </button>
             <a class="featured-bogo__more" href="#deals">See all deals</a>
           </div>
         </div>
       </article>`;
+    armFeaturedBogoFx();
+  }
+
+  /* BOGO entrance FX: one-shot choreography when the card scrolls into view.
+     Transform/glow-only (never hides text), reduced-motion aware, and a 3s
+     fallback guarantees the card plays even if IntersectionObserver stalls. */
+  function armFeaturedBogoFx() {
+    const card = document.getElementById('bogo-card');
+    if (!card) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (armFeaturedBogoFx._io) { armFeaturedBogoFx._io.disconnect(); armFeaturedBogoFx._io = null; }
+    clearTimeout(armFeaturedBogoFx._t);
+    clearTimeout(armFeaturedBogoFx._s);
+    armFeaturedBogoFx._io = new IntersectionObserver((entries) => {
+      entries.forEach((en) => {
+        if (!en.isIntersecting) return;
+        playBogoIntro(en.target);
+        if (armFeaturedBogoFx._io) { armFeaturedBogoFx._io.disconnect(); armFeaturedBogoFx._io = null; }
+        clearTimeout(armFeaturedBogoFx._t);
+      });
+    }, { threshold: 0.22 });
+    armFeaturedBogoFx._io.observe(card);
+    /* fail-safe: even if the observer never fires, the show must go on */
+    armFeaturedBogoFx._t = setTimeout(() => playBogoIntro(card), 3000);
+    initBogoTilt();
+  }
+
+  /* one-shot entrance + guaranteed settle: even a renderer frozen mid-entrance
+     (background tab, throttled frames) snaps to the designed final layout */
+  function playBogoIntro(card) {
+    if (!card || card.classList.contains('bogo-in')) return;
+    card.classList.add('bogo-in');
+    clearTimeout(armFeaturedBogoFx._s);
+    armFeaturedBogoFx._s = setTimeout(() => card.classList.add('bogo-settled'), 2700);
+  }
+
+  /* mouse parallax tilt + glow trail on the BOGO card (desktop pointers only;
+     purely decorative, so it never hides or moves content harmfully) */
+  function initBogoTilt() {
+    const section = document.getElementById('featured-bogo');
+    if (!section || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!window.matchMedia('(hover: hover)').matches) return; /* touch: keep taps clean */
+    if (section._bogoTilt) return;
+    section._bogoTilt = true;
+    const target = () => section.querySelector('.featured-bogo__inner');
+    let pending = false;
+    section.addEventListener('pointermove', (e) => {
+      if (pending) return;
+      pending = true;
+      /* microtask coalescing (not rAF): rAF can stay suspended in occluded
+         tabs and would swallow every tilt update forever */
+      let ev = e;
+      Promise.resolve().then(() => {
+        pending = false;
+        const card = document.getElementById('bogo-card');
+        if (!card) return;
+        const r = card.getBoundingClientRect();
+        const nx = (ev.clientX - r.left - r.width / 2) / (r.width / 2);
+        const ny = (ev.clientY - r.top - r.height / 2) / (r.height / 2);
+        const t = target();
+        if (t) {
+          t.style.transform = `perspective(1200px) rotateX(${(ny * -3.2).toFixed(2)}deg) rotateY(${(nx * 3.2).toFixed(2)}deg)`;
+          t.style.transition = 'transform .18s ease-out';
+        }
+        card.style.setProperty('--fb-gx', `${(nx * 50 + 50).toFixed(1)}%`);
+        card.style.setProperty('--fb-gy', `${(ny * 50 + 50).toFixed(1)}%`);
+        ev = null;
+      });
+    });
+    section.addEventListener('pointerleave', () => {
+      const t = target();
+      if (t) { t.style.transform = ''; }
+      const card = document.getElementById('bogo-card');
+      if (card) { card.style.removeProperty('--fb-gx'); card.style.removeProperty('--fb-gy'); }
+    });
   }
 
   function renderMenu() {
@@ -2244,8 +2404,9 @@
     const customerAddress = addressInput ? addressInput.value.trim() : '';
     const specialNotes = notesInput ? notesInput.value.trim() : '';
 
-    if (!customerName || !customerPhone || !customerAddress) {
-      showToast('Please fill in Name, Phone, and Delivery Address', 'error');
+    const needsAddress = orderType === 'delivery';
+    if (!customerName || !customerPhone || (needsAddress && !customerAddress)) {
+      showToast(needsAddress ? 'Please fill in Name, Phone, and Delivery Address' : 'Please fill in Name and Phone', 'error');
       return;
     }
 
@@ -2290,6 +2451,8 @@
     if (orderType === 'delivery') {
       msg += `📍 *Area:* ${zone.name} · ${zone.time}\n`;
       msg += `🏠 *Address:* ${customerAddress}\n`;
+    } else if (customerAddress) {
+      msg += `🏠 *Address/Note:* ${customerAddress}\n`;
     }
     if (specialNotes) {
       msg += `📝 *Order note:* ${specialNotes}\n`;
@@ -3920,10 +4083,33 @@
     showToast('Coupon deleted');
   }
 
+  /* Homepage B1G1 banner controls (admin full control over the featured section) */
+  function saveFeaturedBogoSettings() {
+    const enabledEl = document.getElementById('featured-bogo-enabled');
+    const dealEl = document.getElementById('featured-bogo-deal');
+    settings.featuredBogoEnabled = !enabledEl || enabledEl.value !== '0';
+    settings.featuredBogoDealId = dealEl ? Number(dealEl.value) || 0 : 0;
+    saveData('settings', settings);
+    renderDeals();
+    showToast(settings.featuredBogoEnabled ? 'Homepage Buy 1 Get 1 banner saved' : 'Homepage Buy 1 Get 1 banner hidden');
+  }
+
   function renderAdminDeals() {
     const list = document.getElementById('admin-deals-list');
     if (!list) return;
     renderDealsSaveStatus();
+
+    /* keep the homepage banner controls in sync with current deals */
+    const featuredSel = document.getElementById('featured-bogo-deal');
+    if (featuredSel) {
+      const bogoDeals = deals.filter((entry) => entry.type === 'bogo');
+      const currentId = Number(settings.featuredBogoDealId) || 0;
+      featuredSel.innerHTML = '<option value="0">Auto — first active B1G1 deal</option>' +
+        bogoDeals.map((entry) => `<option value="${entry.id}">${escapeHtml(entry.title)}${entry.active === false ? ' (hidden)' : ''}</option>`).join('');
+      featuredSel.value = bogoDeals.some((entry) => entry.id === currentId) ? String(currentId) : '0';
+      const enabledEl = document.getElementById('featured-bogo-enabled');
+      if (enabledEl) enabledEl.value = settings.featuredBogoEnabled === false ? '0' : '1';
+    }
     const count = document.getElementById('admin-deal-count');
     if (count) count.textContent = `${deals.length} ${deals.length === 1 ? 'offer' : 'offers'}`;
     if (!deals.length) {
@@ -4601,6 +4787,23 @@
         <div class="flex items-center gap-2 text-xs text-gray-200 font-bold">Every <input type="number" min="3" max="30" value="${Number(heroConfig.interval) || 6}" onchange="window.LFC.setHeroConfig('interval', Number(this.value))" class="w-14 px-2 py-1 rounded-lg bg-[#0B0C10] border border-gray-800 text-white text-xs"/> sec</div></div>
       <div class="flex gap-2"><button onclick="window.LFC.addHeroSlide()" class="px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-black text-xs transition">＋ Add New Slide</button><button onclick="window.LFC.resetHeroSlides()" class="px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 text-red-300 border border-red-500/30 font-bold text-xs transition">Reset Hero</button></div></div>`;
 
+    const bbTheme = heroConfig.bbTheme === 'onyx' ? 'onyx' : 'saffron';
+    const bbColor = (k, label, def) => `<label class="flex flex-col gap-1"><span class="text-[10px] text-gray-400 font-bold uppercase tracking-wide">${label}</span><input type="color" value="${hxe(heroConfig[k] || def)}" onchange="window.LFC.setHeroConfig('${k}', this.value)" class="w-full h-8 rounded-lg bg-transparent cursor-pointer border border-gray-800"/></label>`;
+    const billboard = `<div class="p-3 sm:p-4 rounded-2xl bg-gradient-to-br from-[#2a1c08] to-[#141826] border border-amber-500/30 space-y-3">
+      <div class="flex items-center justify-between flex-wrap gap-2">
+        <div class="text-xs font-black text-amber-300 uppercase tracking-wider">🖌️ Billboard Hero Look</div>
+        <label class="flex items-center gap-2 text-xs text-gray-200 font-bold cursor-pointer"><input type="checkbox" ${heroConfig.billboardOn !== false ? 'checked' : ''} onchange="window.LFC.setHeroConfig('billboardOn', this.checked)" class="accent-amber-500 w-4 h-4"/>Enabled</label>
+      </div>
+      <p class="text-[11px] text-gray-400 leading-relaxed">Angled panel + giant dish word (left) and a saffron-yellow brand canvas. The big word follows each hero slide — set it per slide below, or leave it to use the slide's highlight line.</p>
+      <div class="grid grid-cols-2 gap-2.5">
+        <div><label class="${lbl}">Theme</label><select onchange="window.LFC.setHeroConfig('bbTheme', this.value)" class="${cls}"><option value="saffron" ${bbTheme === 'saffron' ? 'selected' : ''}>Saffron Yellow (brand)</option><option value="onyx" ${bbTheme === 'onyx' ? 'selected' : ''}>Onyx Dark</option></select></div>
+        <div><label class="${lbl}">Word size ×</label><input type="number" step="0.05" min="0.6" max="1.6" value="${Number(heroConfig.bbScale) || 1}" onchange="window.LFC.setHeroConfig('bbScale', Number(this.value))" class="${cls}"/></div>
+        ${bbColor('bbWedge', 'Panel color', '#f4e9d0')}
+        ${bbColor('bbWordColor', 'Big word color', '#8e1616')}
+        ${bbColor('bbBg1', 'Hero bg (top)', '#ffb020')}
+        ${bbColor('bbBg2', 'Hero bg (bottom)', '#ff8a00')}
+      </div></div>`;
+
     const cards = heroSlides.map((s, i) => {
       const on = s.enabled !== false;
       const isData = s.image && s.image.startsWith('data:');
@@ -4631,6 +4834,9 @@
             ${inp(i, 'badgeText', 'Top badge text', s.badgeText)}${inp(i, 'rating', 'Rating text', s.rating, '4.9 ★ (1,840+ reviews)')}
           </div>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            ${inp(i, 'bbWord', 'Big word (billboard)', s.bbWord, 'e.g. ZINGER')}
+          </div>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             ${inp(i, 'ctaText', 'Button text', s.ctaText, 'Order Now')}
             <div><label class="${lbl}">Button opens menu item</label><select onchange="window.LFC.updateHeroSlideField(${i}, 'targetDealId', this.value === '' ? null : (isNaN(Number(this.value)) ? this.value : Number(this.value)))" class="${cls}">${dealOpts(s.targetDealId)}</select></div>
           </div>
@@ -4644,7 +4850,7 @@
       </details>`;
     }).join('');
 
-    list.innerHTML = settings + cards + '<div class="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-[11px] text-amber-200 leading-relaxed">📌 Changes are saved in <b>this browser</b>. To show a new photo to <b>every visitor</b>: tap Download, then in GitHub replace <code>images/hero-N.jpg</code> with that file and commit.</div>';
+    list.innerHTML = settings + billboard + cards + '<div class="p-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-[11px] text-amber-200 leading-relaxed">📌 Changes are saved in <b>this browser</b>. To show a new photo to <b>every visitor</b>: tap Download, then in GitHub replace <code>images/hero-N.jpg</code> with that file and commit.</div>';
   }
 
   function heroRefresh(focusIdx) {
@@ -4848,7 +5054,7 @@
     if (announceEl) announceEl.value = settings.announcementText || '';
 
     const logoPreview = document.getElementById('admin-logo-preview');
-    if (logoPreview) logoPreview.src = settings.logoUrl || './images/logo.png';
+    if (logoPreview) logoPreview.src = settings.logoUrl || './images/lfc-logo.png';
   }
 
   function saveAdminSettings() {
@@ -5133,6 +5339,7 @@
     addToCart,
     addToCartById,
     orderDealById,
+    bogoCheckoutNow,
     orderMenuItemById,
     openBogoDealModal,
     closeBogoDealModal,
@@ -5240,6 +5447,7 @@
     uploadCustomLogo,
     setLogoUrlManually,
     saveAdminSettings,
+    saveFeaturedBogoSettings,
     resetAllData,
     submitReview,
     openReviewModal: () => {

@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 620 340" width="620" height="340" role="img" aria-label="LFC — Lahore Fried Chicken">
+  <defs>
+    <linearGradient id="lfcGold" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FCC24A"/>
+      <stop offset=".45" stop-color="#F5A81C"/>
+      <stop offset="1" stop-color="#E08A08"/>
+    </linearGradient>
+    <linearGradient id="lfcGoldDeep" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F7B42B"/>
+      <stop offset="1" stop-color="#D97F06"/>
+    </linearGradient>
+    <linearGradient id="lfcSheen" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#FFF7DF" stop-opacity=".85"/>
+      <stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <g fill="url(#lfcGold)" stroke="#C86F05" stroke-width="2" stroke-linejoin="round">
+    <!-- L -->
+    <path d="M38 92 h34 v128 h70 l14 22 H38 Z"/>
+    <!-- F -->
+    <path d="M178 92 h112 l12 22 h-80 v46 h66 l-2 22 h-64 v60 h72 l14 22 H178 Z" transform="translate(-6 0)"/>
+    <!-- C — thick crescent whose bowl hosts the rooster -->
+    <path d="M388 60 a104 104 0 1 0 2 208 c10 0 16 -12 9 -19 a82 82 0 1 1 -2 -170 c8 -7 1 -19 -9 -19 Z"/>
+  </g>
+
+  <!-- rooster occupying the C's opening -->
+  <g>
+    <!-- neck + breast flowing into the C bowl -->
+    <path d="M352 128 C366 96 402 78 442 84 C486 91 512 120 516 158 C520 196 500 226 468 240 C494 216 502 184 490 158 C504 168 518 166 524 158 C520 196 500 228 466 242 L452 246 C420 244 388 220 372 192 C362 174 352 150 352 128 Z" fill="url(#lfcGoldDeep)" stroke="#C86F05" stroke-width="2"/>
+    <!-- head -->
+    <circle cx="470" cy="96" r="34" fill="url(#lfcGold)" stroke="#C86F05" stroke-width="2"/>
+    <!-- comb -->
+    <path d="M436 78 C440 58 456 46 470 48 C462 54 458 62 460 70 C468 60 482 56 492 60 C484 64 480 70 482 76 C492 68 506 68 514 76 C498 78 486 84 480 92 C466 84 448 82 436 78 Z" fill="url(#lfcGold)" stroke="#C86F05" stroke-width="2"/>
+    <!-- beak -->
+    <path d="M498 96 L538 104 L502 116 C496 112 494 104 498 96 Z" fill="#E58F0A" stroke="#C86F05" stroke-width="2"/>
+    <!-- wattle -->
+    <path d="M492 120 C504 124 508 134 502 144 C494 150 482 146 478 136 C476 128 482 120 492 120 Z" fill="#E58F0A" stroke="#C86F05" stroke-width="2"/>
+    <!-- white face patch -->
+    <path d="M444 86 C456 74 478 76 488 88 C494 98 490 112 478 118 C464 122 448 116 444 104 Z" fill="#FDF6E8" stroke="#E19A18" stroke-width="1.5"/>
+    <!-- eye -->
+    <circle cx="474" cy="94" r="7.5" fill="#C86F05"/>
+    <circle cx="476" cy="92" r="3.4" fill="#2A1502"/>
+    <circle cx="478" cy="90" r="1.3" fill="#FFF3D6"/>
+  </g>
+
+  <!-- subtle sheen sweep -->
+  <g opacity=".35">
+    <path d="M52 104 h26 v104 h56 l6 8 H52 Z" fill="url(#lfcSheen)"/>
+  </g>
+</svg>
