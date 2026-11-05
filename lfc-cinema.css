@@ -1,97 +1,13 @@
-/* ═════════ LFC CINEMA — preloader / burger film / carousel / final CTA ═════════ */
+/* ═════════ LFC CINEMA — instant reveal / burger film / carousel / final CTA ═════════ */
 
-/* ─────────── 1. PRELOADER — saffron session (studio plate, v3) ─────────── */
-/* canvas: deep espresso with a warm saffron glow rising from below */
-.lfc-pre{
-  position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;overflow:hidden;
-  background:
-    radial-gradient(900px 540px at 50% 114%,rgba(255,196,48,.17),transparent 58%),
-    radial-gradient(760px 460px at 50% 34%,#181008 0%,#0d0a06 62%,#090705 100%);
-}
-/* hairline studio frame with gold corner ticks — the "plate" */
-.lfc-pre-plate{position:absolute;inset:16px;pointer-events:none;border:1px solid rgba(255,214,120,.12);z-index:2}
-.lfc-pre-plate::before,.lfc-pre-plate::after{
-  content:"";position:absolute;width:26px;height:26px;border:2px solid rgba(255,196,48,.8);pointer-events:none;
-  -webkit-mask:linear-gradient(#000 0 0) 0 0/100% 100%;transition:opacity .4s;
-}
-.lfc-pre-plate::before{top:-2px;left:-2px;border-right:0;border-bottom:0}
-.lfc-pre-plate::after{bottom:-2px;right:-2px;border-left:0;border-top:0}
-/* soft key light behind the mark comes from the canvas itself */
-/* corner captions — studio metadata */
-.lfc-pre-head{
-  position:absolute;top:34px;z-index:6;font-size:.55rem;font-weight:900;letter-spacing:.4em;text-transform:uppercase;
-  color:#93866f;pointer-events:none;animation:preFade 1.2s ease .9s both
-}
-.lfc-pre-head--l{left:38px}
-.lfc-pre-head--r{right:38px;text-align:right}
-@keyframes preFade{from{opacity:0;letter-spacing:.55em}to{opacity:1;letter-spacing:.4em}}
-/* rising embers — above the plate so they read during the splash (GSAP owns the JS-path fade) */
-.lfc-pre-embers{position:absolute;inset:0;z-index:4;pointer-events:none;overflow:hidden}
-.lfc-pre.exit .lfc-pre-embers{opacity:0;transition:opacity .5s}
-.lfc-pre-embers i{position:absolute;bottom:-10px;width:5px;height:5px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#ffe9a8,#ffb020 55%,#ff7a00);box-shadow:0 0 10px 2px rgba(255,176,32,.55);opacity:0;animation:preEmber var(--t,7s) linear infinite;animation-delay:var(--dl,0s)}
-@keyframes preEmber{
-  0%{opacity:0;transform:translate3d(0,0,0) scale(.5)}
-  14%{opacity:var(--o,.55)}
-  80%{opacity:var(--o,.55)}
-  100%{opacity:0;transform:translate3d(var(--dx,12px),-108vh,0) scale(.8)}
-}
-.lfc-pre-inner{position:relative;z-index:6;display:flex;flex-direction:column;align-items:center;gap:14px;pointer-events:none}
-.lfc-pre.exit .lfc-pre-inner{opacity:0;transform:translateY(-30px);transition:opacity .4s,transform .4s}
-/* logo with twin comet arcs sweeping counter-rotationally */
-.lfc-pre-logo-wrap{position:relative;width:clamp(150px,26vw,190px);aspect-ratio:1;display:grid;place-items:center;margin-bottom:2px}
-.lfc-pre-logo{width:clamp(96px,14vw,128px);position:relative;z-index:2;filter:drop-shadow(0 14px 42px rgba(255,122,0,.55));animation:preBreathe 2.6s ease-in-out infinite}
-@keyframes preBreathe{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
-.lfc-pre-arc{
-  position:absolute;inset:0;border-radius:50%;z-index:1;pointer-events:none;
-  border:2px solid transparent;border-top-color:#ffcf5e;border-right-color:rgba(255,176,32,.14);
-  filter:drop-shadow(0 0 8px rgba(255,196,48,.75));animation:preArcSpin 1.8s cubic-bezier(.55,.1,.4,.95) infinite;
-}
-.lfc-pre-arc--2{inset:12px;border-top-color:rgba(255,122,0,.85);border-right-color:transparent;animation-duration:2.6s;animation-direction:reverse;filter:drop-shadow(0 0 6px rgba(255,122,0,.6))}
-@keyframes preArcSpin{to{transform:rotate(360deg)}}
-/* brand wordmark — letters land one by one (JS sets --li) */
-.lfc-pre-brand{display:flex;flex-direction:column;align-items:center;gap:4px;perspective:600px}
-.lfc-pre-brand__name{
-  display:flex;font-family:'Bebas Neue',Impact,sans-serif;font-size:clamp(3rem,9vw,4.3rem);line-height:.84;letter-spacing:.1em;padding-left:.1em;
-  background:linear-gradient(180deg,#ffe9a8,#ffb020 46%,#ff7a00);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
-  filter:drop-shadow(0 6px 24px rgba(255,122,0,.42))
-}
-.lfc-pre-brand__name i{font-style:normal;display:inline-block;animation:preLetterIn .7s cubic-bezier(.34,1.56,.64,1) both;animation-delay:calc(var(--li,0)*.07s + .15s)}
-.lfc-pre-brand__sub{display:flex;font-size:.62rem;font-weight:900;letter-spacing:.38em;text-transform:uppercase;color:#c9bda9;padding-left:.38em}
-.lfc-pre-brand__sub i{font-style:normal;display:inline-block;animation:preLetterIn .55s cubic-bezier(.34,1.56,.64,1) both;animation-delay:calc(var(--li,0)*.03s + .5s)}
-@keyframes preLetterIn{
-  0%{opacity:0;transform:translateY(.65em) rotateX(-75deg)}
-  100%{opacity:1;transform:none}
-}
-/* studio progress line — hairline track, gold fill, glowing head dot */
-.lfc-pre-line{display:flex;align-items:center;gap:12px;width:clamp(220px,40vw,340px);margin-top:6px}
-.lfc-pre-min{font-size:.5rem;font-weight:900;letter-spacing:.3em;color:#8d8474;flex:0 0 auto}
-.lfc-pre-track{position:relative;flex:1 1 auto;height:3px;border-radius:99px;background:rgba(255,244,224,.09);overflow:visible;box-shadow:inset 0 1px 2px rgba(0,0,0,.6)}
-.lfc-pre-track i{
-  display:block;height:100%;width:0%;border-radius:99px;
-  background:linear-gradient(90deg,#ffe9a8,#ffb020 60%,#ff8a00);
-  box-shadow:0 0 12px rgba(255,176,32,.75);position:relative;
-  transition:width .35s cubic-bezier(.3,.7,.3,1)
-}
-.lfc-pre-track i::after{content:"";position:absolute;right:-3px;top:50%;width:7px;height:7px;margin-top:-3.5px;border-radius:50%;background:#ffe9a8;box-shadow:0 0 12px 2px rgba(255,214,120,.95)}
-.lfc-pre-pct{flex:0 0 auto;font-family:'Bebas Neue',Impact,sans-serif;font-size:1.05rem;letter-spacing:.05em;color:#ffd36b;font-variant-numeric:tabular-nums;min-width:3.2ch;text-align:right}
-.lfc-pre-text{font-size:.58rem;font-weight:900;letter-spacing:.3em;text-transform:uppercase;color:#b9ad9a;animation:preText 2s ease-in-out infinite;text-align:center;min-height:1rem;max-width:80vw}
-@keyframes preText{0%,100%{opacity:.55}50%{opacity:1}}
-/* fail-safe: never trap the user (CSS emergency fades the plate away) */
-@keyframes preFail{to{opacity:0;visibility:hidden}}
-.lfc-pre{animation:preFail .4s ease 7.5s forwards}
-.lfc-pre.done{display:none}
-body.pre-lock{overflow:hidden;height:100vh}
-/* no-GSAP graceful exit: plate lifts like a curtain */
-.lfc-pre.exit .lfc-pre-inner{opacity:0;transform:translateY(-30px);transition:opacity .4s,transform .4s}
-.lfc-pre.exit{
-  transition:transform .85s cubic-bezier(.85,0,.15,1);
-  transform:translateY(-101%);
-}
-@media(prefers-reduced-motion:reduce){
-  .lfc-pre{display:none!important;animation:none;transition:none}
-  .lfc-pre-logo,.lfc-pre-arc,.lfc-pre-text,.lfc-pre-head,.lfc-pre-brand__name i,.lfc-pre-brand__sub i,.lfc-pre-embers i{animation:none!important}
-  .lfc-pre-brand__name i,.lfc-pre-brand__sub i,.lfc-pre-head{opacity:1!important;transform:none!important}
-}
+/* ─────────── 1. SITE REVEAL — the preloader is retired ───────────
+   No splash screen: the page appears straight away and the hero intro
+   plays immediately (lfc-revealed is set on first paint by the JS).
+   A whisper-soft fade keeps first paint smooth while staying fail-visible:
+   even a frozen render can't hide the site below 60% opacity. */
+@keyframes siteIn{from{opacity:.55}to{opacity:1}}
+body{animation:siteIn .45s ease-out both}
+@media(prefers-reduced-motion:reduce){body{animation:none}}
 
 /* ─────────── 2. BURGER FILM (2.5D assembly + packaging) ─────────── */
 .fx-burger-wrap{position:absolute;inset:0;z-index:6;display:none}
@@ -522,16 +438,6 @@ footer img.brand-logo-img{
 #site-header img.brand-logo-img{height:44px!important}
 @media(max-width:639px){#site-header img.brand-logo-img{height:34px!important}}
 
-/* preloader: gold mark + travelling glow sweep */
-.lfc-pre-logo{filter:drop-shadow(0 10px 34px rgba(245,158,11,.5))}
-.lfc-pre-logo-wrap::after{
-  content:"";position:absolute;left:-18%;top:-8%;bottom:-8%;width:36%;z-index:2;pointer-events:none;transform:skewX(-18deg);
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,.5),transparent);
-  animation:preLogoSheen 2.6s ease-in-out infinite
-}
-@keyframes preLogoSheen{0%{left:-30%}60%,100%{left:112%}}
-@media(prefers-reduced-motion:reduce){.lfc-pre-logo-wrap::after{display:none}}
-
 /* film box lid: crisp gold mark instead of the washed-out png */
 .fx-burger-svg #fx-box-lid image{filter:drop-shadow(0 1px 1px rgba(0,0,0,.25))}
 
@@ -687,9 +593,8 @@ section.lfc-stats [class*="text-gray-600"]{color:var(--mu)!important}
 #branches-grid a.bg-amber-50{background:rgba(255,176,32,.14)!important;color:#fde68a!important;border-color:rgba(255,176,32,.45)!important}
 #branches-grid a.bg-amber-50:hover{background:rgba(255,176,32,.24)!important}
 
-/* final CTA scale + footer warmth */
+/* final CTA scale (footer itself is styled by §15) */
 .fx-final h2{font-size:clamp(44px,7vw,96px)!important;letter-spacing:.02em!important}
-footer{background:linear-gradient(180deg,#15110c,#0b0907)!important}
 
 /* mobile search + bottom bar */
 #mobile-search-input{background:rgba(255,255,255,.07)!important;border-color:rgba(255,176,32,.35)!important;color:var(--cream)!important}
@@ -770,12 +675,7 @@ footer{background:linear-gradient(180deg,#15110c,#0b0907)!important}
 /* card roots: inherit cream text (children keep their own overrides) */
 #reviews-grid>div,#branches-grid>div,#deals-grid .lfc-deal,#why-lfc .reveal>div{color:#e8e0d2}
 
-/* ═══════════ 8i. REVEAL GATE — hero motion waits for the preloader curtain ═══════════ */
-body.lfc-hold .fx-enter,
-body.lfc-hold .fx-word,
-body.lfc-hold .fx-badge-ico,
-body.lfc-hold .fx-scroll-cue,
-body.lfc-hold .fx-underline{animation-play-state:paused!important}
+/* ═══════════ 8i. REVEAL GATE — retired with the preloader (site reveals instantly) ═══════════ */
 
 /* ═══════════ 8j. HERO — premium presentation layer ═══════════ */
 /* price box: white card → dark glass with a gold edge */
@@ -903,7 +803,6 @@ body.lfc-hold .fx-underline{animation-play-state:paused!important}
 }
 @keyframes fxDripWob{0%,100%{transform:rotate(132deg) scale(1)}50%{transform:rotate(126deg) scale(1.08,1.05)}}
 .fx-drip--alt{width:.62em;height:.62em;animation:fxDripWob 4.4s ease-in-out infinite Alternate}
-body.lfc-hold .fx-drip{animation-play-state:paused!important}
 @media(prefers-reduced-motion:reduce){.fx-drip{animation:none}}
 
 /* callouts: blue-grey glass → warm ember glass */
@@ -1155,9 +1054,9 @@ body.lfc-bb.lfc-bb-saffron .fx-spark{color:#7a2412!important}
     animation:none!important;z-index:0;word-break:break-word;
   }
 }
-/* very short screens: preloader + hero never trap */
+/* very short screens: hero motion stays compact */
 @media(max-height:500px){
-  .lfc-pre{display:none!important}
+  .fx-hero-copy{gap:.4rem!important}
 }
 
 /* ═══════════ 12. FLUID AUTO-LAYOUT — one design, every device ═══════════
@@ -1481,4 +1380,85 @@ body.lfc-bb .fx-billboard__word{
   .sg-progress i{transition:none!important;width:100%!important}
   .sg-flip,.sg-card.is-center,.sg-arrive,.sg-arrive .sg-card__cta,
   .sg-card:not(.is-center) .sg-card__img img,#sg-next,#sg-prev{animation:none!important}
+}
+
+/* ═══════════ 15. FOOTER — giant L F C wordmark ═══════════ */
+
+/* warm espresso canvas with a saffron glow rising from below the mark */
+.lfc-footer{
+  position:relative;overflow:hidden;
+  background:
+    radial-gradient(1100px 480px at 50% 128%,rgba(255,140,0,.18),transparent 62%),
+    radial-gradient(760px 300px at 82% -12%,rgba(255,176,32,.07),transparent 60%),
+    linear-gradient(180deg,#14100b,#0a0806)!important;
+}
+/* breathing ember glow behind the wordmark (decor only, pointer-safe) */
+.ft-glow{
+  position:absolute;left:50%;bottom:-16%;width:min(94vw,920px);height:54%;
+  transform:translateX(-50%);pointer-events:none;filter:blur(8px);
+  background:radial-gradient(closest-side,rgba(255,150,10,.2),transparent 72%);
+  animation:ftGlow 5.6s ease-in-out infinite;
+}
+@keyframes ftGlow{0%,100%{opacity:.6}50%{opacity:1}}
+
+/* the mark: three monster letters, gold-gradient clipped */
+.lfc-wordmark{
+  text-align:center;
+  padding:clamp(.6rem,2.5vw,1.6rem) 0 clamp(1.2rem,4vw,2.6rem);
+}
+.ft-mark{
+  display:flex;justify-content:center;align-items:baseline;gap:.05em;
+  font-family:'Bebas Neue',Impact,sans-serif;
+  font-size:clamp(4.6rem,17.5vw,12.5rem);
+  line-height:.88;user-select:none;
+}
+.ft-ch{
+  display:inline-block;color:transparent;
+  background:linear-gradient(112deg,#ffe9a8 0%,#ffd36b 16%,#ff9a2e 38%,#ffe9a8 56%,#ffc44d 76%,#ff8a00 100%);
+  background-size:230% 100%;background-position:6% 50%;
+  -webkit-background-clip:text;background-clip:text;
+  filter:drop-shadow(0 10px 34px rgba(255,122,0,.4));
+  transform-origin:50% 82%;
+  transition:transform .35s cubic-bezier(.34,1.56,.64,1),filter .35s;
+}
+/* fallback if gradient-clip text is unsupported */
+@supports not ((-webkit-background-clip:text) or (background-clip:text)){
+  .ft-ch{color:#ffb020;background:none}
+}
+/* letters pop when touched — works because the entrance uses no forwards fill */
+.ft-ch:hover{transform:translateY(-.07em) rotate(-2.5deg) scale(1.045);filter:drop-shadow(0 16px 42px rgba(255,140,0,.62))}
+/* staggered arrival: IO adds ft-in; letters stay VISIBLE before that (fail-visible) */
+.lfc-wordmark.ft-in .ft-ch{
+  animation:
+    ftLetterIn .85s cubic-bezier(.22,1,.36,1) backwards,
+    ftSheen 7s ease-in-out 1.3s infinite;
+  animation-delay:calc(var(--i,0)*.11s),1.3s;
+}
+@keyframes ftLetterIn{
+  0%{opacity:0;transform:translateY(.42em) scale(.86)}
+  100%{opacity:1;transform:none}
+}
+/* slow gold sheen travels across the letters forever */
+@keyframes ftSheen{0%,58%,100%{background-position:6% 50%}26%{background-position:94% 50%}}
+/* spaced sub-line under the mark */
+.ft-sub{
+  margin-top:.4em;
+  font-size:clamp(.6rem,2.4vw,.85rem);font-weight:900;
+  letter-spacing:clamp(.28em,2.6vw,.62em);text-transform:uppercase;
+  color:#c9bda9;padding-left:clamp(.28em,2.6vw,.62em);
+}
+.lfc-wordmark.ft-in .ft-sub{animation:ftSubIn 1s ease-out backwards .3s}
+@keyframes ftSubIn{0%{opacity:0;letter-spacing:1em}100%{opacity:1}}
+
+/* a hairline of gold above the mark ties into the site's gold system */
+.lfc-wordmark::before{
+  content:"";display:block;width:min(300px,44vw);height:2px;margin:0 auto clamp(1rem,3.5vw,2rem);
+  border-radius:99px;background:linear-gradient(90deg,transparent,rgba(255,176,32,.65),transparent);
+}
+
+@media(prefers-reduced-motion:reduce){
+  .ft-glow{animation:none;opacity:.75}
+  .lfc-wordmark.ft-in .ft-ch{animation:none!important}
+  .lfc-wordmark.ft-in .ft-sub{animation:none}
+  .ft-ch{transition:none}
 }

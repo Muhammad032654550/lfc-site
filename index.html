@@ -722,36 +722,10 @@
   .fx-tilt{transform:none!important}
 }
 </style>
-<link rel="stylesheet" href="./lfc-cinema.css?v=19">
+<link rel="stylesheet" href="./lfc-cinema.css?v=21">
 </head>
 </head>
   <body class="bg-[#FAF8F5] text-gray-900 min-h-screen selection:bg-amber-400 selection:text-slate-950 pb-16 sm:pb-0" id="top">
-    <!-- ══ LFC preloader — saffron session, studio plate ══ -->
-    <div id="lfc-pre" class="lfc-pre" role="status" aria-label="Loading">
-      <div class="lfc-pre-plate" aria-hidden="true"></div>
-      <div class="lfc-pre-embers" aria-hidden="true"></div>
-      <div class="lfc-pre-head lfc-pre-head--l" aria-hidden="true">LFC &bull; LAHORE</div>
-      <div class="lfc-pre-head lfc-pre-head--r" aria-hidden="true">CRISPY &bull; FRESH &bull; FAST</div>
-      <div class="lfc-pre-inner">
-        <div class="lfc-pre-logo-wrap">
-          <div class="lfc-pre-arc" aria-hidden="true"></div>
-          <div class="lfc-pre-arc lfc-pre-arc--2" aria-hidden="true"></div>
-          <img src="./images/lfc-logo.png" alt="LFC logo" class="lfc-pre-logo">
-        </div>
-        <div class="lfc-pre-brand">
-          <span class="lfc-pre-brand__name"><i>L</i><i>F</i><i>C</i></span>
-          <span class="lfc-pre-brand__sub"><i>L</i><i>A</i><i>H</i><i>O</i><i>R</i><i>E</i><i>&nbsp;</i><i>F</i><i>R</i><i>I</i><i>E</i><i>D</i><i>&nbsp;</i><i>C</i><i>H</i><i>I</i><i>C</i><i>K</i><i>E</i><i>N</i></span>
-        </div>
-        <div class="lfc-pre-line">
-          <span class="lfc-pre-min" aria-hidden="true">LOADING</span>
-          <span class="lfc-pre-track" aria-hidden="true"><i></i></span>
-          <span class="lfc-pre-pct" id="lfc-pre-pct">0%</span>
-        </div>
-        <div class="lfc-pre-text">Preparing something delicious&hellip;</div>
-      </div>
-    </div>
-
-
     <!-- Scroll Progress Bar -->
     <div id="scroll-progress"></div>
 
@@ -1180,9 +1154,20 @@
       </div>
     </section>
 
-    <footer class="bg-gradient-to-b from-[#181D2D] to-[#0A0D16] border-t-2 border-amber-400/80 py-10 sm:py-12 text-xs text-gray-300">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
+    <!-- ══ LFC FOOTER — giant wordmark edition ══ -->
+    <footer id="site-footer" class="lfc-footer bg-gradient-to-b from-[#181D2D] to-[#0A0D16] border-t-2 border-amber-400/80 py-10 sm:py-12 text-xs text-gray-300">
+      <div class="ft-glow" aria-hidden="true"></div>
+
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+
+        <!-- giant L F C wordmark -->
+        <div class="lfc-wordmark" id="lfc-wordmark">
+          <div class="ft-mark" translate="no" aria-label="LFC">
+            <span class="ft-ch" style="--i:0">L</span><span class="ft-ch" style="--i:1">F</span><span class="ft-ch" style="--i:2">C</span>
+          </div>
+          <div class="ft-sub">Lahore Fried Chicken</div>
+        </div>
+
         <div class="flex flex-col md:flex-row items-center justify-between gap-6 pb-8 border-b border-gray-800/80">
           <div class="flex items-center gap-3">
             <div class="relative flex-shrink-0">
@@ -1211,7 +1196,7 @@
 
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4 pt-6 text-gray-400 text-[11px]">
           <p>© 2026 LFC (Lahore Fried Chicken). All Rights Reserved.</p>
-          
+
           <!-- Developer Credit -->
           <div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900 border border-amber-500/20 text-gray-300">
             <span class="text-amber-400 font-bold">Developer:</span>
@@ -2417,7 +2402,7 @@
   window.addEventListener('scroll',spy,{passive:true}); spy();
 })();
 </script>
-    <script type="module" src="./app.js?v=19"></script>
+    <script type="module" src="./app.js?v=21"></script>
   <!-- <script src="./cheesy.js?v=1" defer></script> (see comment above cheesy.css link) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
@@ -2733,16 +2718,15 @@
   } else {
     window.addEventListener('lfc:reveal', startIntro, false);
     setTimeout(function () {
-      /* mirrors the preloader's ultimate fail-safe (6.4s) */
+      /* fail-safe: fires even if the cinema engine never loads */
       document.body.classList.remove('lfc-hold');
       document.body.classList.add('lfc-revealed');
       startIntro();
-    }, 6400);
+    }, 2200);
   }
 })();
 </script>
 
-<script src="./lfc-cinema.js?v=19"></script>
-</body>
+<script src="./lfc-cinema.js?v=21"></script>
 </body>
 </html>

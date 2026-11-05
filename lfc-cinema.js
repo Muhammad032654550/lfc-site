@@ -1,4 +1,4 @@
-/* ═════════ LFC CINEMA ENGINE — preloader · burger film · depth carousel ═════════ */
+/* ═════════ LFC CINEMA ENGINE — instant reveal · burger film · depth carousel ═════════ */
 (function () {
   'use strict';
   var d = document;
@@ -6,24 +6,10 @@
   var big = window.innerWidth >= 1024;
   var canFilm = big && !reduceMotion && !!window.gsap;
 
-  /* ══════════════ 1. PRELOADER (honest progress + fail-safes) ══════════════ */
-  var pre = d.getElementById('lfc-pre');
-  var bar = pre && pre.querySelector('.lfc-pre-track i');
-  var pctEl = d.getElementById('lfc-pre-pct');
-  var preProgress = 0;
-  function setProgress(p) {
-    preProgress = Math.max(preProgress, Math.min(p, 95));
-    if (bar) bar.style.width = preProgress + '%';
-    if (pctEl) pctEl.textContent = Math.round(preProgress) + '%';
-  }
-
-  /* wordmark letters land one by one (--li indexes the stagger) */
-  if (pre && !reduceMotion) {
-    var preLetters = pre.querySelectorAll('.lfc-pre-brand i');
-    for (var li = 0; li < preLetters.length; li++) preLetters[li].style.setProperty('--li', li);
-  }
-
-  /* reveal gate: hero choreography starts only when the curtain opens */
+  /* ══════════════ 1. SITE REVEAL — no preloader, the site appears instantly ══════════
+     The preloader is gone by design: no splash, no scroll lock, no waiting.
+     The reveal gate (lfc-revealed) opens immediately so the hero intro and
+     film start right away — a load-in that never blocks the user. */
   var revealed = false;
   function revealSite() {
     if (revealed) return;
@@ -32,100 +18,15 @@
     d.body.classList.add('lfc-revealed');
     try { window.dispatchEvent(new CustomEvent('lfc:reveal')); } catch (e) { /* IE-safe no-op */ }
   }
-
-  /* rotating kitchen taglines (flavor text — progress stays honest) */
-  if (pre && !reduceMotion) {
-    var preTxt = pre.querySelector('.lfc-pre-text');
-    var taglines = ['Preparing something delicious\u2026', 'Firing up the fryers\u2026', 'Browning the legend\u2026', 'Plating the crunch\u2026'];
-    var tagI = 0;
-    if (preTxt) {
-      setInterval(function () {
-        if (!pre || !pre.parentNode || revealed) return;
-        tagI = (tagI + 1) % taglines.length;
-        preTxt.style.transition = 'opacity .3s';
-        preTxt.style.opacity = '0';
-        setTimeout(function () { preTxt.textContent = taglines[tagI]; preTxt.style.opacity = '1'; }, 300);
-      }, 1900);
-    }
+  function bootSite() {
+    revealSite();
+    try { startFilm(); } catch (e) { /* film is optional decor */ }
   }
-
-  /* rising gold embers inside the splash */
-  if (pre && !reduceMotion) {
-    var preEm = pre.querySelector('.lfc-pre-embers');
-    if (preEm) {
-      var emFrag = d.createDocumentFragment();
-      for (var ei = 0; ei < 14; ei++) {
-        var es = d.createElement('i');
-        es.style.left = (Math.random() * 98).toFixed(1) + '%';
-        es.style.setProperty('--t', (5 + Math.random() * 6).toFixed(1) + 's');
-        es.style.setProperty('--dl', (-Math.random() * 9).toFixed(1) + 's');
-        es.style.setProperty('--o', (0.3 + Math.random() * 0.5).toFixed(2));
-        es.style.setProperty('--dx', (Math.random() * 44 - 22).toFixed(0) + 'px');
-        emFrag.appendChild(es);
-      }
-      preEm.appendChild(emFrag);
-    }
-  }
-
-  if (pre && !reduceMotion) {
-    d.body.classList.add('pre-lock', 'lfc-hold');
-    setProgress(14);
-    var critical = ['.lfc-pre-logo', '#hero-image']
-      .map(function (sel) { return d.querySelector(sel); })
-      .filter(function (el) { return el && el.tagName === 'IMG'; });
-    var loadedCount = 0;
-    critical.forEach(function (img) {
-      var bump = function () { loadedCount++; setProgress(14 + loadedCount * 38); };
-      if (img.complete && img.naturalWidth > 0) bump();
-      else { img.addEventListener('load', bump, { once: true }); img.addEventListener('error', bump, { once: true }); }
-    });
-    d.addEventListener('DOMContentLoaded', function () { setProgress(88); });
-    var exited = false;
-    function exitPreloader() {
-      if (exited || !pre || !pre.parentNode) return;
-      exited = true;
-      window.removeEventListener('load', exitPreloader);
-      if (bar) bar.style.width = '100%';
-      if (pctEl) pctEl.textContent = '100%';
-      var go = function () {
-        if (window.gsap) {
-          /* logo shrink toward the header logo, then curtain split */
-          var headerLogo = d.querySelector('#site-header img.brand-logo-img');
-          var inner = pre.querySelector('.lfc-pre-inner');
-          var tl = gsap.timeline({ onComplete: function () { d.body.classList.remove('pre-lock'); if (pre.parentNode) pre.parentNode.removeChild(pre); } });
-          if (headerLogo) {
-            var logoEl = pre.querySelector('.lfc-pre-logo');
-            logoEl.style.animation = 'none'; /* stop breathing so GSAP owns the flight */
-            var fr = logoEl.getBoundingClientRect();
-            var toR = headerLogo.getBoundingClientRect();
-            var dx = (toR.left + toR.width / 2) - (fr.left + fr.width / 2);
-            var dy = (toR.top + toR.height / 2) - (fr.top + fr.height / 2);
-            var sc = toR.width / Math.max(1, fr.width);
-            tl.to(logoEl, { x: dx, y: dy, scale: sc, opacity: .0, duration: .8, ease: 'power3.inOut' }, .22);
-          }
-          tl.to('.lfc-pre-inner', { opacity: 0, y: -26, duration: .4, ease: 'power2.in' }, .28)
-            .to('.lfc-pre-head', { opacity: 0, duration: .3, ease: 'power1.in' }, .26)
-            .to('.lfc-pre-embers', { opacity: 0, duration: .45, ease: 'power1.in' }, .36)
-            .to(pre, { yPercent: -101, duration: .9, ease: 'power4.inOut' }, .5)
-            .add(revealSite, .66)
-            .add(startFilm, .88);
-        } else {
-          /* graceful no-GSAP exit */
-          pre.classList.add('exit');
-          d.body.classList.remove('pre-lock');
-          revealSite();
-          setTimeout(function () { if (pre.parentNode) pre.parentNode.removeChild(pre); }, 1100);
-          startFilm();
-        }
-      };
-      setTimeout(go, 620); /* minimum branded-splash time */
-    }
-    if (d.readyState === 'complete') exitPreloader();
-    else window.addEventListener('load', exitPreloader);
-    setTimeout(exitPreloader, 5200); /* fail-safe: nonessential assets stall */
-    setTimeout(function () { d.body.classList.remove('pre-lock'); revealSite(); }, 6400); /* ultimate fail-safe: motion + scroll never stay frozen */
+  if (d.readyState === 'loading') {
+    d.addEventListener('DOMContentLoaded', bootSite, { once: true });
+    setTimeout(bootSite, 800); /* fail-safe: reveal even if DOMContentLoaded hiccups */
   } else {
-    revealSite(); /* no preloader / reduced motion: reveal right away */
+    bootSite();
   }
 
   /* ══════════════ 2. SHARED STATE ══════════════ */
@@ -833,4 +734,30 @@
   /* retries until the admin menu data is present */
   setTimeout(buildSignaturePicks, 1200);
   setTimeout(buildSignaturePicks, 3200);
+
+  /* ══════════════ 15. FOOTER WORDMARK — giant L F C stagger ══════════════
+     Letters stay fully visible until the footer scrolls into view, then
+     rise one by one (no forwards fill, so hover pops keep working). */
+  function initFooterWordmark() {
+    var wm = d.getElementById('lfc-wordmark');
+    if (!wm || wm._ftInit) return;
+    wm._ftInit = true;
+    if (reduceMotion) { wm.classList.add('ft-in'); return; }
+    var done = false;
+    function go() {
+      if (done) return;
+      done = true;
+      wm.classList.add('ft-in');
+    }
+    if ('IntersectionObserver' in window) {
+      var fio = new IntersectionObserver(function (entries) {
+        for (var i = 0; i < entries.length; i++) {
+          if (entries[i].isIntersecting) { go(); fio.disconnect(); break; }
+        }
+      }, { threshold: .2 });
+      fio.observe(wm);
+    }
+    setTimeout(go, 2600); /* fail-safe: entrance never stays pending */
+  }
+  initFooterWordmark();
 })();
